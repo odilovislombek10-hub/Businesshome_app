@@ -302,7 +302,9 @@ class _HorizontalProjects extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 300,
+      // Tall enough for the card's worst case: 16:9 image, two lines of meta and the chip row
+      // wrapping onto a second line. A short card just leaves whitespace; too short clips.
+      height: 348,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -480,6 +482,20 @@ class _ServicesList extends StatelessWidget {
   const _ServicesList({required this.services});
   final List<ServiceCard> services;
 
+  /// The admin panel stores Font Awesome class names (`fas fa-key`). Map the ones actually in
+  /// use to their Material equivalents; anything new falls back to a neutral badge rather than
+  /// rendering nothing.
+  static IconData _icon(String name) => switch (name.split(' ').last) {
+        'fa-home' => Icons.home_outlined,
+        'fa-key' => Icons.vpn_key_outlined,
+        'fa-building' => Icons.apartment_outlined,
+        'fa-palette' => Icons.palette_outlined,
+        'fa-tools' => Icons.handyman_outlined,
+        'fa-bullhorn' => Icons.campaign_outlined,
+        'fa-shield' || 'shield' => Icons.verified_user_outlined,
+        _ => Icons.verified_outlined,
+      };
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -494,7 +510,7 @@ class _ServicesList extends StatelessWidget {
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 leading: CircleAvatar(
                   backgroundColor: AppColors.olive.withValues(alpha: 0.15),
-                  child: const Icon(Icons.verified_outlined, color: AppColors.olive),
+                  child: Icon(_icon(service.icon), color: AppColors.olive),
                 ),
                 title: Text(service.title, style: theme.textTheme.titleMedium),
                 subtitle: Text(service.description, style: theme.textTheme.bodySmall),
