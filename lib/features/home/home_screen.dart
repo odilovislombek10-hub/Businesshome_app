@@ -84,6 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _repo.topDesigners(),
       _repo.topMasters(),
       RegionsService.instance.regions(),
+      _repo.settings(),
     ]);
     final categories = results[2] as List<PropertyCategory>;
 
@@ -110,6 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
       topDesigners: results[10] as List<Specialist>,
       topMasters: results[11] as List<Specialist>,
       regions: results[12] as List<Region>,
+      settings: results[13] as Map<String, String>,
     );
   }
 
@@ -170,8 +172,11 @@ class _HomeScreenState extends State<HomeScreen> {
             if (data.stats != null) StatsBanner(stats: data.stats!),
             if (data.features.isNotEmpty) FeaturesSection(features: data.features),
             if (data.news.isNotEmpty) NewsSection(news: data.news),
-            const AppDownload(),
-            SiteFooter(regions: data.regions),
+            AppDownload(
+              appStoreUrl: data.settings['app_store_url'],
+              googlePlayUrl: data.settings['google_play_url'],
+            ),
+            SiteFooter(regions: data.regions, contactPhone: data.settings['contact_phone']),
           ],
         );
       },
@@ -195,6 +200,7 @@ class _HomeData {
     required this.topDesigners,
     required this.topMasters,
     required this.regions,
+    required this.settings,
   });
 
   const _HomeData.empty()
@@ -211,7 +217,8 @@ class _HomeData {
       topRent = const [],
       topDesigners = const [],
       topMasters = const [],
-      regions = const [];
+      regions = const [],
+      settings = const {};
 
   final PageContent? hero;
   final List<Project> featured;
@@ -227,4 +234,7 @@ class _HomeData {
   final List<Specialist> topDesigners;
   final List<Specialist> topMasters;
   final List<Region> regions;
+
+  /// Admin key/value pairs: `contact_phone`, `app_store_url`, `google_play_url`, …
+  final Map<String, String> settings;
 }

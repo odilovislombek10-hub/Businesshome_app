@@ -26,6 +26,24 @@ class HomeRepository {
   Future<List<DeveloperSummary>> developers() =>
       _list('/market/developers', DeveloperSummary.fromJson);
 
+  /// Admin-editable key/value settings — contact phone, store links and so on.
+  ///
+  /// Whatever the admin panel changes here shows up on the next launch, exactly as it does on the
+  /// site: the widgets read these values instead of hard-coding them.
+  Future<Map<String, String>> settings() async {
+    try {
+      final res = await _api.get<dynamic>('/market/content/settings');
+      final data = res.data;
+      if (data is! Map) return const {};
+      return {
+        for (final entry in data.entries)
+          if (entry.value != null) entry.key.toString(): entry.value.toString(),
+      };
+    } catch (_) {
+      return const {};
+    }
+  }
+
   Future<List<FeatureItem>> features() => _list('/market/content/features', FeatureItem.fromJson);
 
   Future<List<NewsItem>> news() =>
