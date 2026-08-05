@@ -41,22 +41,70 @@ class _HeroSectionState extends State<HeroSection> {
   /// `sectors` from `hero-section.component.ts`, with the Uzbek strings from `i18n/uz.ts` and the
   /// two gradient stops each tile falls back to before its image loads.
   static const _sectors = <_Sector>[
-    _Sector('Novostroykalar', 'Yangi qurilish loyihalari', '/new-projects', 'new-projects',
-        Color(0xFF999966), Color(0xFF7A7A52)),
-    _Sector('Ikkilamchi bozor', 'Tayyor uy va kvartiralar', '/secondary', 'secondary',
-        Color(0xFF0E9F6E), Color(0xFF057A55)),
-    _Sector('Ijara', "Uy, ofis va do'konlar ijarasi", '/rent', 'rent',
-        Color(0xFF0EA5E9), Color(0xFF0369A1)),
-    _Sector('Xarita', 'Mulklarni xaritada toping', '/map', 'map',
-        Color(0xFFF472A6), Color(0xFFDB2777)),
-    _Sector('Dizaynerlar', 'Interyer dizayni ustalari', '/designers', 'designers',
-        Color(0xFF8B5CF6), Color(0xFF6D28D9)),
-    _Sector('Ustalar', "Ta'mir va qurilish ustalari", '/masters', 'masters',
-        Color(0xFFF59E0B), Color(0xFFD97706)),
-    _Sector('Birja', "Buyurtmalar va ish e'lonlari", '/birja', 'birja',
-        Color(0xFF475569), Color(0xFF1E293B)),
-    _Sector('Jurnal', 'Yangiliklar va tahlillar', '/news', 'news',
-        Color(0xFF06B6D4), Color(0xFF0E7490)),
+    _Sector(
+      'Novostroykalar',
+      'Yangi qurilish loyihalari',
+      '/new-projects',
+      'new-projects',
+      Color(0xFF999966),
+      Color(0xFF7A7A52),
+    ),
+    _Sector(
+      'Ikkilamchi bozor',
+      'Tayyor uy va kvartiralar',
+      '/secondary',
+      'secondary',
+      Color(0xFF0E9F6E),
+      Color(0xFF057A55),
+    ),
+    _Sector(
+      'Ijara',
+      "Uy, ofis va do'konlar ijarasi",
+      '/rent',
+      'rent',
+      Color(0xFF0EA5E9),
+      Color(0xFF0369A1),
+    ),
+    _Sector(
+      'Xarita',
+      'Mulklarni xaritada toping',
+      '/map',
+      'map',
+      Color(0xFFF472A6),
+      Color(0xFFDB2777),
+    ),
+    _Sector(
+      'Dizaynerlar',
+      'Interyer dizayni ustalari',
+      '/designers',
+      'designers',
+      Color(0xFF8B5CF6),
+      Color(0xFF6D28D9),
+    ),
+    _Sector(
+      'Ustalar',
+      "Ta'mir va qurilish ustalari",
+      '/masters',
+      'masters',
+      Color(0xFFF59E0B),
+      Color(0xFFD97706),
+    ),
+    _Sector(
+      'Birja',
+      "Buyurtmalar va ish e'lonlari",
+      '/birja',
+      'birja',
+      Color(0xFF475569),
+      Color(0xFF1E293B),
+    ),
+    _Sector(
+      'Jurnal',
+      'Yangiliklar va tahlillar',
+      '/news',
+      'news',
+      Color(0xFF06B6D4),
+      Color(0xFF0E7490),
+    ),
   ];
 
   @override
@@ -148,9 +196,7 @@ class _HeroSectionState extends State<HeroSection> {
                   crossAxisCount: 2,
                   mainAxisSpacing: 12,
                   crossAxisSpacing: 12,
-                  children: [
-                    for (final sector in _sectors) _SectorTile(sector: sector),
-                  ],
+                  children: [for (final sector in _sectors) _SectorTile(sector: sector)],
                 ),
                 const SizedBox(height: 48),
                 Wrap(
@@ -172,8 +218,9 @@ class _HeroSectionState extends State<HeroSection> {
                           ),
                           Text(
                             stat.label,
-                            style: theme.textTheme.bodyMedium
-                                ?.copyWith(color: AppColors.cream.withValues(alpha: 0.6)),
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: AppColors.cream.withValues(alpha: 0.6),
+                            ),
                           ),
                         ],
                       ),
@@ -207,9 +254,7 @@ class _SectorTile extends StatelessWidget {
   final _Sector sector;
 
   /// `drop-shadow-sm` — what keeps the caption legible where a tile's photo is bright.
-  static const _textShadow = [
-    Shadow(color: Colors.black54, blurRadius: 4, offset: Offset(0, 1)),
-  ];
+  static const _textShadow = [Shadow(color: Colors.black54, blurRadius: 4, offset: Offset(0, 1))];
 
   @override
   Widget build(BuildContext context) {

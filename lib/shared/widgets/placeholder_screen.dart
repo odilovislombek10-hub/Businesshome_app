@@ -29,11 +29,7 @@ class PlaceholderScreen extends StatelessWidget {
               Text('Tayyorlanmoqda', style: theme.textTheme.titleMedium),
               if (note != null) ...[
                 const SizedBox(height: 8),
-                Text(
-                  note!,
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodySmall,
-                ),
+                Text(note!, textAlign: TextAlign.center, style: theme.textTheme.bodySmall),
               ],
             ],
           ),

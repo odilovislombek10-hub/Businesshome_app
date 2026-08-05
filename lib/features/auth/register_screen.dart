@@ -80,11 +80,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Future<void> _sendCode() async {
     if (!_phoneFormKey.currentState!.validate()) return;
     await _run(() async {
-      await _auth.sendOtp(
-        phone: normalizePhone(_phone.text),
-        purpose: 'register',
-        role: _role,
-      );
+      await _auth.sendOtp(phone: normalizePhone(_phone.text), purpose: 'register', role: _role);
       if (mounted) setState(() => _codeSent = true);
     });
   }
@@ -142,9 +138,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               const SizedBox(height: 16),
               FilledButton(
                 onPressed: _busy ? null : _sendCode,
-                child: _busy
-                    ? const _Spinner()
-                    : const Text('Kod yuborish'),
+                child: _busy ? const _Spinner() : const Text('Kod yuborish'),
               ),
             ] else ...[
               Form(
@@ -192,17 +186,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       initialValue: _region,
                       decoration: const InputDecoration(labelText: 'Viloyat'),
                       items: [
-                        for (final r in _regions)
-                          DropdownMenuItem(value: r, child: Text(r.label)),
+                        for (final r in _regions) DropdownMenuItem(value: r, child: Text(r.label)),
                       ],
                       onChanged: _busy
                           ? null
                           : (r) => setState(() {
-                                _region = r;
-                                // Districts belong to a region — a stale one would be sent with
-                                // the wrong parent.
-                                _district = null;
-                              }),
+                              _region = r;
+                              // Districts belong to a region — a stale one would be sent with
+                              // the wrong parent.
+                              _district = null;
+                            }),
                     ),
                     if (_region != null && _region!.districts.isNotEmpty) ...[
                       const SizedBox(height: 16),
@@ -253,9 +246,6 @@ class _Spinner extends StatelessWidget {
   const _Spinner();
 
   @override
-  Widget build(BuildContext context) => const SizedBox(
-        width: 20,
-        height: 20,
-        child: CircularProgressIndicator(strokeWidth: 2),
-      );
+  Widget build(BuildContext context) =>
+      const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2));
 }

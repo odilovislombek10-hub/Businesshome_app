@@ -42,7 +42,10 @@ final appRouter = GoRouter(
         note: 'Saytdagi Leaflet xaritasi — mulklarni xarita ustidan qidirish.',
       ),
     ),
-    GoRoute(path: '/rent', builder: (_, _) => const PlaceholderScreen(title: 'Ijara')),
+    GoRoute(
+      path: '/rent',
+      builder: (_, _) => const PlaceholderScreen(title: 'Ijara'),
+    ),
     GoRoute(
       path: '/property/rent/:id',
       builder: (_, _) => const PlaceholderScreen(title: 'Ijara mulk'),
@@ -56,17 +59,29 @@ final appRouter = GoRouter(
       builder: (_, _) => const PlaceholderScreen(title: 'Ikkilamchi mulk'),
     ),
     GoRoute(path: '/new-projects', builder: (_, _) => const NewProjectsScreen()),
-    GoRoute(path: '/property/:id', builder: (_, _) => const PlaceholderScreen(title: 'Mulk')),
-    GoRoute(path: '/my-home', builder: (_, _) => const PlaceholderScreen(title: 'Mening uyim')),
+    GoRoute(
+      path: '/property/:id',
+      builder: (_, _) => const PlaceholderScreen(title: 'Mulk'),
+    ),
+    GoRoute(
+      path: '/my-home',
+      builder: (_, _) => const PlaceholderScreen(title: 'Mening uyim'),
+    ),
 
     // ── Reels ─────────────────────────────────────────────────────────────────
     // `/reels/create` before `/reels/:id`, otherwise "create" is read as an id.
-    GoRoute(path: '/reels', builder: (_, _) => const PlaceholderScreen(title: 'Reels')),
+    GoRoute(
+      path: '/reels',
+      builder: (_, _) => const PlaceholderScreen(title: 'Reels'),
+    ),
     GoRoute(
       path: '/reels/create',
       builder: (_, _) => const PlaceholderScreen(title: 'Reel yaratish'),
     ),
-    GoRoute(path: '/reels/:id', builder: (_, _) => const PlaceholderScreen(title: 'Reels')),
+    GoRoute(
+      path: '/reels/:id',
+      builder: (_, _) => const PlaceholderScreen(title: 'Reels'),
+    ),
 
     // ── Cabinet ───────────────────────────────────────────────────────────────
     GoRoute(
@@ -83,10 +98,16 @@ final appRouter = GoRouter(
       path: '/cabinet-preview',
       builder: (_, _) => const PlaceholderScreen(title: 'Cabinet Preview'),
     ),
-    GoRoute(path: '/chat/:id', builder: (_, _) => const PlaceholderScreen(title: 'Suhbat')),
+    GoRoute(
+      path: '/chat/:id',
+      builder: (_, _) => const PlaceholderScreen(title: 'Suhbat'),
+    ),
 
     // ── Listings & specialists ────────────────────────────────────────────────
-    GoRoute(path: '/ads', builder: (_, _) => const PlaceholderScreen(title: "E'lonlar")),
+    GoRoute(
+      path: '/ads',
+      builder: (_, _) => const PlaceholderScreen(title: "E'lonlar"),
+    ),
     GoRoute(
       path: '/ads/create',
       builder: (_, _) => const PlaceholderScreen(title: "E'lon yaratish"),
@@ -95,11 +116,26 @@ final appRouter = GoRouter(
       path: '/ads/:id/edit',
       builder: (_, _) => const PlaceholderScreen(title: "E'lonni tahrirlash"),
     ),
-    GoRoute(path: '/agent/:id', builder: (_, _) => const PlaceholderScreen(title: 'Agent')),
-    GoRoute(path: '/designers', builder: (_, _) => const PlaceholderScreen(title: 'Dizaynerlar')),
-    GoRoute(path: '/designers/:id', builder: (_, _) => const PlaceholderScreen(title: 'Dizayner')),
-    GoRoute(path: '/masters', builder: (_, _) => const PlaceholderScreen(title: 'Ustalar')),
-    GoRoute(path: '/masters/:id', builder: (_, _) => const PlaceholderScreen(title: 'Usta')),
+    GoRoute(
+      path: '/agent/:id',
+      builder: (_, _) => const PlaceholderScreen(title: 'Agent'),
+    ),
+    GoRoute(
+      path: '/designers',
+      builder: (_, _) => const PlaceholderScreen(title: 'Dizaynerlar'),
+    ),
+    GoRoute(
+      path: '/designers/:id',
+      builder: (_, _) => const PlaceholderScreen(title: 'Dizayner'),
+    ),
+    GoRoute(
+      path: '/masters',
+      builder: (_, _) => const PlaceholderScreen(title: 'Ustalar'),
+    ),
+    GoRoute(
+      path: '/masters/:id',
+      builder: (_, _) => const PlaceholderScreen(title: 'Usta'),
+    ),
     GoRoute(
       path: '/specialists/create',
       builder: (_, _) => const PlaceholderScreen(title: 'Mutaxassis yaratish'),
@@ -113,8 +149,14 @@ final appRouter = GoRouter(
     ),
 
     // ── Content ───────────────────────────────────────────────────────────────
-    GoRoute(path: '/news', builder: (_, _) => const PlaceholderScreen(title: 'Yangiliklar')),
-    GoRoute(path: '/news/:id', builder: (_, _) => const PlaceholderScreen(title: 'Yangilik')),
+    GoRoute(
+      path: '/news',
+      builder: (_, _) => const PlaceholderScreen(title: 'Yangiliklar'),
+    ),
+    GoRoute(
+      path: '/news/:id',
+      builder: (_, _) => const PlaceholderScreen(title: 'Yangilik'),
+    ),
     GoRoute(
       path: '/privacy',
       builder: (_, _) => const PlaceholderScreen(title: 'Maxfiylik siyosati'),
@@ -133,8 +175,6 @@ final appRouter = GoRouter(
       ),
     ),
   ],
-  errorBuilder: (_, state) => PlaceholderScreen(
-    title: 'Sahifa topilmadi',
-    note: state.uri.toString(),
-  ),
+  errorBuilder: (_, state) =>
+      PlaceholderScreen(title: 'Sahifa topilmadi', note: state.uri.toString()),
 );

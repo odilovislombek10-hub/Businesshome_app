@@ -11,14 +11,12 @@ import '../../core/models/project.dart';
 class HomeRepository {
   final _api = ApiClient.instance;
 
-  Future<List<HeroSlide>> heroSlides() =>
-      _list('/market/homepage/hero-slides', HeroSlide.fromJson);
+  Future<List<HeroSlide>> heroSlides() => _list('/market/homepage/hero-slides', HeroSlide.fromJson);
 
   Future<List<PropertyCategory>> categories() =>
       _list('/market/homepage/categories', PropertyCategory.fromJson);
 
-  Future<List<ServiceCard>> services() =>
-      _list('/market/homepage/services', ServiceCard.fromJson);
+  Future<List<ServiceCard>> services() => _list('/market/homepage/services', ServiceCard.fromJson);
 
   Future<List<PromoBanner>> promoBanners() =>
       _list('/market/homepage/promo-banners', PromoBanner.fromJson);

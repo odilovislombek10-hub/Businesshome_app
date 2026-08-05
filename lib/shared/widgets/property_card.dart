@@ -1,0 +1,375 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../app/theme.dart';
+import '../../core/services/currency_service.dart';
+import '../models/property_view.dart';
+
+/// Port of the site's `app-property-card`.
+///
+/// A 3:4 photo with everything laid over it (`rounded-xl`, `from-dark via-dark/40 to-transparent`
+/// scrim): badges and the favourite button along the top, then title, developer, location, the
+/// stats row, the price and a full-width "Batafsil" bar along the bottom.
+///
+/// With several photos the site splits the card into equal zones and swaps image on hover/touch;
+/// here each zone is a tap target doing the same.
+class PropertyCard extends StatefulWidget {
+  const PropertyCard({super.key, required this.property, this.onFavorite, this.isFavorite = false});
+
+  final PropertyView property;
+  final VoidCallback? onFavorite;
+  final bool isFavorite;
+
+  @override
+  State<PropertyCard> createState() => _PropertyCardState();
+}
+
+class _PropertyCardState extends State<PropertyCard> {
+  int _active = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final property = widget.property;
+    final images = property.images;
+
+    return GestureDetector(
+      onTap: () => context.go(property.detailPath),
+      child: AspectRatio(
+        aspectRatio: 3 / 4,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(AppRadius.md), // rounded-xl
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              for (var i = 0; i < images.length; i++)
+                AnimatedOpacity(
+                  opacity: _active == i ? 1 : 0,
+                  duration: const Duration(milliseconds: 500),
+                  child: CachedNetworkImage(
+                    imageUrl: images[i],
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: double.infinity,
+                    placeholder: (_, _) => const ColoredBox(color: AppColors.oliveMuted),
+                    errorWidget: (_, _, _) => const ColoredBox(color: AppColors.oliveMuted),
+                  ),
+                ),
+
+              // Equal-width zones that switch image, mirroring the site's hover strips.
+              if (images.length > 1)
+                Row(
+                  children: [
+                    for (var i = 0; i < images.length; i++)
+                      Expanded(
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.translucent,
+                          onTapDown: (_) => setState(() => _active = i),
+                        ),
+                      ),
+                  ],
+                ),
+
+              const DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                    colors: [AppColors.dark, Color(0x663D3D3D), Colors.transparent],
+                  ),
+                ),
+              ),
+
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Leave room on the right for the favourite button (`pr-12` on the site).
+                    Padding(
+                      padding: const EdgeInsets.only(right: 48),
+                      child: Wrap(spacing: 8, runSpacing: 8, children: _badges(context, property)),
+                    ),
+                    _Info(property: property),
+                  ],
+                ),
+              ),
+
+              Positioned(
+                top: 16,
+                right: 16,
+                child: _FavoriteButton(isFavorite: widget.isFavorite, onPressed: widget.onFavorite),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  List<Widget> _badges(BuildContext context, PropertyView property) => [
+    if (property.isTop)
+      const _Badge(
+        label: 'TOP',
+        background: Color(0xFFF59E0B), // amber-500
+        icon: Icons.star,
+      ),
+    if (property.segmentLabel case final segment?)
+      _Badge(label: segment, background: AppColors.olive),
+    if (property.hasTour)
+      _Badge(
+        label: '3D',
+        background: AppColors.dark.withValues(alpha: 0.7),
+        icon: Icons.view_in_ar_outlined,
+      ),
+    if (property.tier == 'ultra')
+      const _Badge(label: 'Ultra', background: Color(0xFFF59E0B), icon: Icons.workspace_premium)
+    else if (property.tier == 'pro' || property.verified)
+      const _Badge(
+        label: 'Pro',
+        background: Color(0xFF2563EB), // blue-600
+        icon: Icons.check,
+      ),
+    if (property.completion case final completion?)
+      _Badge(label: 'Topshirish: $completion', background: AppColors.olive.withValues(alpha: 0.8)),
+  ];
+}
+
+class _Badge extends StatelessWidget {
+  const _Badge({required this.label, required this.background, this.icon});
+
+  final String label;
+  final Color background;
+  final IconData? icon;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(AppRadius.pill),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null) ...[
+            Icon(icon, size: 12, color: Colors.white),
+            const SizedBox(width: 4),
+          ],
+          Text(
+            label,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FavoriteButton extends StatelessWidget {
+  const _FavoriteButton({required this.isFavorite, this.onPressed});
+
+  final bool isFavorite;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        width: 36,
+        height: 36,
+        decoration: BoxDecoration(
+          color: isFavorite ? AppColors.olive : Colors.white.withValues(alpha: 0.9),
+          shape: BoxShape.circle,
+          boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 2))],
+        ),
+        child: Icon(
+          isFavorite ? Icons.favorite : Icons.favorite_border,
+          size: 16,
+          color: isFavorite ? AppColors.cream : AppColors.dark.withValues(alpha: 0.6),
+        ),
+      ),
+    );
+  }
+}
+
+class _Info extends StatelessWidget {
+  const _Info({required this.property});
+
+  final PropertyView property;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final currency = CurrencyService.instance;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            if (property.projectLogo case final logo?) ...[
+              ClipRRect(
+                borderRadius: BorderRadius.circular(AppRadius.sm),
+                child: CachedNetworkImage(imageUrl: logo, width: 32, height: 32, fit: BoxFit.cover),
+              ),
+              const SizedBox(width: 8),
+            ],
+            Expanded(
+              child: Text(
+                property.name,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.cream,
+                  height: 1.15,
+                ),
+              ),
+            ),
+          ],
+        ),
+        if (property.developer case final developer?) ...[
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              if (property.developerLogo case final logo?) ...[
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: CachedNetworkImage(
+                    imageUrl: logo,
+                    width: 16,
+                    height: 16,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                const SizedBox(width: 6),
+              ],
+              Expanded(
+                child: Text(
+                  developer,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: _shadowed(theme.textTheme.bodyMedium, Colors.white),
+                ),
+              ),
+            ],
+          ),
+        ],
+        if (property.location.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Icon(Icons.place_outlined, size: 14, color: AppColors.cream.withValues(alpha: 0.7)),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  property.location,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: AppColors.cream.withValues(alpha: 0.7),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+        if (_stats.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 12,
+            runSpacing: 4,
+            children: [
+              for (final (icon, label) in _stats)
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(icon, size: 14, color: Colors.white),
+                    const SizedBox(width: 4),
+                    Text(label, style: _shadowed(theme.textTheme.labelSmall, Colors.white)),
+                  ],
+                ),
+            ],
+          ),
+        ],
+        if (_price(currency) case final price?) ...[
+          const SizedBox(height: 8),
+          Text(
+            price,
+            style: _shadowed(
+              theme.textTheme.titleLarge?.copyWith(fontSize: 18, fontWeight: FontWeight.w700),
+              Colors.white,
+            ),
+          ),
+        ],
+        if (property.payment case final payment?) ...[
+          const SizedBox(height: 8),
+          _Badge(
+            label: "Boshlang'ich to'lov (%): $payment",
+            background: AppColors.olive.withValues(alpha: 0.8),
+          ),
+        ],
+        const SizedBox(height: 8),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            color: AppColors.cream,
+            borderRadius: BorderRadius.circular(AppRadius.md),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Batafsil',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: AppColors.olive,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Icon(Icons.arrow_forward, size: 16, color: AppColors.olive),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// The stats row, in the site's order: apartments, area, blocks, rooms, floors.
+  List<(IconData, String)> get _stats => [
+    if (property.totalApartments case final value?) (Icons.home_outlined, '$value'),
+    if (property.totalArea case final value?) (Icons.straighten, '${value.toStringAsFixed(0)} m²'),
+    if (property.totalBlocks case final value?) (Icons.apartment_outlined, '$value blok'),
+    if (property.rooms case final value?) (Icons.meeting_room_outlined, '$value xona'),
+    if (property.totalFloors case final value?) (Icons.layers_outlined, '$value qavat'),
+  ];
+
+  /// Price per m² wins over the total, which wins over a plain price — the site's order.
+  String? _price(CurrencyService currency) {
+    if (property.minPricePerM2 case final value?) {
+      return '1m²: ${currency.formatWithSymbol(value)}';
+    }
+    if (property.minPrice case final value?) return currency.formatWithSymbol(value);
+    if (property.price case final value?) return currency.formatWithSymbol(value);
+    return null;
+  }
+
+  /// `drop-shadow-sm` — the site relies on it to keep light text readable over a photo.
+  TextStyle? _shadowed(TextStyle? style, Color color) => style?.copyWith(
+    color: color,
+    fontWeight: FontWeight.w500,
+    shadows: const [Shadow(color: Colors.black54, blurRadius: 4, offset: Offset(0, 1))],
+  );
+}

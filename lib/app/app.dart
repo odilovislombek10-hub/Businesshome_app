@@ -7,11 +7,7 @@ import 'router.dart';
 import 'theme.dart';
 
 class BusinessHomeApp extends StatelessWidget {
-  const BusinessHomeApp({
-    super.key,
-    required this.themeController,
-    required this.authService,
-  });
+  const BusinessHomeApp({super.key, required this.themeController, required this.authService});
 
   final ThemeController themeController;
   final AuthService authService;

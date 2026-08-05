@@ -10,14 +10,15 @@ class Region {
   final List<District> districts;
 
   factory Region.fromJson(Map<String, dynamic> json) => Region(
-        value: json['value']?.toString() ?? '',
-        label: json['label']?.toString() ?? '',
-        districts: (json['districts'] as List?)
-                ?.whereType<Map<String, dynamic>>()
-                .map(District.fromJson)
-                .toList() ??
-            const [],
-      );
+    value: json['value']?.toString() ?? '',
+    label: json['label']?.toString() ?? '',
+    districts:
+        (json['districts'] as List?)
+            ?.whereType<Map<String, dynamic>>()
+            .map(District.fromJson)
+            .toList() ??
+        const [],
+  );
 }
 
 class District {
@@ -26,8 +27,6 @@ class District {
   final String value;
   final String label;
 
-  factory District.fromJson(Map<String, dynamic> json) => District(
-        value: json['value']?.toString() ?? '',
-        label: json['label']?.toString() ?? '',
-      );
+  factory District.fromJson(Map<String, dynamic> json) =>
+      District(value: json['value']?.toString() ?? '', label: json['label']?.toString() ?? '');
 }

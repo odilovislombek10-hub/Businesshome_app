@@ -54,11 +54,10 @@ class AuthService extends ChangeNotifier {
     required String password,
     MarketRole? role,
   }) async {
-    final res = await _api.post<dynamic>('$_base/login', data: {
-      'phone': phone,
-      'password': password,
-      if (role != null) 'role': role.wire,
-    });
+    final res = await _api.post<dynamic>(
+      '$_base/login',
+      data: {'phone': phone, 'password': password, if (role != null) 'role': role.wire},
+    );
     return _acceptAuth(res);
   }
 
@@ -85,11 +84,10 @@ class AuthService extends ChangeNotifier {
     String purpose = 'register',
     MarketRole? role,
   }) async {
-    final res = await _api.post<dynamic>('$_base/send-otp', data: {
-      'phone': phone,
-      'purpose': purpose,
-      if (role != null) 'role': role.wire,
-    });
+    final res = await _api.post<dynamic>(
+      '$_base/send-otp',
+      data: {'phone': phone, 'purpose': purpose, if (role != null) 'role': role.wire},
+    );
     _ok(res);
   }
 
@@ -107,10 +105,7 @@ class AuthService extends ChangeNotifier {
 
   /// Sign in with an SMS code instead of a password.
   Future<MarketUser> loginWithOtp({required String phone, required String code}) async {
-    final res = await _api.post<dynamic>(
-      '$_base/login-otp',
-      data: {'phone': phone, 'code': code},
-    );
+    final res = await _api.post<dynamic>('$_base/login-otp', data: {'phone': phone, 'code': code});
     return _acceptAuth(res);
   }
 
@@ -124,15 +119,18 @@ class AuthService extends ChangeNotifier {
     String? district,
     MarketRole role = MarketRole.user,
   }) async {
-    final res = await _api.post<dynamic>('$_base/register', data: {
-      'phone': phone,
-      'code': code,
-      'full_name': fullName,
-      'role': role.wire,
-      if (password != null && password.isNotEmpty) 'password': password,
-      'region': ?region,
-      'district': ?district,
-    });
+    final res = await _api.post<dynamic>(
+      '$_base/register',
+      data: {
+        'phone': phone,
+        'code': code,
+        'full_name': fullName,
+        'role': role.wire,
+        if (password != null && password.isNotEmpty) 'password': password,
+        'region': ?region,
+        'district': ?district,
+      },
+    );
     return _acceptAuth(res);
   }
 

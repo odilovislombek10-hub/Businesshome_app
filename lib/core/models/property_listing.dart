@@ -61,40 +61,40 @@ class PropertyListing {
   String? get thumbnail => images.isEmpty ? null : images.first;
 
   /// Human-readable location, skipping the parts the backend left empty.
-  String get locationLabel => [district, city]
-      .where((s) => s != null && s.trim().isNotEmpty)
-      .map((s) => s!.trim())
-      .join(', ');
+  String get locationLabel => [
+    district,
+    city,
+  ].where((s) => s != null && s.trim().isNotEmpty).map((s) => s!.trim()).join(', ');
 
   factory PropertyListing.fromJson(Map<String, dynamic> json) => PropertyListing(
-        id: (json['id'] as num?)?.toInt() ?? 0,
-        title: json['title']?.toString() ?? '',
-        type: json['type']?.toString(),
-        price: json['price'] as num?,
-        currency: json['currency']?.toString(),
-        rooms: (json['rooms'] as num?)?.toInt(),
-        bathrooms: (json['bathrooms'] as num?)?.toInt(),
-        area: (json['area'] as num?)?.toDouble(),
-        landArea: (json['landArea'] as num?)?.toDouble(),
-        floor: (json['floor'] as num?)?.toInt(),
-        totalFloors: (json['totalFloors'] as num?)?.toInt(),
-        city: json['city']?.toString(),
-        district: json['district']?.toString(),
-        address: json['address']?.toString(),
-        lat: (json['lat'] as num?)?.toDouble(),
-        lng: (json['lng'] as num?)?.toDouble(),
-        images: (json['images'] as List?)?.whereType<String>().toList() ?? const [],
-        description: json['description']?.toString(),
-        amenities: (json['amenities'] as List?)?.whereType<String>().toList() ?? const [],
-        status: json['status']?.toString(),
-        hasVirtualTour: json['hasVirtualTour'] == true,
-        videoUrl: json['videoUrl']?.toString(),
-        videoThumbnail: json['videoThumbnail']?.toString(),
-        owner: json['owner'] is Map<String, dynamic>
-            ? ListingOwner.fromJson(json['owner'] as Map<String, dynamic>)
-            : null,
-        createdAt: DateTime.tryParse(json['createdAt']?.toString() ?? ''),
-      );
+    id: (json['id'] as num?)?.toInt() ?? 0,
+    title: json['title']?.toString() ?? '',
+    type: json['type']?.toString(),
+    price: json['price'] as num?,
+    currency: json['currency']?.toString(),
+    rooms: (json['rooms'] as num?)?.toInt(),
+    bathrooms: (json['bathrooms'] as num?)?.toInt(),
+    area: (json['area'] as num?)?.toDouble(),
+    landArea: (json['landArea'] as num?)?.toDouble(),
+    floor: (json['floor'] as num?)?.toInt(),
+    totalFloors: (json['totalFloors'] as num?)?.toInt(),
+    city: json['city']?.toString(),
+    district: json['district']?.toString(),
+    address: json['address']?.toString(),
+    lat: (json['lat'] as num?)?.toDouble(),
+    lng: (json['lng'] as num?)?.toDouble(),
+    images: (json['images'] as List?)?.whereType<String>().toList() ?? const [],
+    description: json['description']?.toString(),
+    amenities: (json['amenities'] as List?)?.whereType<String>().toList() ?? const [],
+    status: json['status']?.toString(),
+    hasVirtualTour: json['hasVirtualTour'] == true,
+    videoUrl: json['videoUrl']?.toString(),
+    videoThumbnail: json['videoThumbnail']?.toString(),
+    owner: json['owner'] is Map<String, dynamic>
+        ? ListingOwner.fromJson(json['owner'] as Map<String, dynamic>)
+        : null,
+    createdAt: DateTime.tryParse(json['createdAt']?.toString() ?? ''),
+  );
 }
 
 class ListingOwner {
@@ -108,22 +108,23 @@ class ListingOwner {
   final String? type;
 
   factory ListingOwner.fromJson(Map<String, dynamic> json) => ListingOwner(
-        name: json['name']?.toString(),
-        phone: json['phone']?.toString(),
-        avatar: json['avatar']?.toString(),
-        type: json['type']?.toString(),
-      );
+    name: json['name']?.toString(),
+    phone: json['phone']?.toString(),
+    avatar: json['avatar']?.toString(),
+    type: json['type']?.toString(),
+  );
 }
 
 /// The `{items, total, page, pages}` envelope the listing endpoints return.
 class Paginated<T> {
-  const Paginated({required this.items, required this.total, required this.page, required this.pages});
+  const Paginated({
+    required this.items,
+    required this.total,
+    required this.page,
+    required this.pages,
+  });
 
-  const Paginated.empty()
-      : items = const [],
-        total = 0,
-        page = 1,
-        pages = 1;
+  const Paginated.empty() : items = const [], total = 0, page = 1, pages = 1;
 
   final List<T> items;
   final int total;
@@ -132,12 +133,10 @@ class Paginated<T> {
 
   bool get hasMore => page < pages;
 
-  factory Paginated.fromJson(
-    Map<String, dynamic> json,
-    T Function(Map<String, dynamic>) parse,
-  ) =>
+  factory Paginated.fromJson(Map<String, dynamic> json, T Function(Map<String, dynamic>) parse) =>
       Paginated(
-        items: (json['items'] as List?)?.whereType<Map<String, dynamic>>().map(parse).toList() ??
+        items:
+            (json['items'] as List?)?.whereType<Map<String, dynamic>>().map(parse).toList() ??
             const [],
         total: (json['total'] as num?)?.toInt() ?? 0,
         page: (json['page'] as num?)?.toInt() ?? 1,

@@ -57,33 +57,33 @@ class Project {
   });
 
   factory Project.fromJson(Map<String, dynamic> json) => Project(
-        id: json['id'] as int,
-        name: (json['name'] ?? '') as String,
-        slug: (json['slug'] ?? '') as String,
-        address: json['address'] as String?,
-        city: json['city'] as String?,
-        region: json['region'] as String?,
-        district: json['district'] as String?,
-        description: json['description'] as String?,
-        coverImage: json['cover_image'] as String?,
-        cardImage: json['card_image'] as String?,
-        cardImages: (json['card_images'] as List?)?.whereType<String>().toList() ?? const [],
-        cardSubtitle: json['card_subtitle'] as String?,
-        projectLogo: json['project_logo'] as String?,
-        status: json['status'] as String?,
-        startDate: json['start_date'] as String?,
-        endDate: json['end_date'] as String?,
-        totalArea: (json['total_area'] as num?)?.toDouble(),
-        totalBlocks: json['total_blocks'] as int?,
-        totalApartments: json['total_apartments'] as int?,
-        minPrice: json['min_price'] as num?,
-        latitude: (json['latitude'] as num?)?.toDouble(),
-        longitude: (json['longitude'] as num?)?.toDouble(),
-        isTop: (json['is_top'] as bool?) ?? false,
-        developer: json['developer'] is Map<String, dynamic>
-            ? Developer.fromJson(json['developer'] as Map<String, dynamic>)
-            : null,
-      );
+    id: json['id'] as int,
+    name: (json['name'] ?? '') as String,
+    slug: (json['slug'] ?? '') as String,
+    address: json['address'] as String?,
+    city: json['city'] as String?,
+    region: json['region'] as String?,
+    district: json['district'] as String?,
+    description: json['description'] as String?,
+    coverImage: json['cover_image'] as String?,
+    cardImage: json['card_image'] as String?,
+    cardImages: (json['card_images'] as List?)?.whereType<String>().toList() ?? const [],
+    cardSubtitle: json['card_subtitle'] as String?,
+    projectLogo: json['project_logo'] as String?,
+    status: json['status'] as String?,
+    startDate: json['start_date'] as String?,
+    endDate: json['end_date'] as String?,
+    totalArea: (json['total_area'] as num?)?.toDouble(),
+    totalBlocks: json['total_blocks'] as int?,
+    totalApartments: json['total_apartments'] as int?,
+    minPrice: json['min_price'] as num?,
+    latitude: (json['latitude'] as num?)?.toDouble(),
+    longitude: (json['longitude'] as num?)?.toDouble(),
+    isTop: (json['is_top'] as bool?) ?? false,
+    developer: json['developer'] is Map<String, dynamic>
+        ? Developer.fromJson(json['developer'] as Map<String, dynamic>)
+        : null,
+  );
 
   /// First usable image: the card image is what the website shows in listings, with the cover and
   /// the extra card images as fallbacks.
@@ -107,8 +107,8 @@ class Developer {
   const Developer({this.code, this.name, this.logo});
 
   factory Developer.fromJson(Map<String, dynamic> json) => Developer(
-        code: json['code'] as String?,
-        name: json['name'] as String?,
-        logo: json['logo'] as String?,
-      );
+    code: json['code'] as String?,
+    name: json['name'] as String?,
+    logo: json['logo'] as String?,
+  );
 }

@@ -76,36 +76,32 @@ abstract final class AppTheme {
   }
 
   static ThemeData get light {
-    final scheme = ColorScheme.fromSeed(
-      seedColor: AppColors.olive,
-      brightness: Brightness.light,
-    ).copyWith(
-      primary: AppColors.olive,
-      onPrimary: Colors.white,
-      secondary: AppColors.bronze,
-      surface: AppColors.surfaceLight,
-      onSurface: AppColors.textLight,
-      onSurfaceVariant: AppColors.textMutedLight,
-      outlineVariant: AppColors.borderLight,
-      error: AppColors.danger,
-    );
+    final scheme = ColorScheme.fromSeed(seedColor: AppColors.olive, brightness: Brightness.light)
+        .copyWith(
+          primary: AppColors.olive,
+          onPrimary: Colors.white,
+          secondary: AppColors.bronze,
+          surface: AppColors.surfaceLight,
+          onSurface: AppColors.textLight,
+          onSurfaceVariant: AppColors.textMutedLight,
+          outlineVariant: AppColors.borderLight,
+          error: AppColors.danger,
+        );
     return _build(scheme, AppColors.cream, AppColors.textLight, AppColors.textMutedLight);
   }
 
   static ThemeData get dark {
-    final scheme = ColorScheme.fromSeed(
-      seedColor: AppColors.olive,
-      brightness: Brightness.dark,
-    ).copyWith(
-      primary: AppColors.olive,
-      onPrimary: Colors.white,
-      secondary: AppColors.bronze,
-      surface: AppColors.surfaceDark,
-      onSurface: AppColors.textDark,
-      onSurfaceVariant: AppColors.textMutedDark,
-      outlineVariant: AppColors.borderDark,
-      error: AppColors.danger,
-    );
+    final scheme = ColorScheme.fromSeed(seedColor: AppColors.olive, brightness: Brightness.dark)
+        .copyWith(
+          primary: AppColors.olive,
+          onPrimary: Colors.white,
+          secondary: AppColors.bronze,
+          surface: AppColors.surfaceDark,
+          onSurface: AppColors.textDark,
+          onSurfaceVariant: AppColors.textMutedDark,
+          outlineVariant: AppColors.borderDark,
+          error: AppColors.danger,
+        );
     return _build(scheme, AppColors.scaffoldDark, AppColors.textDark, AppColors.textMutedDark);
   }
 

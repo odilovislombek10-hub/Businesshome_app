@@ -127,9 +127,7 @@ class _SiteHeaderState extends State<SiteHeader> {
                     : theme.colorScheme.surface,
                 border: Border(
                   bottom: BorderSide(
-                    color: _isTranslucent
-                        ? Colors.white24
-                        : theme.colorScheme.outlineVariant,
+                    color: _isTranslucent ? Colors.white24 : theme.colorScheme.outlineVariant,
                   ),
                 ),
               ),
@@ -137,8 +135,7 @@ class _SiteHeaderState extends State<SiteHeader> {
             ),
           ),
         ),
-        if (_menuOpen)
-          MobileMenuPanel(onClose: () => setState(() => _menuOpen = false)),
+        if (_menuOpen) MobileMenuPanel(onClose: () => setState(() => _menuOpen = false)),
       ],
     );
   }
@@ -147,10 +144,7 @@ class _SiteHeaderState extends State<SiteHeader> {
     showModalBottomSheet<void>(
       context: context,
       builder: (context) => const SafeArea(
-        child: Padding(
-          padding: EdgeInsets.all(24),
-          child: Text('AI yordamchi tayyorlanmoqda'),
-        ),
+        child: Padding(padding: EdgeInsets.all(24), child: Text('AI yordamchi tayyorlanmoqda')),
       ),
     );
   }
@@ -183,7 +177,10 @@ class _Logo extends StatelessWidget {
                   text: 'Business',
                   style: TextStyle(color: AppColors.olive),
                 ),
-                TextSpan(text: 'HOME', style: TextStyle(color: onBar)),
+                TextSpan(
+                  text: 'HOME',
+                  style: TextStyle(color: onBar),
+                ),
               ],
             ),
             style: theme.textTheme.headlineMedium?.copyWith(fontSize: 18),
@@ -353,10 +350,12 @@ class _MobileMenuPanelState extends State<MobileMenuPanel> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(auth.user!.fullName,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: theme.textTheme.titleMedium),
+                                Text(
+                                  auth.user!.fullName,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: theme.textTheme.titleMedium,
+                                ),
                                 Text(auth.user!.phone, style: theme.textTheme.bodySmall),
                               ],
                             ),
@@ -370,10 +369,7 @@ class _MobileMenuPanelState extends State<MobileMenuPanel> {
                   _MenuItem(
                     icon: Icons.language,
                     label: 'Til',
-                    trailing: Text(
-                      _lang.toUpperCase(),
-                      style: theme.textTheme.labelSmall,
-                    ),
+                    trailing: Text(_lang.toUpperCase(), style: theme.textTheme.labelSmall),
                     onTap: () => setState(() => _view = _MenuView.language),
                   ),
                   if (auth.isLoggedIn) ...[

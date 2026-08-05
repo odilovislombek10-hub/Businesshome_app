@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../core/models/project.dart';
 import '../../shared/widgets/error_view.dart';
-import '../../shared/widgets/project_card.dart';
+import '../../shared/models/property_view.dart';
+import '../../shared/widgets/property_card.dart';
 import 'new_projects_repository.dart';
 
 /// New-build projects list — the `/new-projects` page of the website.
@@ -58,10 +58,8 @@ class _NewProjectsScreenState extends State<NewProjectsScreen> {
               padding: const EdgeInsets.all(12),
               itemCount: projects.length,
               separatorBuilder: (_, _) => const SizedBox(height: 12),
-              itemBuilder: (context, i) => ProjectCard(
-                project: projects[i],
-                onTap: () => context.go('/property/${projects[i].id}'),
-              ),
+              itemBuilder: (context, i) =>
+                  PropertyCard(property: PropertyView.fromProject(projects[i])),
             ),
           );
         },

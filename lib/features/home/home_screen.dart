@@ -10,8 +10,8 @@ import '../../core/api/media_url.dart';
 import '../../core/models/homepage.dart';
 import '../../core/models/page_content.dart';
 import '../../core/models/project.dart';
-import '../../shared/widgets/project_card.dart';
 import '../../shared/widgets/site_header.dart';
+import 'components/featured_buildings.dart';
 import 'components/hero_section.dart';
 import 'home_repository.dart';
 
@@ -115,13 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.only(bottom: 32),
           children: [
             HeroSection(content: data.hero),
-            if (data.featured.isNotEmpty)
-              _Section(
-                title: 'Tanlangan binolar',
-                actionLabel: 'Barchasi',
-                onAction: () => context.go('/new-projects'),
-                child: _HorizontalProjects(projects: data.featured),
-              ),
+            if (data.featured.isNotEmpty) FeaturedBuildings(projects: data.featured),
             for (final promo in data.promos) _PromoCard(banner: promo),
             if (data.categories.isNotEmpty)
               _Section(
@@ -168,14 +162,12 @@ class _HomeData {
   final List<ServiceCard> services;
 }
 
-/// Section wrapper: heading on the left, optional "see all" link on the right.
+/// Section wrapper: a display-font heading above the section's content.
 class _Section extends StatelessWidget {
-  const _Section({required this.title, required this.child, this.actionLabel, this.onAction});
+  const _Section({required this.title, required this.child});
 
   final String title;
   final Widget child;
-  final String? actionLabel;
-  final VoidCallback? onAction;
 
   @override
   Widget build(BuildContext context) {
@@ -186,39 +178,11 @@ class _Section extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 24, 8, 12),
           child: Row(
-            children: [
-              Expanded(child: Text(title, style: theme.textTheme.displaySmall)),
-              if (actionLabel != null) TextButton(onPressed: onAction, child: Text(actionLabel!)),
-            ],
+            children: [Expanded(child: Text(title, style: theme.textTheme.displaySmall))],
           ),
         ),
         child,
       ],
-    );
-  }
-}
-
-class _HorizontalProjects extends StatelessWidget {
-  const _HorizontalProjects({required this.projects});
-  final List<Project> projects;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      // Tall enough for the card's worst case: 16:9 image, two lines of meta and the chip row
-      // wrapping onto a second line. A short card just leaves whitespace; too short clips.
-      height: 348,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        itemCount: projects.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 12),
-        itemBuilder: (context, i) => ProjectCard(
-          project: projects[i],
-          width: 260,
-          onTap: () => context.go('/property/${projects[i].id}'),
-        ),
-      ),
     );
   }
 }

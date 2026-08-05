@@ -101,31 +101,30 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<MarketRole?> _pickRole(List<AvailableRole> roles) => showModalBottomSheet<MarketRole>(
-        context: context,
-        builder: (context) => SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
-                child: Text('Qaysi hisobga kirasiz?',
-                    style: Theme.of(context).textTheme.titleMedium),
-              ),
-              for (final r in roles)
-                ListTile(
-                  leading: const Icon(Icons.person_outline),
-                  title: Text(r.fullName.isEmpty ? r.role.label : r.fullName),
-                  subtitle: Text(r.role.label),
-                  trailing: r.isVerified
-                      ? const Icon(Icons.verified, size: 18, color: AppColors.olive)
-                      : null,
-                  onTap: () => Navigator.of(context).pop(r.role),
-                ),
-              const SizedBox(height: 8),
-            ],
+    context: context,
+    builder: (context) => SafeArea(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+            child: Text('Qaysi hisobga kirasiz?', style: Theme.of(context).textTheme.titleMedium),
           ),
-        ),
-      );
+          for (final r in roles)
+            ListTile(
+              leading: const Icon(Icons.person_outline),
+              title: Text(r.fullName.isEmpty ? r.role.label : r.fullName),
+              subtitle: Text(r.role.label),
+              trailing: r.isVerified
+                  ? const Icon(Icons.verified, size: 18, color: AppColors.olive)
+                  : null,
+              onTap: () => Navigator.of(context).pop(r.role),
+            ),
+          const SizedBox(height: 8),
+        ],
+      ),
+    ),
+  );
 
   /// Social sign-in is a browser round trip on the site; open the same URL and let the site
   /// finish the exchange until the app registers its own deep-link callback.
@@ -167,8 +166,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       onPressed: () => setState(() => _obscure = !_obscure),
                     ),
                   ),
-                  validator: (v) =>
-                      (v == null || v.length < 6) ? 'Parol kamida 6 ta belgi' : null,
+                  validator: (v) => (v == null || v.length < 6) ? 'Parol kamida 6 ta belgi' : null,
                   onFieldSubmitted: (_) => _submitPassword(),
                 ),
                 Align(
@@ -206,8 +204,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   child: Text(
                     _error!,
-                    style: theme.textTheme.bodySmall
-                        ?.copyWith(color: theme.colorScheme.onErrorContainer),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onErrorContainer,
+                    ),
                   ),
                 ),
               ],
@@ -238,10 +237,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 onPressed: _busy
                     ? null
                     : () => setState(() {
-                          _mode = _mode == _Mode.password ? _Mode.otp : _Mode.password;
-                          _codeSent = false;
-                          _error = null;
-                        }),
+                        _mode = _mode == _Mode.password ? _Mode.otp : _Mode.password;
+                        _codeSent = false;
+                        _error = null;
+                      }),
                 child: Text(
                   _mode == _Mode.password ? 'SMS kod bilan kirish' : 'Parol bilan kirish',
                 ),

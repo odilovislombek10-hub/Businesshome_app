@@ -19,26 +19,28 @@ class ApiClient {
   static const String _tokenKey = 'market_token';
   static const String _refreshKey = 'market_refresh_token';
 
-  late final Dio _dio = Dio(
-    BaseOptions(
-      baseUrl: baseUrl,
-      connectTimeout: const Duration(seconds: 20),
-      receiveTimeout: const Duration(seconds: 30),
-      // Don't throw on 4xx: the API answers with structured errors (e.g. {"detail": "..."}) that
-      // the UI shows to the user, and turning those into exceptions loses the message.
-      validateStatus: (status) => status != null && status < 500,
-    ),
-  )..interceptors.add(
-      InterceptorsWrapper(
-        onRequest: (options, handler) async {
-          final token = await _readToken();
-          if (token != null && token.isNotEmpty) {
-            options.headers['Authorization'] = 'Bearer $token';
-          }
-          handler.next(options);
-        },
-      ),
-    );
+  late final Dio _dio =
+      Dio(
+          BaseOptions(
+            baseUrl: baseUrl,
+            connectTimeout: const Duration(seconds: 20),
+            receiveTimeout: const Duration(seconds: 30),
+            // Don't throw on 4xx: the API answers with structured errors (e.g. {"detail": "..."}) that
+            // the UI shows to the user, and turning those into exceptions loses the message.
+            validateStatus: (status) => status != null && status < 500,
+          ),
+        )
+        ..interceptors.add(
+          InterceptorsWrapper(
+            onRequest: (options, handler) async {
+              final token = await _readToken();
+              if (token != null && token.isNotEmpty) {
+                options.headers['Authorization'] = 'Bearer $token';
+              }
+              handler.next(options);
+            },
+          ),
+        );
 
   String? _cachedToken;
 

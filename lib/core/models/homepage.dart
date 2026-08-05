@@ -12,11 +12,11 @@ String? _str(Object? v) {
 }
 
 int _int(Object? v) => switch (v) {
-      int i => i,
-      num n => n.toInt(),
-      String s => int.tryParse(s) ?? 0,
-      _ => 0,
-    };
+  int i => i,
+  num n => n.toInt(),
+  String s => int.tryParse(s) ?? 0,
+  _ => 0,
+};
 
 class HeroSlide {
   const HeroSlide({
@@ -38,13 +38,13 @@ class HeroSlide {
   String? get title => titleUz ?? titleRu;
 
   factory HeroSlide.fromJson(Map<String, dynamic> json) => HeroSlide(
-        id: _int(json['id']),
-        image: _str(json['image']) ?? '',
-        titleUz: _str(json['title_uz']),
-        titleRu: _str(json['title_ru']),
-        link: _str(json['link']),
-        sortOrder: _int(json['sort_order']),
-      );
+    id: _int(json['id']),
+    image: _str(json['image']) ?? '',
+    titleUz: _str(json['title_uz']),
+    titleRu: _str(json['title_ru']),
+    link: _str(json['link']),
+    sortOrder: _int(json['sort_order']),
+  );
 }
 
 class ServiceCard {
@@ -74,16 +74,16 @@ class ServiceCard {
   String get description => descriptionUz.isNotEmpty ? descriptionUz : (descriptionRu ?? '');
 
   factory ServiceCard.fromJson(Map<String, dynamic> json) => ServiceCard(
-        id: _int(json['id']),
-        icon: _str(json['icon']) ?? 'shield',
-        image: _str(json['image']),
-        titleUz: _str(json['title_uz']) ?? '',
-        titleRu: _str(json['title_ru']),
-        descriptionUz: _str(json['description_uz']) ?? '',
-        descriptionRu: _str(json['description_ru']),
-        link: _str(json['link']),
-        sortOrder: _int(json['sort_order']),
-      );
+    id: _int(json['id']),
+    icon: _str(json['icon']) ?? 'shield',
+    image: _str(json['image']),
+    titleUz: _str(json['title_uz']) ?? '',
+    titleRu: _str(json['title_ru']),
+    descriptionUz: _str(json['description_uz']) ?? '',
+    descriptionRu: _str(json['description_ru']),
+    link: _str(json['link']),
+    sortOrder: _int(json['sort_order']),
+  );
 }
 
 class PromoBanner {
@@ -123,18 +123,18 @@ class PromoBanner {
   String get bestImage => imageMobile ?? image;
 
   factory PromoBanner.fromJson(Map<String, dynamic> json) => PromoBanner(
-        id: _int(json['id']),
-        image: _str(json['image']) ?? '',
-        imageMobile: _str(json['image_mobile']),
-        titleUz: _str(json['title_uz']),
-        titleRu: _str(json['title_ru']),
-        descriptionUz: _str(json['description_uz']),
-        descriptionRu: _str(json['description_ru']),
-        link: _str(json['link']),
-        buttonTextUz: _str(json['button_text_uz']),
-        buttonTextRu: _str(json['button_text_ru']),
-        position: _str(json['position']) ?? 'top',
-      );
+    id: _int(json['id']),
+    image: _str(json['image']) ?? '',
+    imageMobile: _str(json['image_mobile']),
+    titleUz: _str(json['title_uz']),
+    titleRu: _str(json['title_ru']),
+    descriptionUz: _str(json['description_uz']),
+    descriptionRu: _str(json['description_ru']),
+    link: _str(json['link']),
+    buttonTextUz: _str(json['button_text_uz']),
+    buttonTextRu: _str(json['button_text_ru']),
+    position: _str(json['position']) ?? 'top',
+  );
 }
 
 class PropertyCategory {
@@ -157,13 +157,13 @@ class PropertyCategory {
   String get name => nameUz.isNotEmpty ? nameUz : (nameRu ?? '');
 
   factory PropertyCategory.fromJson(Map<String, dynamic> json) => PropertyCategory(
-        id: _int(json['id']),
-        nameUz: _str(json['name_uz']) ?? '',
-        nameRu: _str(json['name_ru']),
-        image: _str(json['image']) ?? '',
-        link: _str(json['link']) ?? '/',
-        sortOrder: _int(json['sort_order']),
-      );
+    id: _int(json['id']),
+    nameUz: _str(json['name_uz']) ?? '',
+    nameRu: _str(json['name_ru']),
+    image: _str(json['image']) ?? '',
+    link: _str(json['link']) ?? '/',
+    sortOrder: _int(json['sort_order']),
+  );
 }
 
 class FeatureBadge {
@@ -173,10 +173,10 @@ class FeatureBadge {
   final String? text;
 
   factory FeatureBadge.fromJson(Map<String, dynamic> json) => FeatureBadge(
-        icon: _str(json['icon']),
-        // The badge payload is admin-authored and has drifted between `text` and `label`.
-        text: _str(json['text']) ?? _str(json['label']),
-      );
+    icon: _str(json['icon']),
+    // The badge payload is admin-authored and has drifted between `text` and `label`.
+    text: _str(json['text']) ?? _str(json['label']),
+  );
 }
 
 class PlatformStats {
@@ -207,20 +207,21 @@ class PlatformStats {
   final List<FeatureBadge> features;
 
   factory PlatformStats.fromJson(Map<String, dynamic> json) => PlatformStats(
-        totalProperties: _int(json['total_properties']),
-        totalDevelopers: _int(json['total_developers']),
-        totalUsers: _int(json['total_users']),
-        totalProjects: _int(json['total_projects']),
-        citiesCount: _int(json['cities_count']),
-        youtubeUrl: _str(json['youtube_url']),
-        videoTitle: _str(json['video_title']),
-        videoSubtitle: _str(json['video_subtitle']),
-        videoThumbnail: _str(json['video_thumbnail']),
-        backgroundImage: _str(json['background_image']),
-        features: (json['features'] as List?)
-                ?.whereType<Map<String, dynamic>>()
-                .map(FeatureBadge.fromJson)
-                .toList() ??
-            const [],
-      );
+    totalProperties: _int(json['total_properties']),
+    totalDevelopers: _int(json['total_developers']),
+    totalUsers: _int(json['total_users']),
+    totalProjects: _int(json['total_projects']),
+    citiesCount: _int(json['cities_count']),
+    youtubeUrl: _str(json['youtube_url']),
+    videoTitle: _str(json['video_title']),
+    videoSubtitle: _str(json['video_subtitle']),
+    videoThumbnail: _str(json['video_thumbnail']),
+    backgroundImage: _str(json['background_image']),
+    features:
+        (json['features'] as List?)
+            ?.whereType<Map<String, dynamic>>()
+            .map(FeatureBadge.fromJson)
+            .toList() ??
+        const [],
+  );
 }

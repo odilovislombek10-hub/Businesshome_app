@@ -72,9 +72,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         newPassword: _password.text,
       );
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Parol yangilandi — endi kirishingiz mumkin')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Parol yangilandi — endi kirishingiz mumkin')));
       context.pushReplacement('/login');
     });
   }
@@ -166,9 +166,6 @@ class _Spinner extends StatelessWidget {
   const _Spinner();
 
   @override
-  Widget build(BuildContext context) => const SizedBox(
-        width: 20,
-        height: 20,
-        child: CircularProgressIndicator(strokeWidth: 2),
-      );
+  Widget build(BuildContext context) =>
+      const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2));
 }

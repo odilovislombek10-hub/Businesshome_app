@@ -27,16 +27,16 @@ class MarketUser {
   final DateTime? createdAt;
 
   factory MarketUser.fromJson(Map<String, dynamic> json) => MarketUser(
-        id: (json['id'] as num?)?.toInt() ?? 0,
-        phone: json['phone']?.toString() ?? '',
-        fullName: json['full_name']?.toString() ?? '',
-        region: json['region']?.toString(),
-        district: json['district']?.toString(),
-        role: MarketRole.parse(json['role']?.toString()),
-        avatar: json['avatar']?.toString(),
-        isVerified: json['is_verified'] == true,
-        createdAt: DateTime.tryParse(json['created_at']?.toString() ?? ''),
-      );
+    id: (json['id'] as num?)?.toInt() ?? 0,
+    phone: json['phone']?.toString() ?? '',
+    fullName: json['full_name']?.toString() ?? '',
+    region: json['region']?.toString(),
+    district: json['district']?.toString(),
+    role: MarketRole.parse(json['role']?.toString()),
+    avatar: json['avatar']?.toString(),
+    isVerified: json['is_verified'] == true,
+    createdAt: DateTime.tryParse(json['created_at']?.toString() ?? ''),
+  );
 }
 
 /// `Role = Literal["user", "agent", "designer", "master", "developer"]` in the backend schema.
@@ -69,8 +69,8 @@ class AvailableRole {
   final bool isVerified;
 
   factory AvailableRole.fromJson(Map<String, dynamic> json) => AvailableRole(
-        role: MarketRole.parse(json['role']?.toString()),
-        fullName: json['full_name']?.toString() ?? '',
-        isVerified: json['is_verified'] == true,
-      );
+    role: MarketRole.parse(json['role']?.toString()),
+    fullName: json['full_name']?.toString() ?? '',
+    isVerified: json['is_verified'] == true,
+  );
 }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'app/app.dart';
 import 'core/services/auth_service.dart';
+import 'core/services/currency_service.dart';
 import 'core/services/theme_controller.dart';
 
 Future<void> main() async {
@@ -18,6 +19,9 @@ Future<void> main() async {
   // catalogue is browsable signed-out. Screens that care listen to AuthService instead.
   final authService = AuthService();
   unawaited(authService.restore());
+
+  // Currency preference and the USD rate — prices render in UZS until the rate arrives.
+  unawaited(CurrencyService.instance.load());
 
   runApp(BusinessHomeApp(themeController: themeController, authService: authService));
 }
