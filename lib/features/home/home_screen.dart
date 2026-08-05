@@ -3,16 +3,20 @@ import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import '../../app/theme.dart';
 import '../../core/api/media_url.dart';
+import '../../core/models/developer_summary.dart';
 import '../../core/models/homepage.dart';
 import '../../core/models/page_content.dart';
 import '../../core/models/project.dart';
+import '../../core/models/property_listing.dart';
 import '../../shared/widgets/site_header.dart';
 import 'components/featured_buildings.dart';
+import 'components/developers_slider.dart';
 import 'components/hero_section.dart';
+import 'components/property_categories.dart';
+import 'components/stats_banner.dart';
 import 'home_repository.dart';
 
 /// The front page, section for section in the order `home.component.ts` renders them:
@@ -63,14 +67,27 @@ class _HomeScreenState extends State<HomeScreen> {
       _repo.categories(),
       _repo.stats(),
       _repo.services(),
+      _repo.developers(),
     ]);
+    final categories = results[3] as List<PropertyCategory>;
+
+    // Each category tile shows its cheapest listing; fetch them together once the categories
+    // themselves are known, as the site does after its category request resolves.
+    final tops = await Future.wait(categories.map(_repo.topListingForCategory));
+    final topListings = <int, PropertyListing>{
+      // `?` drops the entry for a category whose request found nothing.
+      for (var i = 0; i < categories.length; i++) categories[i].id: ?tops[i],
+    };
+
     return _HomeData(
       hero: results[0] as PageContent?,
       featured: results[1] as List<Project>,
       promos: results[2] as List<PromoBanner>,
-      categories: results[3] as List<PropertyCategory>,
+      categories: categories,
+      topListings: topListings,
       stats: results[4] as PlatformStats?,
       services: results[5] as List<ServiceCard>,
+      developers: results[6] as List<DeveloperSummary>,
     );
   }
 
@@ -117,12 +134,10 @@ class _HomeScreenState extends State<HomeScreen> {
             HeroSection(content: data.hero),
             if (data.featured.isNotEmpty) FeaturedBuildings(projects: data.featured),
             for (final promo in data.promos) _PromoCard(banner: promo),
+            if (data.developers.isNotEmpty) DevelopersSlider(developers: data.developers),
             if (data.categories.isNotEmpty)
-              _Section(
-                title: 'Kategoriyalar',
-                child: _CategoryGrid(categories: data.categories),
-              ),
-            if (data.stats != null) _StatsBanner(stats: data.stats!),
+              PropertyCategories(categories: data.categories, topListings: data.topListings),
+            if (data.stats != null) StatsBanner(stats: data.stats!),
             if (data.services.isNotEmpty)
               _Section(
                 title: 'Nega BusinessHome?',
@@ -142,8 +157,10 @@ class _HomeData {
     required this.featured,
     required this.promos,
     required this.categories,
+    required this.topListings,
     required this.stats,
     required this.services,
+    required this.developers,
   });
 
   const _HomeData.empty()
@@ -151,15 +168,19 @@ class _HomeData {
       featured = const [],
       promos = const [],
       categories = const [],
+      topListings = const {},
       stats = null,
-      services = const [];
+      services = const [],
+      developers = const [];
 
   final PageContent? hero;
   final List<Project> featured;
   final List<PromoBanner> promos;
   final List<PropertyCategory> categories;
+  final Map<int, PropertyListing> topListings;
   final PlatformStats? stats;
   final List<ServiceCard> services;
+  final List<DeveloperSummary> developers;
 }
 
 /// Section wrapper: a display-font heading above the section's content.
@@ -233,109 +254,6 @@ class _PromoCard extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _CategoryGrid extends StatelessWidget {
-  const _CategoryGrid({required this.categories});
-  final List<PropertyCategory> categories;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: 12,
-        crossAxisSpacing: 12,
-        childAspectRatio: 1.4,
-      ),
-      itemCount: categories.length,
-      itemBuilder: (context, i) {
-        final category = categories[i];
-        final url = absoluteMediaUrl(category.image);
-        return InkWell(
-          borderRadius: BorderRadius.circular(AppRadius.lg),
-          onTap: () => context.go(category.link),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(AppRadius.lg),
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                if (url != null)
-                  CachedNetworkImage(imageUrl: url, fit: BoxFit.cover)
-                else
-                  Container(color: theme.colorScheme.surfaceContainerHighest),
-                const DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [Colors.transparent, Colors.black54],
-                    ),
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.bottomLeft,
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Text(
-                      category.name,
-                      style: theme.textTheme.titleMedium?.copyWith(color: Colors.white),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _StatsBanner extends StatelessWidget {
-  const _StatsBanner({required this.stats});
-  final PlatformStats stats;
-
-  static final _n = NumberFormat.decimalPattern('uz');
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final items = <(String, int)>[
-      ('Loyihalar', stats.totalProjects),
-      ('Mulklar', stats.totalProperties),
-      ('Quruvchilar', stats.totalDevelopers),
-      ('Shaharlar', stats.citiesCount),
-    ];
-    return Container(
-      margin: const EdgeInsets.fromLTRB(16, 24, 16, 0),
-      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
-      decoration: BoxDecoration(
-        color: AppColors.olive,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          for (final (label, value) in items)
-            Column(
-              children: [
-                Text(
-                  _n.format(value),
-                  style: theme.textTheme.titleLarge?.copyWith(color: Colors.white),
-                ),
-                const SizedBox(height: 2),
-                Text(label, style: theme.textTheme.labelSmall?.copyWith(color: Colors.white70)),
-              ],
-            ),
-        ],
       ),
     );
   }

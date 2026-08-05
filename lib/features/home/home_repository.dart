@@ -1,7 +1,9 @@
 import '../../core/api/api_client.dart';
+import '../../core/models/developer_summary.dart';
 import '../../core/models/homepage.dart';
 import '../../core/models/page_content.dart';
 import '../../core/models/project.dart';
+import '../../core/models/property_listing.dart';
 
 /// Everything the front page needs, in the same shape the site's `HomeComponent` assembles.
 ///
@@ -17,6 +19,9 @@ class HomeRepository {
       _list('/market/homepage/categories', PropertyCategory.fromJson);
 
   Future<List<ServiceCard>> services() => _list('/market/homepage/services', ServiceCard.fromJson);
+
+  Future<List<DeveloperSummary>> developers() =>
+      _list('/market/developers', DeveloperSummary.fromJson);
 
   Future<List<PromoBanner>> promoBanners() =>
       _list('/market/homepage/promo-banners', PromoBanner.fromJson);
@@ -34,6 +39,30 @@ class HomeRepository {
       final res = await _api.get<dynamic>('/market/content/pages/new-projects');
       final data = res.data;
       return data is Map<String, dynamic> ? PageContent.fromJson(data) : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// The cheapest listing matching a category, used for the overlay on its tile.
+  ///
+  /// The category's `link` carries the filter (`/secondary?type=house`), so the type comes from
+  /// there and the endpoint from whether the link points at rent or the secondary market — the
+  /// same two branches the site takes.
+  Future<PropertyListing?> topListingForCategory(PropertyCategory category) async {
+    final type = Uri.tryParse(category.link)?.queryParameters['type'];
+    if (type == null || type.isEmpty) return null;
+    final isRent = category.link.startsWith('/rent');
+    try {
+      final res = await _api.get<dynamic>(
+        isRent ? '/market/rent' : '/market/secondary',
+        query: {'type': type, 'page': 1, 'per_page': 1},
+      );
+      final data = res.data;
+      final items = data is Map<String, dynamic> ? data['items'] : null;
+      if (items is! List || items.isEmpty) return null;
+      final first = items.first;
+      return first is Map<String, dynamic> ? PropertyListing.fromJson(first) : null;
     } catch (_) {
       return null;
     }
