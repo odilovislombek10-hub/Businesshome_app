@@ -8,8 +8,11 @@ import 'package:intl/intl.dart';
 import '../../app/theme.dart';
 import '../../core/api/media_url.dart';
 import '../../core/models/homepage.dart';
+import '../../core/models/page_content.dart';
 import '../../core/models/project.dart';
 import '../../shared/widgets/project_card.dart';
+import '../../shared/widgets/site_header.dart';
+import 'components/hero_section.dart';
 import 'home_repository.dart';
 
 /// The front page, section for section in the order `home.component.ts` renders them:
@@ -27,20 +30,34 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final _repo = HomeRepository();
+  final _scroll = ScrollController();
 
   late Future<_HomeData> _future;
+
+  /// Drives the header: translucent over the hero, solid once the page moves.
+  bool _scrolled = false;
 
   @override
   void initState() {
     super.initState();
     _future = _load();
+    _scroll.addListener(() {
+      final scrolled = _scroll.offset > 10;
+      if (scrolled != _scrolled) setState(() => _scrolled = scrolled);
+    });
+  }
+
+  @override
+  void dispose() {
+    _scroll.dispose();
+    super.dispose();
   }
 
   Future<_HomeData> _load() async {
     // One round trip per section, all in flight together — the page is as slow as its slowest
     // section rather than the sum of them.
     final results = await Future.wait([
-      _repo.heroSlides(),
+      _repo.heroContent(),
       _repo.featured(),
       _repo.promoBanners(),
       _repo.categories(),
@@ -48,7 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _repo.services(),
     ]);
     return _HomeData(
-      hero: results[0] as List<HeroSlide>,
+      hero: results[0] as PageContent?,
       featured: results[1] as List<Project>,
       promos: results[2] as List<PromoBanner>,
       categories: results[3] as List<PropertyCategory>,
@@ -65,55 +82,62 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // The header is `fixed` on the site and floats over the hero, so the content is not inset by
+    // it — a Stack, not an AppBar.
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('BusinessHome'),
-        actions: [
-          IconButton(
-            onPressed: () => context.go('/map'),
-            icon: const Icon(Icons.map_outlined),
-            tooltip: 'Xaritada qidirish',
+      body: Stack(
+        children: [
+          RefreshIndicator(onRefresh: _refresh, child: _body(context)),
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: SiteHeader(
+              transparent: true,
+              scrolled: _scrolled,
+              onSearch: (q) => context.go('/secondary?search=$q'),
+            ),
           ),
         ],
       ),
-      body: RefreshIndicator(
-        onRefresh: _refresh,
-        child: FutureBuilder<_HomeData>(
-          future: _future,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            final data = snapshot.data ?? const _HomeData.empty();
-            return ListView(
-              padding: const EdgeInsets.only(bottom: 32),
-              children: [
-                if (data.hero.isNotEmpty) _HeroCarousel(slides: data.hero),
-                if (data.featured.isNotEmpty)
-                  _Section(
-                    title: 'Tanlangan binolar',
-                    actionLabel: 'Barchasi',
-                    onAction: () => context.go('/new-projects'),
-                    child: _HorizontalProjects(projects: data.featured),
-                  ),
-                for (final promo in data.promos) _PromoCard(banner: promo),
-                if (data.categories.isNotEmpty)
-                  _Section(
-                    title: 'Kategoriyalar',
-                    child: _CategoryGrid(categories: data.categories),
-                  ),
-                if (data.stats != null) _StatsBanner(stats: data.stats!),
-                if (data.services.isNotEmpty)
-                  _Section(
-                    title: 'Nega BusinessHome?',
-                    child: _ServicesList(services: data.services),
-                  ),
-                const _Footer(),
-              ],
-            );
-          },
-        ),
-      ),
+    );
+  }
+
+  Widget _body(BuildContext context) {
+    return FutureBuilder<_HomeData>(
+      future: _future,
+      builder: (context, snapshot) {
+        // No full-page spinner: the hero is static copy and renders straight away, exactly as on
+        // the site. Sections below it simply appear once their data lands.
+        final data = snapshot.data ?? const _HomeData.empty();
+        return ListView(
+          controller: _scroll,
+          padding: const EdgeInsets.only(bottom: 32),
+          children: [
+            HeroSection(content: data.hero),
+            if (data.featured.isNotEmpty)
+              _Section(
+                title: 'Tanlangan binolar',
+                actionLabel: 'Barchasi',
+                onAction: () => context.go('/new-projects'),
+                child: _HorizontalProjects(projects: data.featured),
+              ),
+            for (final promo in data.promos) _PromoCard(banner: promo),
+            if (data.categories.isNotEmpty)
+              _Section(
+                title: 'Kategoriyalar',
+                child: _CategoryGrid(categories: data.categories),
+              ),
+            if (data.stats != null) _StatsBanner(stats: data.stats!),
+            if (data.services.isNotEmpty)
+              _Section(
+                title: 'Nega BusinessHome?',
+                child: _ServicesList(services: data.services),
+              ),
+            const _Footer(),
+          ],
+        );
+      },
     );
   }
 }
@@ -129,14 +153,14 @@ class _HomeData {
   });
 
   const _HomeData.empty()
-      : hero = const [],
-        featured = const [],
-        promos = const [],
-        categories = const [],
-        stats = null,
-        services = const [];
+    : hero = null,
+      featured = const [],
+      promos = const [],
+      categories = const [],
+      stats = null,
+      services = const [];
 
-  final List<HeroSlide> hero;
+  final PageContent? hero;
   final List<Project> featured;
   final List<PromoBanner> promos;
   final List<PropertyCategory> categories;
@@ -144,129 +168,9 @@ class _HomeData {
   final List<ServiceCard> services;
 }
 
-/// Auto-advancing hero slider — the site's `hero-section`.
-class _HeroCarousel extends StatefulWidget {
-  const _HeroCarousel({required this.slides});
-  final List<HeroSlide> slides;
-
-  @override
-  State<_HeroCarousel> createState() => _HeroCarouselState();
-}
-
-class _HeroCarouselState extends State<_HeroCarousel> {
-  final _controller = PageController();
-  Timer? _timer;
-  int _index = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    if (widget.slides.length > 1) {
-      _timer = Timer.periodic(const Duration(seconds: 5), (_) {
-        if (!mounted || !_controller.hasClients) return;
-        _controller.animateToPage(
-          (_index + 1) % widget.slides.length,
-          duration: const Duration(milliseconds: 400),
-          curve: Curves.easeOut,
-        );
-      });
-    }
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 220,
-      child: Stack(
-        children: [
-          PageView.builder(
-            controller: _controller,
-            itemCount: widget.slides.length,
-            onPageChanged: (i) => setState(() => _index = i),
-            itemBuilder: (context, i) {
-              final slide = widget.slides[i];
-              final url = absoluteMediaUrl(slide.image);
-              return GestureDetector(
-                onTap: slide.link == null ? null : () => context.go(slide.link!),
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    if (url != null)
-                      CachedNetworkImage(imageUrl: url, fit: BoxFit.cover)
-                    else
-                      Container(color: AppColors.olive),
-                    if (slide.title != null)
-                      // Scrim so the caption stays readable over any photo.
-                      DecoratedBox(
-                        decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.center,
-                            end: Alignment.bottomCenter,
-                            colors: [Colors.transparent, Colors.black54],
-                          ),
-                        ),
-                        child: Align(
-                          alignment: Alignment.bottomLeft,
-                          child: Padding(
-                            padding: const EdgeInsets.all(20),
-                            child: Text(
-                              slide.title!,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headlineMedium
-                                  ?.copyWith(color: Colors.white),
-                            ),
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              );
-            },
-          ),
-          if (widget.slides.length > 1)
-            Positioned(
-              bottom: 12,
-              left: 0,
-              right: 0,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  for (var i = 0; i < widget.slides.length; i++)
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      margin: const EdgeInsets.symmetric(horizontal: 3),
-                      width: i == _index ? 20 : 6,
-                      height: 6,
-                      decoration: BoxDecoration(
-                        color: i == _index ? Colors.white : Colors.white54,
-                        borderRadius: BorderRadius.circular(AppRadius.pill),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-}
-
 /// Section wrapper: heading on the left, optional "see all" link on the right.
 class _Section extends StatelessWidget {
-  const _Section({
-    required this.title,
-    required this.child,
-    this.actionLabel,
-    this.onAction,
-  });
+  const _Section({required this.title, required this.child, this.actionLabel, this.onAction});
 
   final String title;
   final Widget child;
@@ -284,8 +188,7 @@ class _Section extends StatelessWidget {
           child: Row(
             children: [
               Expanded(child: Text(title, style: theme.textTheme.displaySmall)),
-              if (actionLabel != null)
-                TextButton(onPressed: onAction, child: Text(actionLabel!)),
+              if (actionLabel != null) TextButton(onPressed: onAction, child: Text(actionLabel!)),
             ],
           ),
         ),
@@ -356,8 +259,7 @@ class _PromoCard extends StatelessWidget {
                       if (banner.buttonText != null) ...[
                         const SizedBox(height: 12),
                         FilledButton(
-                          onPressed:
-                              banner.link == null ? null : () => context.go(banner.link!),
+                          onPressed: banner.link == null ? null : () => context.go(banner.link!),
                           child: Text(banner.buttonText!),
                         ),
                       ],
@@ -466,10 +368,7 @@ class _StatsBanner extends StatelessWidget {
                   style: theme.textTheme.titleLarge?.copyWith(color: Colors.white),
                 ),
                 const SizedBox(height: 2),
-                Text(
-                  label,
-                  style: theme.textTheme.labelSmall?.copyWith(color: Colors.white70),
-                ),
+                Text(label, style: theme.textTheme.labelSmall?.copyWith(color: Colors.white70)),
               ],
             ),
         ],
@@ -486,15 +385,15 @@ class _ServicesList extends StatelessWidget {
   /// use to their Material equivalents; anything new falls back to a neutral badge rather than
   /// rendering nothing.
   static IconData _icon(String name) => switch (name.split(' ').last) {
-        'fa-home' => Icons.home_outlined,
-        'fa-key' => Icons.vpn_key_outlined,
-        'fa-building' => Icons.apartment_outlined,
-        'fa-palette' => Icons.palette_outlined,
-        'fa-tools' => Icons.handyman_outlined,
-        'fa-bullhorn' => Icons.campaign_outlined,
-        'fa-shield' || 'shield' => Icons.verified_user_outlined,
-        _ => Icons.verified_outlined,
-      };
+    'fa-home' => Icons.home_outlined,
+    'fa-key' => Icons.vpn_key_outlined,
+    'fa-building' => Icons.apartment_outlined,
+    'fa-palette' => Icons.palette_outlined,
+    'fa-tools' => Icons.handyman_outlined,
+    'fa-bullhorn' => Icons.campaign_outlined,
+    'fa-shield' || 'shield' => Icons.verified_user_outlined,
+    _ => Icons.verified_outlined,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -538,10 +437,7 @@ class _Footer extends StatelessWidget {
           const SizedBox(height: 16),
           Text('BusinessHome', style: theme.textTheme.titleMedium),
           const SizedBox(height: 4),
-          Text(
-            "O'zbekistondagi yangi binolar va kvartiralar",
-            style: theme.textTheme.bodySmall,
-          ),
+          Text("O'zbekistondagi yangi binolar va kvartiralar", style: theme.textTheme.bodySmall),
           const SizedBox(height: 12),
           Wrap(
             spacing: 16,

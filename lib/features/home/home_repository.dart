@@ -1,5 +1,6 @@
 import '../../core/api/api_client.dart';
 import '../../core/models/homepage.dart';
+import '../../core/models/page_content.dart';
 import '../../core/models/project.dart';
 
 /// Everything the front page needs, in the same shape the site's `HomeComponent` assembles.
@@ -27,6 +28,18 @@ class HomeRepository {
   /// returns a sponsored master/designer pair for the category cards, a different section.
   Future<List<Project>> featured() =>
       _list('/viewer/projects', Project.fromJson, query: {'per_page': 6});
+
+  /// Hero copy and stat labels. The site's hero reads the `new-projects` page content on the home
+  /// page too — same slug, deliberately.
+  Future<PageContent?> heroContent() async {
+    try {
+      final res = await _api.get<dynamic>('/market/content/pages/new-projects');
+      final data = res.data;
+      return data is Map<String, dynamic> ? PageContent.fromJson(data) : null;
+    } catch (_) {
+      return null;
+    }
+  }
 
   Future<PlatformStats?> stats() async {
     try {

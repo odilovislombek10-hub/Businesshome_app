@@ -69,6 +69,12 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
+  assets:
+    # Saytdagi /images/logo.jpg — header'da o'sha logotip ishlatiladi.
+    # Papka yozuvlari rekursiv EMAS — har bir ichki papka alohida sanaladi.
+    - assets/images/
+    - assets/images/sectors/
+
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg
