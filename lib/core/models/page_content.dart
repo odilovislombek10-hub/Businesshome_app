@@ -9,6 +9,13 @@ class PageContent {
     this.heroDescription,
     this.heroBgUrl,
     this.stats = const [],
+    this.bannerEnabled = false,
+    this.bannerBadge,
+    this.bannerTitle,
+    this.bannerSubtitle,
+    this.bannerImageUrl,
+    this.bannerProjectDevCode,
+    this.bannerProjectId,
   });
 
   final String? heroBadge;
@@ -18,6 +25,21 @@ class PageContent {
 
   /// The three value/label pairs shown under the hero.
   final List<PageStat> stats;
+
+  /// The promo banner further down the page. The admin can switch it off, and the site skips the
+  /// whole section when it is off.
+  final bool bannerEnabled;
+  final String? bannerBadge;
+  final String? bannerTitle;
+  final String? bannerSubtitle;
+  final String? bannerImageUrl;
+  final String? bannerProjectDevCode;
+  final int? bannerProjectId;
+
+  /// Where the banner links: a project's vanity URL when both codes are set, else new projects.
+  String get bannerLink => (bannerProjectDevCode != null && bannerProjectId != null)
+      ? '/$bannerProjectDevCode/$bannerProjectId'
+      : '/new-projects';
 
   factory PageContent.fromJson(Map<String, dynamic> json) {
     String? read(String key) {
@@ -40,6 +62,13 @@ class PageContent {
       heroDescription: read('hero_description'),
       heroBgUrl: read('hero_bg_url'),
       stats: stats,
+      bannerEnabled: json['banner_enabled'] == true,
+      bannerBadge: read('banner_badge'),
+      bannerTitle: read('banner_title'),
+      bannerSubtitle: read('banner_subtitle'),
+      bannerImageUrl: read('banner_image_url'),
+      bannerProjectDevCode: read('banner_project_dev_code'),
+      bannerProjectId: (json['banner_project_id'] as num?)?.toInt(),
     );
   }
 }

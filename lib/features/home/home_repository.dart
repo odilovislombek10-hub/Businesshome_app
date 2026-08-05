@@ -1,9 +1,12 @@
 import '../../core/api/api_client.dart';
+import '../../core/models/content.dart';
 import '../../core/models/developer_summary.dart';
 import '../../core/models/homepage.dart';
 import '../../core/models/page_content.dart';
 import '../../core/models/project.dart';
 import '../../core/models/property_listing.dart';
+import '../../core/models/reel.dart';
+import '../../core/models/specialist.dart';
 
 /// Everything the front page needs, in the same shape the site's `HomeComponent` assembles.
 ///
@@ -22,6 +25,26 @@ class HomeRepository {
 
   Future<List<DeveloperSummary>> developers() =>
       _list('/market/developers', DeveloperSummary.fromJson);
+
+  Future<List<FeatureItem>> features() => _list('/market/content/features', FeatureItem.fromJson);
+
+  Future<List<NewsItem>> news() =>
+      _list('/market/content/news', NewsItem.fromJson, query: {'per_page': 3});
+
+  Future<List<Reel>> reels() => _list('/market/reels', Reel.fromJson, query: {'per_page': 10});
+
+  /// The four "top picks" strips. Counts match the site: 4 listings each, 6 specialists each.
+  Future<List<PropertyListing>> topSecondary() =>
+      _list('/market/secondary', PropertyListing.fromJson, query: {'page': 1, 'per_page': 4});
+
+  Future<List<PropertyListing>> topRent() =>
+      _list('/market/rent', PropertyListing.fromJson, query: {'page': 1, 'per_page': 4});
+
+  Future<List<Specialist>> topDesigners() =>
+      _list('/market/designers', Specialist.fromJson, query: {'page': 1, 'per_page': 6});
+
+  Future<List<Specialist>> topMasters() =>
+      _list('/market/masters', Specialist.fromJson, query: {'page': 1, 'per_page': 6});
 
   Future<List<PromoBanner>> promoBanners() =>
       _list('/market/homepage/promo-banners', PromoBanner.fromJson);
