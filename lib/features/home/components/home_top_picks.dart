@@ -127,7 +127,8 @@ class _Block extends StatelessWidget {
             crossAxisCount: 2,
             mainAxisSpacing: 12, // gap-3
             crossAxisSpacing: 12,
-            childAspectRatio: 0.72,
+            // Taller than it looks: the text block needs room for title, district and stats.
+            childAspectRatio: 0.62,
             children: children,
           ),
         ],

@@ -27,7 +27,7 @@ class PropertyCategories extends StatelessWidget {
     return ColoredBox(
       color: AppColors.cream,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 40, 16, 40), // py-10
+        padding: const EdgeInsets.fromLTRB(16, 32, 16, 32),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -35,11 +35,8 @@ class PropertyCategories extends StatelessWidget {
               'Kvartiralardan tashqari',
               style: theme.textTheme.displaySmall?.copyWith(fontSize: 24, color: AppColors.dark),
             ),
-            const SizedBox(height: 32), // mb-8
-            for (final category in categories) ...[
-              _CategoryTile(category: category, top: topListings[category.id]),
-              const SizedBox(height: 16), // gap-4
-            ],
+            const SizedBox(height: 20),
+            _CategoryBento(categories: categories, topListings: topListings),
           ],
         ),
       ),
@@ -47,11 +44,99 @@ class PropertyCategories extends StatelessWidget {
   }
 }
 
+/// Bento arrangement for the category block.
+///
+/// A plain stack of full-width tiles ate most of a screen for five categories. This packs the
+/// same set into roughly one third of that: the first category takes a tall hero cell on the
+/// left, the next two stack beside it, and anything after that runs along a short strip
+/// underneath. The eye gets one clear entry point instead of five equal blocks.
+class _CategoryBento extends StatelessWidget {
+  const _CategoryBento({required this.categories, required this.topListings});
+
+  final List<PropertyCategory> categories;
+  final Map<int, PropertyListing> topListings;
+
+  static const _gap = 10.0;
+
+  /// Height of the hero row. The two stacked cells split it, so each lands near 4:3.
+  static const _heroHeight = 190.0;
+  static const _stripHeight = 78.0;
+
+  @override
+  Widget build(BuildContext context) {
+    if (categories.isEmpty) return const SizedBox.shrink();
+
+    final hero = categories.first;
+    final side = categories.skip(1).take(2).toList();
+    final strip = categories.skip(3).toList();
+
+    return Column(
+      children: [
+        SizedBox(
+          height: _heroHeight,
+          child: Row(
+            children: [
+              // Hero cell — the widest and the only one that keeps the listing overlay.
+              Expanded(
+                flex: side.isEmpty ? 1 : 53,
+                child: _CategoryTile(category: hero, top: topListings[hero.id]),
+              ),
+              if (side.isNotEmpty) ...[
+                const SizedBox(width: _gap),
+                Expanded(
+                  flex: 47,
+                  child: Column(
+                    children: [
+                      for (final (i, category) in side.indexed) ...[
+                        if (i > 0) const SizedBox(height: _gap),
+                        Expanded(
+                          child: _CategoryTile(
+                            category: category,
+                            top: topListings[category.id],
+                            compact: true,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+        if (strip.isNotEmpty) ...[
+          const SizedBox(height: _gap),
+          SizedBox(
+            height: _stripHeight,
+            child: Row(
+              children: [
+                for (final (i, category) in strip.indexed) ...[
+                  if (i > 0) const SizedBox(width: _gap),
+                  Expanded(
+                    child: _CategoryTile(
+                      category: category,
+                      top: topListings[category.id],
+                      compact: true,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
 class _CategoryTile extends StatelessWidget {
-  const _CategoryTile({required this.category, this.top});
+  const _CategoryTile({required this.category, this.top, this.compact = false});
 
   final PropertyCategory category;
   final PropertyListing? top;
+
+  /// The smaller cells: title only, no listing overlay — there is no room for it.
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -65,53 +150,58 @@ class _CategoryTile extends StatelessWidget {
 
     return Pressable.builder(
       onTap: () => context.go(category.link),
-      builder: (context, pressed) => AspectRatio(
-        aspectRatio: 4 / 3,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(AppRadius.lg), // rounded-2xl
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              ZoomOnPress(
-                pressed: pressed,
-                child: CachedNetworkImage(
-                  imageUrl: image,
-                  fit: BoxFit.cover,
-                  placeholder: (_, _) => const ColoredBox(color: AppColors.oliveMuted),
-                  errorWidget: (_, _, _) => const ColoredBox(color: AppColors.oliveMuted),
-                ),
+      // The bento gives each cell its size, so no AspectRatio here.
+      builder: (context, pressed) => ClipRRect(
+        borderRadius: BorderRadius.circular(AppRadius.lg), // rounded-2xl
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            ZoomOnPress(
+              pressed: pressed,
+              child: CachedNetworkImage(
+                imageUrl: image,
+                fit: BoxFit.cover,
+                placeholder: (_, _) => const ColoredBox(color: AppColors.oliveMuted),
+                errorWidget: (_, _, _) => const ColoredBox(color: AppColors.oliveMuted),
               ),
+            ),
 
-              // `h-32 from-dark/70 to-transparent` across the top, behind the name.
-              Align(
-                alignment: Alignment.topCenter,
-                child: SizedBox(
-                  height: 128,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [AppColors.dark.withValues(alpha: 0.7), Colors.transparent],
-                      ),
+            // `h-32 from-dark/70 to-transparent` across the top, behind the name.
+            Align(
+              alignment: Alignment.topCenter,
+              child: SizedBox(
+                height: compact ? 60 : 128,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [AppColors.dark.withValues(alpha: 0.7), Colors.transparent],
                     ),
-                    child: const SizedBox(width: double.infinity),
                   ),
+                  child: const SizedBox(width: double.infinity),
                 ),
               ),
-              Positioned(
-                top: 16,
-                left: 16,
-                right: 16,
-                child: Text(
-                  category.name,
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                  ),
+            ),
+            Positioned(
+              top: compact ? 10 : 16,
+              left: compact ? 10 : 16,
+              right: compact ? 10 : 16,
+              child: Text(
+                category.name,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontSize: compact ? 13 : 20,
+                  height: 1.15,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
+            ),
 
+            // The listing overlay only fits the hero cell.
+            if (!compact)
               if (top case final listing?)
                 Positioned(
                   left: 0,
@@ -173,8 +263,7 @@ class _CategoryTile extends StatelessWidget {
                     ),
                   ),
                 ),
-            ],
-          ),
+          ],
         ),
       ),
     );

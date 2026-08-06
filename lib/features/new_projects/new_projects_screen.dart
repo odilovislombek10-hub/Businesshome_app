@@ -54,12 +54,18 @@ class _NewProjectsScreenState extends State<NewProjectsScreen> {
           }
           return RefreshIndicator(
             onRefresh: _refresh,
-            child: ListView.separated(
-              padding: const EdgeInsets.all(12),
+            // Two per row so four cards fit one screen, like the other listing pages.
+            child: GridView.builder(
+              padding: const EdgeInsets.all(16),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 16,
+                crossAxisSpacing: 16,
+                childAspectRatio: PropertyCard.compactAspectRatio,
+              ),
               itemCount: projects.length,
-              separatorBuilder: (_, _) => const SizedBox(height: 12),
               itemBuilder: (context, i) =>
-                  PropertyCard(property: PropertyView.fromProject(projects[i])),
+                  PropertyCard(property: PropertyView.fromProject(projects[i]), compact: true),
             ),
           );
         },
