@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:path_drawing/path_drawing.dart';
 
 import '../../../app/theme.dart';
+import '../../../shared/widgets/entrance.dart';
 import 'uzbekistan_map_data.dart';
 
 /// One region's prices, from `/api/market/regions/price-map`.
@@ -31,6 +33,16 @@ class RegionPrice {
     };
   }
 
+  /// Drawing id back to the value the listing filters expect (`mapToApiKey` on the site).
+  static String toApiRegion(String mapId) => switch (mapId) {
+    'sirdaryo' => 'syrdarya',
+    'jizzakh' => 'jizzax',
+    'navoiy' => 'navoi',
+    'khorezm' => 'khorazm',
+    'tashkent' => 'tashkent_region',
+    _ => mapId,
+  };
+
   /// The price endpoint and the map drawing spell a few regions differently.
   static String _canonicalId(String region) => switch (region) {
     'syrdarya' => 'sirdaryo',
@@ -42,6 +54,24 @@ class RegionPrice {
     'tashkent_region' => 'tashkent',
     _ => region,
   };
+}
+
+/// The `map.*` strings from the site's `i18n/uz.ts`, kept together so they stay comparable.
+abstract final class MapTexts {
+  static const title = "O'zbekiston bo'ylab ko'chmas mulk narxlari";
+  static const rent = 'Ijara';
+  static const buy = 'Sotib olish';
+  static const rentPrices = 'Ijara narxlari';
+  static const buyPrices = 'Sotib olish narxlari';
+  static const highest = 'Eng yuqori:';
+  static const average = "O'rtacha:";
+  static const lowest = 'Eng past:';
+  static const dataNote = "* Ma'lumotlar so'nggi 3 oy asosida";
+  static const backToList = "Narxlar ro'yxatiga qaytish";
+  static const fullMap = "To'liq xarita";
+  static const viewRentListings = "Bu hududdagi ijara variantlari";
+  static const viewBuyListings = "Bu hududdagi sotuvdagi uylar";
+  static const viewListings = "ta e'lonni ko'rish";
 }
 
 /// The site's `property-price-map`: a tinted map of Uzbekistan where each region's shade comes
@@ -60,6 +90,12 @@ class PropertyPriceMap extends StatefulWidget {
 class _PropertyPriceMapState extends State<PropertyPriceMap> {
   bool _rentTab = true;
   String? _selected;
+
+  /// `zoomIn`/`zoomOut` step by 0.3 and clamp to 1..2.5, as on the site.
+  double _scale = 1;
+
+  /// On phones the site hides the legend behind a button (`sm:hidden` toggle).
+  bool _legendOpen = false;
 
   Map<String, RegionPrice> get _prices => _rentTab ? widget.rentPrices : widget.buyPrices;
 
@@ -106,7 +142,7 @@ class _PropertyPriceMapState extends State<PropertyPriceMap> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "O'zbekiston bo'ylab ko'chmas mulk narxlari",
+              MapTexts.title,
               style: theme.textTheme.displaySmall?.copyWith(fontSize: 24, color: AppColors.dark),
             ),
             const SizedBox(height: 16), // mb-4
@@ -122,7 +158,7 @@ class _PropertyPriceMapState extends State<PropertyPriceMap> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   _Tab(
-                    label: 'Ijara',
+                    label: MapTexts.rent,
                     active: _rentTab,
                     onTap: () => setState(() {
                       _rentTab = true;
@@ -130,7 +166,7 @@ class _PropertyPriceMapState extends State<PropertyPriceMap> {
                     }),
                   ),
                   _Tab(
-                    label: 'Sotib olish',
+                    label: MapTexts.buy,
                     active: !_rentTab,
                     onTap: () => setState(() {
                       _rentTab = false;
@@ -150,42 +186,136 @@ class _PropertyPriceMapState extends State<PropertyPriceMap> {
               ),
               child: Column(
                 children: [
-                  AspectRatio(
-                    aspectRatio: UzbekistanMap.viewBox.width / UzbekistanMap.viewBox.height,
-                    child: LayoutBuilder(
-                      builder: (context, constraints) => GestureDetector(
-                        onTapUp: (details) {
-                          final id = _MapPainter.regionAt(
-                            details.localPosition,
-                            Size(constraints.maxWidth, constraints.maxHeight),
-                          );
-                          setState(() => _selected = id == _selected ? null : id);
-                        },
-                        child: CustomPaint(
-                          painter: _MapPainter(
-                            ranking: ranking,
-                            selected: _selected,
-                            hasPrices: _prices.isNotEmpty,
-                          ),
-                          size: Size.infinite,
+                  Stack(
+                    children: [
+                      AspectRatio(
+                        aspectRatio: UzbekistanMap.viewBox.width / UzbekistanMap.viewBox.height,
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            final box = Size(constraints.maxWidth, constraints.maxHeight);
+                            return GestureDetector(
+                              onTapUp: (details) {
+                                // Undo the zoom before hit-testing, or the tap lands on whatever
+                                // region sits at the untransformed point.
+                                final centre = Offset(box.width / 2, box.height / 2);
+                                final local = centre + (details.localPosition - centre) / _scale;
+                                final id = _MapPainter.regionAt(local, box);
+                                setState(() => _selected = id == _selected ? null : id);
+                              },
+                              child: Transform.scale(
+                                scale: _scale,
+                                child: CustomPaint(
+                                  painter: _MapPainter(
+                                    ranking: ranking,
+                                    selected: _selected,
+                                    hasPrices: _prices.isNotEmpty,
+                                  ),
+                                  size: Size.infinite,
+                                ),
+                              ),
+                            );
+                          },
                         ),
                       ),
-                    ),
+                      Positioned(
+                        top: 16,
+                        right: 16,
+                        child: Pressable(
+                          onTap: () => context.go('/map'),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(AppRadius.sm),
+                              border: Border.all(color: AppColors.dark.withValues(alpha: 0.05)),
+                              boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 12)],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.open_in_full, size: 16, color: AppColors.olive),
+                                const SizedBox(width: 8),
+                                Text(
+                                  MapTexts.fullMap,
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: AppColors.olive,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        top: 68,
+                        right: 16,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(AppRadius.sm),
+                            border: Border.all(color: AppColors.dark.withValues(alpha: 0.05)),
+                            boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 12)],
+                          ),
+                          child: Column(
+                            children: [
+                              // +/- 0.3 clamped to 1..2.5, the site's step and bounds.
+                              _ZoomButton(
+                                icon: Icons.add,
+                                onTap: () =>
+                                    setState(() => _scale = (_scale + 0.3).clamp(1.0, 2.5)),
+                              ),
+                              _ZoomButton(
+                                icon: Icons.remove,
+                                onTap: () =>
+                                    setState(() => _scale = (_scale - 0.3).clamp(1.0, 2.5)),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   if (_selected case final id?)
                     _RegionPanel(
                       region: UzbekistanMap.regions.firstWhere((r) => r.id == id),
                       price: _prices[id],
                       format: _format,
+                      rentTab: _rentTab,
                       onBack: () => setState(() => _selected = null),
                     )
-                  else
-                    _Legend(
-                      title: _rentTab ? 'Ijara narxlari' : 'Sotib olish narxlari',
-                      highest: _format(_maxPrice),
-                      average: _format(_avgPrice),
-                      lowest: _format(_minPrice),
+                  else ...[
+                    // On phones the site hides the legend behind a button.
+                    Pressable(
+                      onTap: () => setState(() => _legendOpen = !_legendOpen),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.layers_outlined, size: 16, color: AppColors.olive),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                _rentTab ? MapTexts.rentPrices : MapTexts.buyPrices,
+                                style: theme.textTheme.titleMedium?.copyWith(color: AppColors.dark),
+                              ),
+                            ),
+                            Icon(
+                              _legendOpen ? Icons.expand_less : Icons.expand_more,
+                              size: 18,
+                              color: AppColors.dark.withValues(alpha: 0.4),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
+                    if (_legendOpen)
+                      _Legend(
+                        highest: _format(_maxPrice),
+                        average: _format(_avgPrice),
+                        lowest: _format(_minPrice),
+                      ),
+                  ],
                 ],
               ),
             ),
@@ -307,15 +437,25 @@ class _MapPainter extends CustomPainter {
       old.selected != selected || old.hasPrices != hasPrices || old.ranking != ranking;
 }
 
-class _Legend extends StatelessWidget {
-  const _Legend({
-    required this.title,
-    required this.highest,
-    required this.average,
-    required this.lowest,
-  });
+/// One of the two square zoom controls stacked beside the map.
+class _ZoomButton extends StatelessWidget {
+  const _ZoomButton({required this.icon, required this.onTap});
 
-  final String title;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Pressable(
+      onTap: onTap,
+      child: SizedBox(width: 32, height: 32, child: Icon(icon, size: 16, color: AppColors.dark)),
+    );
+  }
+}
+
+class _Legend extends StatelessWidget {
+  const _Legend({required this.highest, required this.average, required this.lowest});
+
   final String highest;
   final String average;
   final String lowest;
@@ -328,8 +468,6 @@ class _Legend extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: theme.textTheme.titleMedium?.copyWith(color: AppColors.dark)),
-          const Padding(padding: EdgeInsets.symmetric(vertical: 8), child: Divider(height: 1)),
           Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -352,11 +490,11 @@ class _Legend extends StatelessWidget {
               Expanded(
                 child: Column(
                   children: [
-                    _LegendRow(label: 'Eng yuqori:', value: highest),
+                    _LegendRow(label: MapTexts.highest, value: highest),
                     const SizedBox(height: 8),
-                    _LegendRow(label: "O'rtacha:", value: average),
+                    _LegendRow(label: MapTexts.average, value: average),
                     const SizedBox(height: 8),
-                    _LegendRow(label: 'Eng past:', value: lowest),
+                    _LegendRow(label: MapTexts.lowest, value: lowest),
                   ],
                 ),
               ),
@@ -364,7 +502,7 @@ class _Legend extends StatelessWidget {
           ),
           const Padding(padding: EdgeInsets.only(top: 12, bottom: 8), child: Divider(height: 1)),
           Text(
-            "* Ma'lumotlar so'nggi 3 oy asosida",
+            MapTexts.dataNote,
             style: theme.textTheme.labelSmall?.copyWith(
               fontSize: 11,
               color: AppColors.dark.withValues(alpha: 0.4),
@@ -409,12 +547,16 @@ class _RegionPanel extends StatelessWidget {
     required this.region,
     required this.price,
     required this.format,
+    required this.rentTab,
     required this.onBack,
   });
 
   final MapRegion region;
   final RegionPrice? price;
   final String Function(num) format;
+
+  /// Decides both the button label and which listing page it opens.
+  final bool rentTab;
   final VoidCallback onBack;
 
   @override
@@ -433,7 +575,7 @@ class _RegionPanel extends StatelessWidget {
                 Icon(Icons.arrow_back, size: 16, color: AppColors.dark.withValues(alpha: 0.6)),
                 const SizedBox(width: 8),
                 Text(
-                  "Narxlar ro'yxatiga qaytish",
+                  MapTexts.backToList,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: AppColors.dark.withValues(alpha: 0.6),
                   ),
@@ -465,12 +607,62 @@ class _RegionPanel extends StatelessWidget {
               ),
             )
           else ...[
-            _LegendRow(label: 'Eng yuqori:', value: format(price!.highest)),
+            _LegendRow(label: MapTexts.highest, value: format(price!.highest)),
             const SizedBox(height: 8),
-            _LegendRow(label: "O'rtacha:", value: format(price!.average)),
+            _LegendRow(label: MapTexts.average, value: format(price!.average)),
             const SizedBox(height: 8),
-            _LegendRow(label: 'Eng past:', value: format(price!.lowest)),
+            _LegendRow(label: MapTexts.lowest, value: format(price!.lowest)),
           ],
+          const SizedBox(height: 16),
+          // Straight into the listings for this region, filtered by `city`.
+          Pressable(
+            onTap: () => context.go(
+              '${rentTab ? '/rent' : '/secondary'}?city=${RegionPrice.toApiRegion(region.id)}',
+            ),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              decoration: BoxDecoration(
+                color: AppColors.olive,
+                borderRadius: BorderRadius.circular(AppRadius.sm),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.search, size: 16, color: Colors.white),
+                  const SizedBox(width: 8),
+                  Text(
+                    rentTab ? MapTexts.viewRentListings : MapTexts.viewBuyListings,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Pressable(
+            onTap: () => context.go('/new-projects?city=${RegionPrice.toApiRegion(region.id)}'),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(AppRadius.sm),
+                border: Border.all(color: AppColors.olive.withValues(alpha: 0.4)),
+              ),
+              child: Center(
+                child: Text(
+                  'Loyihalarni ko\'rish',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: AppColors.olive,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
