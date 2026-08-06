@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/theme.dart';
+import '../../../shared/widgets/entrance.dart';
 import '../../../core/api/media_url.dart';
 import '../../../core/models/reel.dart';
 
@@ -159,9 +160,9 @@ class _ReelCard extends StatelessWidget {
     final thumbnail = absoluteMediaUrl(reel.thumbnail);
     final avatar = absoluteMediaUrl(reel.authorAvatar);
 
-    return GestureDetector(
+    return Pressable.builder(
       onTap: () => context.go('/reels/${reel.id}'),
-      child: SizedBox(
+      builder: (context, pressed) => SizedBox(
         width: width,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(AppRadius.lg), // rounded-2xl
@@ -169,11 +170,14 @@ class _ReelCard extends StatelessWidget {
             fit: StackFit.expand,
             children: [
               if (thumbnail != null)
-                CachedNetworkImage(
-                  imageUrl: thumbnail,
-                  fit: BoxFit.cover,
-                  placeholder: (_, _) => const ColoredBox(color: AppColors.dark),
-                  errorWidget: (_, _, _) => const ColoredBox(color: AppColors.dark),
+                ZoomOnPress(
+                  pressed: pressed,
+                  child: CachedNetworkImage(
+                    imageUrl: thumbnail,
+                    fit: BoxFit.cover,
+                    placeholder: (_, _) => const ColoredBox(color: AppColors.dark),
+                    errorWidget: (_, _, _) => const ColoredBox(color: AppColors.dark),
+                  ),
                 )
               else
                 const ColoredBox(color: AppColors.dark),

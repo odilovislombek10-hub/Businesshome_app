@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/theme.dart';
+import '../../../shared/widgets/entrance.dart';
 import '../../../core/api/media_url.dart';
 import '../../../core/models/content.dart';
 
@@ -69,9 +70,9 @@ class _NewsCard extends StatelessWidget {
     // The site substitutes a stock photo rather than leaving the card imageless.
     final image = absoluteMediaUrl(item.image) ?? NewsItem.fallbackImage;
 
-    return GestureDetector(
+    return Pressable.builder(
       onTap: () => context.go('/news/${item.id}'),
-      child: Container(
+      builder: (context, pressed) => Container(
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           color: AppColors.surfaceAltLight, // bg-gray-50
@@ -120,11 +121,14 @@ class _NewsCard extends StatelessWidget {
             ),
             AspectRatio(
               aspectRatio: 4 / 3,
-              child: CachedNetworkImage(
-                imageUrl: image,
-                fit: BoxFit.cover,
-                placeholder: (_, _) => const ColoredBox(color: AppColors.surfaceMutedLight),
-                errorWidget: (_, _, _) => const ColoredBox(color: AppColors.surfaceMutedLight),
+              child: ZoomOnPress(
+                pressed: pressed,
+                child: CachedNetworkImage(
+                  imageUrl: image,
+                  fit: BoxFit.cover,
+                  placeholder: (_, _) => const ColoredBox(color: AppColors.surfaceMutedLight),
+                  errorWidget: (_, _, _) => const ColoredBox(color: AppColors.surfaceMutedLight),
+                ),
               ),
             ),
           ],

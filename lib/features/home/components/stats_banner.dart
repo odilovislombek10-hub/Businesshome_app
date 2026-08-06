@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../app/theme.dart';
+import '../../../shared/widgets/entrance.dart';
 import '../../../core/api/media_url.dart';
 import '../../../core/models/homepage.dart';
 
@@ -206,16 +207,19 @@ class _VideoPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return GestureDetector(
+    return Pressable.builder(
       onTap: onTap,
-      child: ClipRRect(
+      builder: (context, pressed) => ClipRRect(
         borderRadius: BorderRadius.circular(AppRadius.lg),
         child: AspectRatio(
           aspectRatio: 16 / 9,
           child: Stack(
             fit: StackFit.expand,
             children: [
-              CachedNetworkImage(imageUrl: thumbnail, fit: BoxFit.cover),
+              ZoomOnPress(
+                pressed: pressed,
+                child: CachedNetworkImage(imageUrl: thumbnail, fit: BoxFit.cover),
+              ),
               ColoredBox(color: AppColors.dark.withValues(alpha: 0.3)),
               Center(
                 child: Container(

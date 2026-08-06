@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/theme.dart';
+import '../../../shared/widgets/entrance.dart';
 import '../../../core/api/media_url.dart';
 import '../../../core/models/page_content.dart';
 
@@ -29,20 +30,23 @@ class PromoBanner extends StatelessWidget {
       color: AppColors.cream,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32), // py-8
-        child: GestureDetector(
+        child: Pressable.builder(
           onTap: () => context.go(content.bannerLink),
-          child: ClipRRect(
+          builder: (context, pressed) => ClipRRect(
             borderRadius: BorderRadius.circular(AppRadius.md), // rounded-xl
             child: SizedBox(
               height: 200, // h-[200px]
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  CachedNetworkImage(
-                    imageUrl: image,
-                    fit: BoxFit.cover,
-                    placeholder: (_, _) => const ColoredBox(color: AppColors.oliveMuted),
-                    errorWidget: (_, _, _) => const ColoredBox(color: AppColors.oliveMuted),
+                  ZoomOnPress(
+                    pressed: pressed,
+                    child: CachedNetworkImage(
+                      imageUrl: image,
+                      fit: BoxFit.cover,
+                      placeholder: (_, _) => const ColoredBox(color: AppColors.oliveMuted),
+                      errorWidget: (_, _, _) => const ColoredBox(color: AppColors.oliveMuted),
+                    ),
                   ),
                   // `from-black/80 via-black/55 to-black/10`, left to right.
                   const DecoratedBox(

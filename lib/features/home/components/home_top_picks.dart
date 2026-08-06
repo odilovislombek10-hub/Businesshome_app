@@ -6,6 +6,7 @@ import '../../../app/theme.dart';
 import '../../../core/api/media_url.dart';
 import '../../../core/models/property_listing.dart';
 import '../../../core/models/specialist.dart';
+import '../../../shared/widgets/entrance.dart';
 import 'property_categories.dart' show priceLabel;
 
 /// The site's `home-top-picks`: four small-card blocks — top secondary listings, top rentals, top
@@ -143,6 +144,7 @@ class _SmallCard extends StatelessWidget {
     required this.aspectRatio,
     required this.body,
     this.chip,
+    this.zoom = 1.05,
   });
 
   final VoidCallback onTap;
@@ -151,11 +153,14 @@ class _SmallCard extends StatelessWidget {
   final Widget body;
   final Widget? chip;
 
+  /// `group-hover:scale-105` for listings, `scale-110` for specialists.
+  final double zoom;
+
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return Pressable.builder(
       onTap: onTap,
-      child: Container(
+      builder: (context, pressed) => Container(
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           color: Colors.white,
@@ -171,12 +176,16 @@ class _SmallCard extends StatelessWidget {
                 fit: StackFit.expand,
                 children: [
                   if (image != null)
-                    CachedNetworkImage(
-                      imageUrl: image!,
-                      fit: BoxFit.cover,
-                      placeholder: (_, _) => const ColoredBox(color: AppColors.surfaceMutedLight),
-                      errorWidget: (_, _, _) =>
-                          const ColoredBox(color: AppColors.surfaceMutedLight),
+                    ZoomOnPress(
+                      pressed: pressed,
+                      scale: zoom,
+                      child: CachedNetworkImage(
+                        imageUrl: image!,
+                        fit: BoxFit.cover,
+                        placeholder: (_, _) => const ColoredBox(color: AppColors.surfaceMutedLight),
+                        errorWidget: (_, _, _) =>
+                            const ColoredBox(color: AppColors.surfaceMutedLight),
+                      ),
                     )
                   else
                     const ColoredBox(color: AppColors.surfaceMutedLight),
@@ -284,6 +293,7 @@ class _SpecialistTile extends StatelessWidget {
       onTap: () => context.go(specialist.pathIn(section)),
       image: absoluteMediaUrl(specialist.image),
       aspectRatio: 1,
+      zoom: 1.10, // group-hover:scale-110
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,

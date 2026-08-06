@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../app/theme.dart';
 import '../../../core/models/project.dart';
 import '../../../shared/models/property_view.dart';
+import '../../../shared/widgets/entrance.dart';
 import '../../../shared/widgets/property_card.dart';
 
 /// The site's `featured-buildings` block.
@@ -40,8 +41,12 @@ class FeaturedBuildings extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            for (final project in projects) ...[
-              PropertyCard(property: PropertyView.fromProject(project)),
+            // `animate-fade-in` with `animation-delay: (i * 100)ms` — the site staggers the cards.
+            for (final (i, project) in projects.indexed) ...[
+              Entrance.fadeIn(
+                delay: Duration(milliseconds: i * 100),
+                child: PropertyCard(property: PropertyView.fromProject(project)),
+              ),
               const SizedBox(height: 16), // gap-4
             ],
             const SizedBox(height: 32),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../app/theme.dart';
 import '../../core/services/ai_chat_service.dart';
+import 'entrance.dart';
 
 /// The site's floating `ai-assistant` — "Aziza".
 ///
@@ -69,7 +70,8 @@ class _AiAssistantState extends State<AiAssistant> {
                 ),
               ),
             ),
-          GestureDetector(
+          Pressable(
+            scale: 0.9, // active:scale-90
             onTap: _open,
             child: Stack(
               clipBehavior: Clip.none,
@@ -97,13 +99,15 @@ class _AiAssistantState extends State<AiAssistant> {
                 Positioned(
                   top: -2,
                   right: -2,
-                  child: Container(
-                    width: 12,
-                    height: 12,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFEF4444), // red-500
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2),
+                  child: Pulse(
+                    child: Container(
+                      width: 12,
+                      height: 12,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFEF4444), // red-500
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 2),
+                      ),
                     ),
                   ),
                 ),
@@ -211,12 +215,16 @@ class _ChatSheetState extends State<_ChatSheet> {
                         ),
                         Row(
                           children: [
-                            Container(
-                              width: 6,
-                              height: 6,
-                              decoration: const BoxDecoration(
-                                color: Color(0xFF86EFAC), // green-300
-                                shape: BoxShape.circle,
+                            const Pulse(
+                              child: SizedBox(
+                                width: 6,
+                                height: 6,
+                                child: DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    color: Color(0xFF86EFAC), // green-300
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
                               ),
                             ),
                             const SizedBox(width: 6),
@@ -256,7 +264,8 @@ class _ChatSheetState extends State<_ChatSheet> {
                       runSpacing: 8,
                       children: [
                         for (final suggestion in _suggestions)
-                          GestureDetector(
+                          Pressable(
+                            scale: 0.95, // active:scale-95
                             onTap: () => _send(suggestion),
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),

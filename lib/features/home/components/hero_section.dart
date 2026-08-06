@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/theme.dart';
+import '../../../shared/widgets/entrance.dart';
 import '../../../core/api/media_url.dart';
 import '../../../core/models/page_content.dart';
 
@@ -181,50 +182,58 @@ class _HeroSectionState extends State<HeroSection> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  content?.heroTitle ?? 'Orzuingizdagi uyingizda yashang',
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.displayLarge?.copyWith(
-                    color: AppColors.cream,
-                    fontSize: 36, // text-4xl
+                // `animate-slide-up` on the title block and on the sector grid.
+                Entrance.slideUp(
+                  child: Text(
+                    content?.heroTitle ?? 'Orzuingizdagi uyingizda yashang',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.displayLarge?.copyWith(
+                      color: AppColors.cream,
+                      fontSize: 36, // text-4xl
+                    ),
                   ),
                 ),
                 const SizedBox(height: 32),
-                GridView.count(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 12,
-                  crossAxisSpacing: 12,
-                  children: [for (final sector in _sectors) _SectorTile(sector: sector)],
+                Entrance.slideUp(
+                  child: GridView.count(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
+                    children: [for (final sector in _sectors) _SectorTile(sector: sector)],
+                  ),
                 ),
                 const SizedBox(height: 48),
-                Wrap(
-                  alignment: WrapAlignment.center,
-                  spacing: 32,
-                  runSpacing: 16,
-                  children: [
-                    for (final stat in stats)
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            stat.value,
-                            style: theme.textTheme.titleLarge?.copyWith(
-                              color: AppColors.cream,
-                              fontSize: 30, // text-3xl
-                              fontWeight: FontWeight.w700,
+                Entrance.fadeIn(
+                  delay: const Duration(milliseconds: 300), // animate-delay-300
+                  child: Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 32,
+                    runSpacing: 16,
+                    children: [
+                      for (final stat in stats)
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              stat.value,
+                              style: theme.textTheme.titleLarge?.copyWith(
+                                color: AppColors.cream,
+                                fontSize: 30, // text-3xl
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
-                          ),
-                          Text(
-                            stat.label,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: AppColors.cream.withValues(alpha: 0.6),
+                            Text(
+                              stat.label,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: AppColors.cream.withValues(alpha: 0.6),
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                  ],
+                          ],
+                        ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -261,73 +270,73 @@ class _SectorTile extends StatelessWidget {
     final theme = Theme.of(context);
     // A plain Container, not `Ink`: `Ink` paints its decoration onto the nearest Material
     // ancestor, which here sits *behind* the hero photo — the gradient would never be seen.
-    return Container(
-      clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(AppRadius.xl), // rounded-3xl
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [sector.from, sector.to],
+    // `active:scale-[0.98]` shrinks the whole tile, so the press wrapper goes outside it.
+    return Pressable(
+      scale: 0.98,
+      onTap: () => context.go(sector.href),
+      child: Container(
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(AppRadius.xl), // rounded-3xl
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [sector.from, sector.to],
+          ),
         ),
-      ),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          Image.asset(
-            'assets/images/sectors/${sector.image}.png',
-            fit: BoxFit.cover,
-            // The site hides a missing tile image and leaves the gradient showing.
-            errorBuilder: (_, _, _) => const SizedBox.shrink(),
-          ),
-          const DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.bottomCenter,
-                end: Alignment.topCenter,
-                colors: [Colors.black54, Colors.black12, Colors.black26],
-              ),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.asset(
+              'assets/images/sectors/${sector.image}.png',
+              fit: BoxFit.cover,
+              // The site hides a missing tile image and leaves the gradient showing.
+              errorBuilder: (_, _, _) => const SizedBox.shrink(),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Align(
-              alignment: Alignment.topLeft,
-              child: FractionallySizedBox(
-                widthFactor: 0.78, // max-w-[78%]
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      sector.title,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                        height: 1.15,
-                        shadows: _textShadow,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      sector.description,
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: Colors.white.withValues(alpha: 0.9),
-                        height: 1.3,
-                        shadows: _textShadow,
-                      ),
-                    ),
-                  ],
+            const DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.bottomCenter,
+                  end: Alignment.topCenter,
+                  colors: [Colors.black54, Colors.black12, Colors.black26],
                 ),
               ),
             ),
-          ),
-          // Ripple on top of the artwork, transparent so the tile stays visible.
-          Material(
-            color: Colors.transparent,
-            child: InkWell(onTap: () => context.go(sector.href)),
-          ),
-        ],
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Align(
+                alignment: Alignment.topLeft,
+                child: FractionallySizedBox(
+                  widthFactor: 0.78, // max-w-[78%]
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        sector.title,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                          height: 1.15,
+                          shadows: _textShadow,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        sector.description,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: Colors.white.withValues(alpha: 0.9),
+                          height: 1.3,
+                          shadows: _textShadow,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

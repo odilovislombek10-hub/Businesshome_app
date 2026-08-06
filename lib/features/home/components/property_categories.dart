@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/theme.dart';
+import '../../../shared/widgets/entrance.dart';
 import '../../../core/api/media_url.dart';
 import '../../../core/models/homepage.dart';
 import '../../../core/models/property_listing.dart';
@@ -62,20 +63,23 @@ class _CategoryTile extends StatelessWidget {
         absoluteMediaUrl(category.image) ??
         _fallbackImage(_typeOf(category.link));
 
-    return GestureDetector(
+    return Pressable.builder(
       onTap: () => context.go(category.link),
-      child: AspectRatio(
+      builder: (context, pressed) => AspectRatio(
         aspectRatio: 4 / 3,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(AppRadius.lg), // rounded-2xl
           child: Stack(
             fit: StackFit.expand,
             children: [
-              CachedNetworkImage(
-                imageUrl: image,
-                fit: BoxFit.cover,
-                placeholder: (_, _) => const ColoredBox(color: AppColors.oliveMuted),
-                errorWidget: (_, _, _) => const ColoredBox(color: AppColors.oliveMuted),
+              ZoomOnPress(
+                pressed: pressed,
+                child: CachedNetworkImage(
+                  imageUrl: image,
+                  fit: BoxFit.cover,
+                  placeholder: (_, _) => const ColoredBox(color: AppColors.oliveMuted),
+                  errorWidget: (_, _, _) => const ColoredBox(color: AppColors.oliveMuted),
+                ),
               ),
 
               // `h-32 from-dark/70 to-transparent` across the top, behind the name.
