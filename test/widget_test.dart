@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:business_home/app/app.dart';
+import 'package:business_home/shared/widgets/site_icon.dart';
 import 'package:business_home/core/services/auth_service.dart';
 import 'package:business_home/core/services/theme_controller.dart';
 import 'package:business_home/shared/widgets/site_header.dart';
@@ -21,7 +21,8 @@ void main() {
 
     // The site's header — logo wordmark, the hamburger, and the hero's sector tiles under it.
     expect(find.byType(SiteHeader), findsOneWidget);
-    expect(find.byIcon(Icons.menu), findsOneWidget);
+    // The hamburger is the site's own SVG now, not a Material glyph.
+    expect(find.byType(SiteIcon), findsWidgets);
     expect(find.text('Novostroykalar'), findsOneWidget);
 
     // The home screen fires its section requests on init. There is no network here, so drain the

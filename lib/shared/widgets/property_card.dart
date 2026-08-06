@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../app/theme.dart';
 import '../../core/services/currency_service.dart';
 import '../models/property_view.dart';
+import 'site_icon.dart';
 
 /// Port of the site's `app-property-card`.
 ///
@@ -113,23 +114,19 @@ class _PropertyCardState extends State<PropertyCard> {
       const _Badge(
         label: 'TOP',
         background: Color(0xFFF59E0B), // amber-500
-        icon: Icons.star,
+        icon: SiteIcons.star,
       ),
     if (property.segmentLabel case final segment?)
       _Badge(label: segment, background: AppColors.olive),
     if (property.hasTour)
-      _Badge(
-        label: '3D',
-        background: AppColors.dark.withValues(alpha: 0.7),
-        icon: Icons.view_in_ar_outlined,
-      ),
+      _Badge(label: '3D', background: AppColors.dark.withValues(alpha: 0.7), icon: SiteIcons.box3d),
     if (property.tier == 'ultra')
-      const _Badge(label: 'Ultra', background: Color(0xFFF59E0B), icon: Icons.workspace_premium)
+      const _Badge(label: 'Ultra', background: Color(0xFFF59E0B), icon: SiteIcons.star)
     else if (property.tier == 'pro' || property.verified)
       const _Badge(
         label: 'Pro',
         background: Color(0xFF2563EB), // blue-600
-        icon: Icons.check,
+        icon: SiteIcons.check,
       ),
     if (property.completion case final completion?)
       _Badge(label: 'Topshirish: $completion', background: AppColors.olive.withValues(alpha: 0.8)),
@@ -141,7 +138,7 @@ class _Badge extends StatelessWidget {
 
   final String label;
   final Color background;
-  final IconData? icon;
+  final SiteIconData? icon;
 
   @override
   Widget build(BuildContext context) {
@@ -156,7 +153,7 @@ class _Badge extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (icon != null) ...[
-            Icon(icon, size: 12, color: Colors.white),
+            SiteIcon(icon!, size: 12, color: Colors.white),
             const SizedBox(width: 4),
           ],
           Text(
@@ -190,10 +187,12 @@ class _FavoriteButton extends StatelessWidget {
           shape: BoxShape.circle,
           boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 2))],
         ),
-        child: Icon(
-          isFavorite ? Icons.favorite : Icons.favorite_border,
-          size: 16,
-          color: isFavorite ? AppColors.cream : AppColors.dark.withValues(alpha: 0.6),
+        child: Center(
+          child: SiteIcon(
+            SiteIcons.heart,
+            size: 16,
+            color: isFavorite ? AppColors.cream : AppColors.dark.withValues(alpha: 0.6),
+          ),
         ),
       ),
     );
@@ -270,7 +269,7 @@ class _Info extends StatelessWidget {
           const SizedBox(height: 8),
           Row(
             children: [
-              Icon(Icons.place_outlined, size: 14, color: AppColors.cream.withValues(alpha: 0.7)),
+              SiteIcon(SiteIcons.mapPin, size: 14, color: AppColors.cream.withValues(alpha: 0.7)),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
@@ -295,7 +294,7 @@ class _Info extends StatelessWidget {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(icon, size: 14, color: Colors.white),
+                    SiteIcon(icon, size: 14, color: Colors.white),
                     const SizedBox(width: 4),
                     Text(label, style: _shadowed(theme.textTheme.labelSmall, Colors.white)),
                   ],
@@ -339,7 +338,7 @@ class _Info extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              const Icon(Icons.arrow_forward, size: 16, color: AppColors.olive),
+              const SiteIcon(SiteIcons.arrowRight, size: 16, color: AppColors.olive),
             ],
           ),
         ),
@@ -348,12 +347,12 @@ class _Info extends StatelessWidget {
   }
 
   /// The stats row, in the site's order: apartments, area, blocks, rooms, floors.
-  List<(IconData, String)> get _stats => [
-    if (property.totalApartments case final value?) (Icons.home_outlined, '$value'),
-    if (property.totalArea case final value?) (Icons.straighten, '${value.toStringAsFixed(0)} m²'),
-    if (property.totalBlocks case final value?) (Icons.apartment_outlined, '$value blok'),
-    if (property.rooms case final value?) (Icons.meeting_room_outlined, '$value xona'),
-    if (property.totalFloors case final value?) (Icons.layers_outlined, '$value qavat'),
+  List<(SiteIconData, String)> get _stats => [
+    if (property.totalApartments case final value?) (SiteIcons.house, '$value'),
+    if (property.totalArea case final value?) (SiteIcons.ruler, '${value.toStringAsFixed(0)} m²'),
+    if (property.totalBlocks case final value?) (SiteIcons.building, '$value blok'),
+    if (property.rooms case final value?) (SiteIcons.house, '$value xona'),
+    if (property.totalFloors case final value?) (SiteIcons.floors, '$value qavat'),
   ];
 
   /// Price per m² wins over the total, which wins over a plain price — the site's order.

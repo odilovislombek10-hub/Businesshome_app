@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../app/theme.dart';
+import 'entrance.dart';
+import 'site_icon.dart';
 import '../../core/services/auth_service.dart';
 import '../../core/services/theme_controller.dart';
 
@@ -88,7 +90,11 @@ class _SiteHeaderState extends State<SiteHeader> {
                 _IconButton(
                   onBar: onBar,
                   onPressed: () => setState(() => _menuOpen = !_menuOpen),
-                  child: Icon(_menuOpen ? Icons.close : Icons.menu, size: 24, color: onBar),
+                  child: SiteIcon(
+                    _menuOpen ? SiteIcons.close : SiteIcons.menu,
+                    size: 24,
+                    color: onBar,
+                  ),
                 ),
               ],
             ),
@@ -107,6 +113,7 @@ class _SiteHeaderState extends State<SiteHeader> {
                       controller: _search,
                       translucent: _isTranslucent,
                       onSubmit: widget.onSearch,
+                      onFilters: () => context.go('/secondary?filters=open'),
                     ),
                   ),
           ),
@@ -210,11 +217,19 @@ class _IconButton extends StatelessWidget {
 }
 
 class _SearchBar extends StatelessWidget {
-  const _SearchBar({required this.controller, required this.translucent, this.onSubmit});
+  const _SearchBar({
+    required this.controller,
+    required this.translucent,
+    this.onSubmit,
+    this.onFilters,
+  });
 
   final TextEditingController controller;
   final bool translucent;
   final ValueChanged<String>? onSubmit;
+
+  /// The filter button sitting inside the field's right edge, `/secondary?filters=open`.
+  final VoidCallback? onFilters;
 
   @override
   Widget build(BuildContext context) {
@@ -230,11 +245,42 @@ class _SearchBar extends StatelessWidget {
         hintStyle: TextStyle(
           color: translucent ? Colors.white70 : theme.colorScheme.onSurfaceVariant,
         ),
-        prefixIcon: Icon(
-          Icons.search,
-          size: 18,
-          color: translucent ? Colors.white70 : theme.colorScheme.onSurfaceVariant,
+        prefixIcon: Padding(
+          padding: const EdgeInsets.all(12),
+          child: SiteIcon(
+            SiteIcons.search,
+            size: 18,
+            color: translucent ? Colors.white70 : theme.colorScheme.onSurfaceVariant,
+          ),
         ),
+        // `w-11 h-10` with a divider on its left, exactly as the site places it.
+        suffixIcon: onFilters == null
+            ? null
+            : Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 1,
+                    height: 24,
+                    color: translucent ? Colors.white24 : theme.colorScheme.outlineVariant,
+                  ),
+                  Pressable(
+                    onTap: onFilters,
+                    child: SizedBox(
+                      width: 44,
+                      height: 40,
+                      child: Center(
+                        child: SiteIcon(
+                          SiteIcons.filters,
+                          size: 18,
+                          color: translucent ? Colors.white70 : theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+        suffixIconConstraints: const BoxConstraints(minWidth: 45, minHeight: 40),
         filled: true,
         fillColor: translucent ? Colors.white10 : theme.inputDecorationTheme.fillColor,
         contentPadding: const EdgeInsets.symmetric(vertical: 10),
@@ -367,38 +413,38 @@ class _MobileMenuPanelState extends State<MobileMenuPanel> {
                   ],
 
                   _MenuItem(
-                    icon: Icons.language,
+                    icon: SiteIcons.globe,
                     label: 'Til',
                     trailing: Text(_lang.toUpperCase(), style: theme.textTheme.labelSmall),
                     onTap: () => setState(() => _view = _MenuView.language),
                   ),
                   if (auth.isLoggedIn) ...[
                     _MenuItem(
-                      icon: Icons.dashboard_outlined,
+                      icon: SiteIcons.dashboard,
                       label: 'Mening kabinetim',
                       tint: AppColors.olive,
                       onTap: () => _go(context, '/cabinet'),
                     ),
                     _MenuItem(
-                      icon: Icons.favorite_outline,
+                      icon: SiteIcons.heart,
                       label: 'Sevimlilar',
                       tint: AppColors.danger,
                       onTap: () => _go(context, '/cabinet/favorites'),
                     ),
                   ],
                   _MenuItem(
-                    icon: Icons.play_circle_outline,
+                    icon: SiteIcons.reel,
                     label: 'Reels',
                     tint: const Color(0xFFF43F5E), // rose-500
                     onTap: () => _go(context, '/reels'),
                   ),
                   _MenuItem(
-                    icon: Icons.home_outlined,
+                    icon: SiteIcons.house,
                     label: 'Mening uyim',
                     onTap: () => _go(context, '/my-home'),
                   ),
                   _MenuItem(
-                    icon: themeController.isDark ? Icons.light_mode : Icons.dark_mode,
+                    icon: SiteIcons.moon,
                     label: 'Tema',
                     trailing: Text(
                       themeController.isDark ? 'Tungi' : 'Yorug‘',
@@ -450,7 +496,7 @@ class _MenuItem extends StatelessWidget {
     this.tint,
   });
 
-  final IconData icon;
+  final SiteIconData icon;
   final String label;
   final VoidCallback onTap;
   final Widget? trailing;
@@ -474,12 +520,12 @@ class _MenuItem extends StatelessWidget {
                 color: color.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(AppRadius.sm),
               ),
-              child: Icon(icon, size: 18, color: color),
+              child: Center(child: SiteIcon(icon, size: 18, color: color)),
             ),
             const SizedBox(width: 12),
             Expanded(child: Text(label, style: theme.textTheme.titleMedium)),
             if (trailing != null) ...[trailing!, const SizedBox(width: 8)],
-            Icon(Icons.chevron_right, size: 18, color: theme.colorScheme.onSurfaceVariant),
+            SiteIcon(SiteIcons.chevronRight, size: 18, color: theme.colorScheme.onSurfaceVariant),
           ],
         ),
       ),

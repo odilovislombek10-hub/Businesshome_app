@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../app/theme.dart';
 import '../../core/services/ai_chat_service.dart';
 import 'entrance.dart';
+import 'site_icon.dart';
 
 /// The site's floating `ai-assistant` — "Aziza".
 ///
@@ -94,7 +95,9 @@ class _AiAssistantState extends State<AiAssistant> {
                       ),
                     ],
                   ),
-                  child: const Icon(Icons.auto_awesome, color: Colors.white, size: 26),
+                  child: const Center(
+                    child: SiteIcon(SiteIcons.sparkle, size: 26, color: Colors.white),
+                  ),
                 ),
                 Positioned(
                   top: -2,
@@ -201,7 +204,7 @@ class _ChatSheetState extends State<_ChatSheet> {
                   const CircleAvatar(
                     radius: 18,
                     backgroundColor: Colors.white24,
-                    child: Icon(Icons.auto_awesome, color: Colors.white, size: 18),
+                    child: SiteIcon(SiteIcons.sparkle, size: 18, color: Colors.white),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
