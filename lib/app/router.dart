@@ -5,6 +5,7 @@ import '../features/auth/login_screen.dart';
 import '../features/auth/register_screen.dart';
 import '../features/home/home_screen.dart';
 import '../features/secondary/secondary_detail_screen.dart';
+import '../features/secondary/listings_config.dart';
 import '../features/secondary/secondary_screen.dart';
 import '../features/new_projects/new_projects_screen.dart';
 import '../shared/widgets/placeholder_screen.dart';
@@ -46,7 +47,11 @@ final appRouter = GoRouter(
     ),
     GoRoute(
       path: '/rent',
-      builder: (_, _) => const PlaceholderScreen(title: 'Ijara'),
+      builder: (_, state) => SecondaryScreen(
+        config: ListingsConfig.rent,
+        initialCity: state.uri.queryParameters['city'],
+        openFilters: state.uri.queryParameters['filters'] == 'open',
+      ),
     ),
     GoRoute(
       path: '/property/rent/:id',

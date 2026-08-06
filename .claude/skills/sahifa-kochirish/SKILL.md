@@ -166,6 +166,35 @@ Tugatgach shablon bilan qatorma-qator taqqosla:
 O'zbekcha, nima o'zgargani va **nega** — ayniqsa shablon bilan solishtirishda topilgan farqlarni
 yoz.
 
+### 11. Muammo chiqsa — avval O'QI, keyin fikrla
+
+Biror narsa kutilganidek ishlamasa, darrov sabab o'ylab topma. Avval:
+
+1. **Suhbatning oldingi qismini o'qi** — bu narsa haqida allaqachon nima aytilgan? Sen o'zing
+   qanday tushuntirgansan? Sening xotirangda o'zing aytgan gaping saqlanmaydi, lekin suhbatda
+   turadi.
+2. **Qilingan ishlarni ko'r** — `git log`, `worklog` hotirasi, joriy holat fayli. Bu qism tayyor
+   deb aytilganmi yoki yo'qmi?
+3. **Keyin** tekshir va xulosa qil.
+
+Misol: `/rent` da "Tayyorlanmoqda" chiqdi. Oldin `/property/:id` uchun "detal sahifasi hali
+ko'chirilmagan" deb tushuntirilgandi — ikkisi boshqa-boshqa sabab. O'qimasdan xulosa qilsang,
+noto'g'ri joyni tuzatasan.
+
+### 12. "Tayyor" degin — faqat EMULYATORDA ko'rganingdan keyin
+
+`flutter analyze` toza bo'lishi va skript `ok` yozishi **hech narsani anglatmaydi**.
+
+- Fayl almashtiruvchi skript mos kelmasa ham `ok` yozib o'tib ketishi mumkin — shuning uchun
+  `assert old in s` qo'y va almashtirgandan keyin natijani `grep` bilan tekshir.
+- `dart format` fayllarni qayta formatlaydi, shuning uchun oldingi almashtiruv matni mos
+  kelmay qolishi mumkin.
+- Har bir route'ni ilovada **ochib ko'r**. Ochilmasa — route ulanmagan.
+
+Haqiqiy misol: `/rent` route'i almashtirilmay qolgan (formatter qatorni bo'lib yuborgan edi),
+skript `ok` yozgan, `analyze` toza, lekin ilovada "Tayyorlanmoqda" chiqardi. Emulyatorda
+tekshirmasdan "tayyor" deb aytilgandi.
+
 ## Tuzoqlar
 
 - **Sayt vaqti-vaqti bilan javob bermaydi** (`curl` `000`, 2-3 daqiqa). Rasm yuklanmasa avval
