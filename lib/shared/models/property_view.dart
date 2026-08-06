@@ -39,6 +39,7 @@ class PropertyView {
     this.isTop = false,
     this.dealType = 'buy',
     this.propertyType = 'secondary',
+    this.priceCurrency = 'uzs',
   });
 
   final int id;
@@ -85,6 +86,14 @@ class PropertyView {
 
   /// `new-project` | `rent` | `secondary` — the favourites key the site uses.
   final String propertyType;
+
+  /// The currency the listing's own price is stored in. The site passes this to
+  /// `currency.format(price, property.currency)` rather than assuming UZS.
+  final String priceCurrency;
+
+  /// Rent prices are printed per month — the site appends the tail of `rent.perMonth`
+  /// ("so'm/oy") to the symbol.
+  bool get isMonthly => dealType == 'rent';
 
   /// Where tapping the card goes, matching the site's `detailLink` getter: a project with both
   /// codes uses its vanity URL, everything else the id route.
@@ -144,6 +153,7 @@ class PropertyView {
       price: listing.price,
       hasTour: listing.hasVirtualTour,
       status: listing.status,
+      priceCurrency: listing.currency ?? 'uzs',
       dealType: propertyType == 'rent' ? 'rent' : 'buy',
       propertyType: propertyType,
     );

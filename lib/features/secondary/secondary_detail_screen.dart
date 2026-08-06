@@ -344,7 +344,7 @@ class _SecondaryDetailScreenState extends State<SecondaryDetailScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            p.price == null ? '—' : currency.formatWithSymbol(p.price!),
+            p.price == null ? '—' : currency.formatWithSymbol(p.price!, from: p.currency ?? 'uzs'),
             style: theme.textTheme.displaySmall?.copyWith(fontSize: 28, color: Colors.white),
           ),
           const SizedBox(height: 16),

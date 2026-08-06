@@ -356,12 +356,20 @@ class _Info extends StatelessWidget {
   ];
 
   /// Price per m² wins over the total, which wins over a plain price — the site's order.
+  ///
+  /// Listings carry their own currency, so the conversion source is the listing's, not a blanket
+  /// UZS. Rent is a monthly figure and gets the "/oy" tail the site appends.
   String? _price(CurrencyService currency) {
+    final suffix = property.isMonthly ? '/oy' : '';
     if (property.minPricePerM2 case final value?) {
-      return '1m²: ${currency.formatWithSymbol(value)}';
+      return '1m²: ${currency.formatWithSymbol(value, from: property.priceCurrency)}';
     }
-    if (property.minPrice case final value?) return currency.formatWithSymbol(value);
-    if (property.price case final value?) return currency.formatWithSymbol(value);
+    if (property.minPrice case final value?) {
+      return currency.formatWithSymbol(value, from: property.priceCurrency);
+    }
+    if (property.price case final value?) {
+      return '${currency.formatWithSymbol(value, from: property.priceCurrency)}$suffix';
+    }
     return null;
   }
 
