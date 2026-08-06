@@ -4,6 +4,7 @@ import '../features/auth/forgot_password_screen.dart';
 import '../features/auth/login_screen.dart';
 import '../features/auth/register_screen.dart';
 import '../features/home/home_screen.dart';
+import '../features/secondary/secondary_detail_screen.dart';
 import '../features/secondary/secondary_screen.dart';
 import '../features/new_projects/new_projects_screen.dart';
 import '../shared/widgets/placeholder_screen.dart';
@@ -61,7 +62,8 @@ final appRouter = GoRouter(
     ),
     GoRoute(
       path: '/property/secondary/:id',
-      builder: (_, _) => const PlaceholderScreen(title: 'Ikkilamchi mulk'),
+      builder: (_, state) =>
+          SecondaryDetailScreen(id: int.tryParse(state.pathParameters['id'] ?? '') ?? 0),
     ),
     GoRoute(path: '/new-projects', builder: (_, _) => const NewProjectsScreen()),
     GoRoute(
