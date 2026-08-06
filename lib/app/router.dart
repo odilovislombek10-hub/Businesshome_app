@@ -4,6 +4,7 @@ import '../features/auth/forgot_password_screen.dart';
 import '../features/auth/login_screen.dart';
 import '../features/auth/register_screen.dart';
 import '../features/home/home_screen.dart';
+import '../features/secondary/secondary_screen.dart';
 import '../features/new_projects/new_projects_screen.dart';
 import '../shared/widgets/placeholder_screen.dart';
 
@@ -52,7 +53,11 @@ final appRouter = GoRouter(
     ),
     GoRoute(
       path: '/secondary',
-      builder: (_, _) => const PlaceholderScreen(title: 'Ikkilamchi bozor'),
+      builder: (_, state) => SecondaryScreen(
+        // `?city=` from the map and footer, `?filters=open` from the header button.
+        initialCity: state.uri.queryParameters['city'],
+        openFilters: state.uri.queryParameters['filters'] == 'open',
+      ),
     ),
     GoRoute(
       path: '/property/secondary/:id',
