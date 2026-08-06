@@ -16,11 +16,24 @@ import 'site_icon.dart';
 /// With several photos the site splits the card into equal zones and swaps image on hover/touch;
 /// here each zone is a tap target doing the same.
 class PropertyCard extends StatefulWidget {
-  const PropertyCard({super.key, required this.property, this.onFavorite, this.isFavorite = false});
+  const PropertyCard({
+    super.key,
+    required this.property,
+    this.onFavorite,
+    this.isFavorite = false,
+    this.compact = false,
+  });
 
   final PropertyView property;
   final VoidCallback? onFavorite;
   final bool isFavorite;
+
+  /// Half-width, two-per-row layout. Same card, smaller: the type badges and the developer line
+  /// drop out and the remaining text steps down a size, so it still reads at ~170px wide.
+  final bool compact;
+
+  /// Slightly taller than the full-width 3:4 so the price and the button clear the bottom edge.
+  static const compactAspectRatio = 0.66;
 
   @override
   State<PropertyCard> createState() => _PropertyCardState();
@@ -37,7 +50,7 @@ class _PropertyCardState extends State<PropertyCard> {
     return GestureDetector(
       onTap: () => context.go(property.detailPath),
       child: AspectRatio(
-        aspectRatio: 3 / 4,
+        aspectRatio: widget.compact ? PropertyCard.compactAspectRatio : 3 / 4,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(AppRadius.md), // rounded-xl
           child: Stack(
@@ -82,25 +95,29 @@ class _PropertyCardState extends State<PropertyCard> {
               ),
 
               Padding(
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.all(widget.compact ? 10 : 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     // Leave room on the right for the favourite button (`pr-12` on the site).
                     Padding(
-                      padding: const EdgeInsets.only(right: 48),
-                      child: Wrap(spacing: 8, runSpacing: 8, children: _badges(context, property)),
+                      padding: const EdgeInsets.only(right: 44),
+                      child: Wrap(spacing: 6, runSpacing: 6, children: _badges(context, property)),
                     ),
-                    _Info(property: property),
+                    _Info(property: property, compact: widget.compact),
                   ],
                 ),
               ),
 
               Positioned(
-                top: 16,
-                right: 16,
-                child: _FavoriteButton(isFavorite: widget.isFavorite, onPressed: widget.onFavorite),
+                top: widget.compact ? 10 : 16,
+                right: widget.compact ? 10 : 16,
+                child: _FavoriteButton(
+                  isFavorite: widget.isFavorite,
+                  onPressed: widget.onFavorite,
+                  compact: widget.compact,
+                ),
               ),
             ],
           ),
@@ -110,26 +127,45 @@ class _PropertyCardState extends State<PropertyCard> {
   }
 
   List<Widget> _badges(BuildContext context, PropertyView property) => [
-    if (property.isTop)
-      const _Badge(
-        label: 'TOP',
-        background: Color(0xFFF59E0B), // amber-500
-        icon: SiteIcons.star,
-      ),
-    if (property.segmentLabel case final segment?)
-      _Badge(label: segment, background: AppColors.olive),
-    if (property.hasTour)
-      _Badge(label: '3D', background: AppColors.dark.withValues(alpha: 0.7), icon: SiteIcons.box3d),
-    if (property.tier == 'ultra')
-      const _Badge(label: 'Ultra', background: Color(0xFFF59E0B), icon: SiteIcons.star)
-    else if (property.tier == 'pro' || property.verified)
-      const _Badge(
-        label: 'Pro',
-        background: Color(0xFF2563EB), // blue-600
-        icon: SiteIcons.check,
-      ),
-    if (property.completion case final completion?)
-      _Badge(label: 'Topshirish: $completion', background: AppColors.olive.withValues(alpha: 0.8)),
+    // At half width only the two shortest badges fit; the rest would wrap over the photo.
+    if (widget.compact) ...[
+      if (property.isTop)
+        const _Badge(label: 'TOP', background: Color(0xFFF59E0B), icon: SiteIcons.star),
+      if (property.hasTour)
+        _Badge(
+          label: '3D',
+          background: AppColors.dark.withValues(alpha: 0.7),
+          icon: SiteIcons.box3d,
+        ),
+    ] else ...[
+      if (property.isTop)
+        const _Badge(
+          label: 'TOP',
+          background: Color(0xFFF59E0B), // amber-500
+          icon: SiteIcons.star,
+        ),
+      if (property.segmentLabel case final segment?)
+        _Badge(label: segment, background: AppColors.olive),
+      if (property.hasTour)
+        _Badge(
+          label: '3D',
+          background: AppColors.dark.withValues(alpha: 0.7),
+          icon: SiteIcons.box3d,
+        ),
+      if (property.tier == 'ultra')
+        const _Badge(label: 'Ultra', background: Color(0xFFF59E0B), icon: SiteIcons.star)
+      else if (property.tier == 'pro' || property.verified)
+        const _Badge(
+          label: 'Pro',
+          background: Color(0xFF2563EB), // blue-600
+          icon: SiteIcons.check,
+        ),
+      if (property.completion case final completion?)
+        _Badge(
+          label: 'Topshirish: $completion',
+          background: AppColors.olive.withValues(alpha: 0.8),
+        ),
+    ],
   ];
 }
 
@@ -170,18 +206,19 @@ class _Badge extends StatelessWidget {
 }
 
 class _FavoriteButton extends StatelessWidget {
-  const _FavoriteButton({required this.isFavorite, this.onPressed});
+  const _FavoriteButton({required this.isFavorite, this.onPressed, this.compact = false});
 
   final bool isFavorite;
   final VoidCallback? onPressed;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onPressed,
       child: Container(
-        width: 36,
-        height: 36,
+        width: compact ? 30 : 36,
+        height: compact ? 30 : 36,
         decoration: BoxDecoration(
           color: isFavorite ? AppColors.olive : Colors.white.withValues(alpha: 0.9),
           shape: BoxShape.circle,
@@ -200,9 +237,10 @@ class _FavoriteButton extends StatelessWidget {
 }
 
 class _Info extends StatelessWidget {
-  const _Info({required this.property});
+  const _Info({required this.property, this.compact = false});
 
   final PropertyView property;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -216,20 +254,25 @@ class _Info extends StatelessWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            if (property.projectLogo case final logo?) ...[
+            if (!compact && property.projectLogo != null) ...[
               ClipRRect(
                 borderRadius: BorderRadius.circular(AppRadius.sm),
-                child: CachedNetworkImage(imageUrl: logo, width: 32, height: 32, fit: BoxFit.cover),
+                child: CachedNetworkImage(
+                  imageUrl: property.projectLogo!,
+                  width: 32,
+                  height: 32,
+                  fit: BoxFit.cover,
+                ),
               ),
               const SizedBox(width: 8),
             ],
             Expanded(
               child: Text(
                 property.name,
-                maxLines: 2,
+                maxLines: compact ? 1 : 2,
                 overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.titleLarge?.copyWith(
-                  fontSize: 18,
+                  fontSize: compact ? 14 : 18,
                   fontWeight: FontWeight.w700,
                   color: AppColors.cream,
                   height: 1.15,
@@ -238,7 +281,7 @@ class _Info extends StatelessWidget {
             ),
           ],
         ),
-        if (property.developer case final developer?) ...[
+        if (!compact && property.developer != null) ...[
           const SizedBox(height: 8),
           Row(
             children: [
@@ -256,7 +299,7 @@ class _Info extends StatelessWidget {
               ],
               Expanded(
                 child: Text(
-                  developer,
+                  property.developer!,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: _shadowed(theme.textTheme.bodyMedium, Colors.white),
@@ -277,6 +320,7 @@ class _Info extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.bodyMedium?.copyWith(
+                    fontSize: compact ? 11 : 14,
                     color: AppColors.cream.withValues(alpha: 0.7),
                   ),
                 ),
@@ -285,44 +329,56 @@ class _Info extends StatelessWidget {
           ),
         ],
         if (_stats.isNotEmpty) ...[
-          const SizedBox(height: 8),
+          SizedBox(height: compact ? 4 : 8),
           Wrap(
-            spacing: 12,
+            spacing: compact ? 8 : 12,
             runSpacing: 4,
             children: [
-              for (final (icon, label) in _stats)
+              // Only the first two stats fit on a half-width card.
+              for (final (icon, label) in compact ? _stats.take(2) : _stats)
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    SiteIcon(icon, size: 14, color: Colors.white),
+                    SiteIcon(icon, size: compact ? 11 : 14, color: Colors.white),
                     const SizedBox(width: 4),
-                    Text(label, style: _shadowed(theme.textTheme.labelSmall, Colors.white)),
+                    Text(
+                      label,
+                      style: _shadowed(
+                        theme.textTheme.labelSmall?.copyWith(fontSize: compact ? 10 : 11),
+                        Colors.white,
+                      ),
+                    ),
                   ],
                 ),
             ],
           ),
         ],
         if (_price(currency) case final price?) ...[
-          const SizedBox(height: 8),
+          SizedBox(height: compact ? 4 : 8),
           Text(
             price,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: _shadowed(
-              theme.textTheme.titleLarge?.copyWith(fontSize: 18, fontWeight: FontWeight.w700),
+              theme.textTheme.titleLarge?.copyWith(
+                fontSize: compact ? 14 : 18,
+                fontWeight: FontWeight.w700,
+              ),
               Colors.white,
             ),
           ),
         ],
-        if (property.payment case final payment?) ...[
+        if (!compact && property.payment != null) ...[
           const SizedBox(height: 8),
           _Badge(
-            label: "Boshlang'ich to'lov (%): $payment",
+            label: "Boshlang'ich to'lov (%): ${property.payment}",
             background: AppColors.olive.withValues(alpha: 0.8),
           ),
         ],
-        const SizedBox(height: 8),
+        SizedBox(height: compact ? 6 : 8),
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 10),
+          padding: EdgeInsets.symmetric(vertical: compact ? 6 : 10),
           decoration: BoxDecoration(
             color: AppColors.cream,
             borderRadius: BorderRadius.circular(AppRadius.md),
@@ -333,12 +389,13 @@ class _Info extends StatelessWidget {
               Text(
                 'Batafsil',
                 style: theme.textTheme.bodyMedium?.copyWith(
+                  fontSize: compact ? 12 : 14,
                   color: AppColors.olive,
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              const SizedBox(width: 8),
-              const SiteIcon(SiteIcons.arrowRight, size: 16, color: AppColors.olive),
+              SizedBox(width: compact ? 4 : 8),
+              SiteIcon(SiteIcons.arrowRight, size: compact ? 12 : 16, color: AppColors.olive),
             ],
           ),
         ),

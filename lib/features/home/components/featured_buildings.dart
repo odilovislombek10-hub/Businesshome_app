@@ -41,14 +41,23 @@ class FeaturedBuildings extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            // `animate-fade-in` with `animation-delay: (i * 100)ms` — the site staggers the cards.
-            for (final (i, project) in projects.indexed) ...[
-              Entrance.fadeIn(
-                delay: Duration(milliseconds: i * 100),
-                child: PropertyCard(property: PropertyView.fromProject(project)),
-              ),
-              const SizedBox(height: 16), // gap-4
-            ],
+            // Two per row so four cards fit one screen — the app's own choice, not the site's
+            // single column. `animation-delay: (i * 100)ms` staggering is kept.
+            GridView.count(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              crossAxisCount: 2,
+              mainAxisSpacing: 16, // gap-4
+              crossAxisSpacing: 16,
+              childAspectRatio: PropertyCard.compactAspectRatio,
+              children: [
+                for (final (i, project) in projects.indexed)
+                  Entrance.fadeIn(
+                    delay: Duration(milliseconds: i * 100),
+                    child: PropertyCard(property: PropertyView.fromProject(project), compact: true),
+                  ),
+              ],
+            ),
             const SizedBox(height: 32),
             Center(
               child: FilledButton(

@@ -130,6 +130,7 @@ class _SecondaryScreenState extends State<SecondaryScreen> {
               SliverToBoxAdapter(child: _hero(context)),
               SliverToBoxAdapter(child: _toolbar(context)),
               _results(context),
+              SliverToBoxAdapter(child: _paginationBlock(context)),
               const SliverToBoxAdapter(child: SizedBox(height: 64)), // pb-16
             ],
           ),
@@ -522,18 +523,26 @@ class _SecondaryScreenState extends State<SecondaryScreen> {
         }
         return SliverPadding(
           padding: const EdgeInsets.fromLTRB(16, 24, 16, 0), // mt-6
-          sliver: SliverList.separated(
-            itemCount: page.items.length + 1,
-            separatorBuilder: (_, _) => const SizedBox(height: 24), // gap-6
-            itemBuilder: (context, i) {
-              if (i == page.items.length) return _pagination(context, page);
-              return Entrance.fadeIn(
-                delay: Duration(milliseconds: i * 100),
-                child: PropertyCard(
-                  property: PropertyView.fromListing(page.items[i], propertyType: 'secondary'),
+          // Two per row so four cards fit one screen.
+          sliver: SliverGrid.builder(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: 16,
+              crossAxisSpacing: 16,
+              childAspectRatio: PropertyCard.compactAspectRatio,
+            ),
+            itemCount: page.items.length,
+            itemBuilder: (context, i) => Entrance.fadeIn(
+              delay: Duration(milliseconds: i * 100),
+              child: PropertyCard(
+                compact: true,
+                property: PropertyView.fromListing(
+                  page.items[i],
+                  // Was hard-coded to 'secondary', so rent cards linked to the wrong detail page.
+                  propertyType: widget.config.propertyType,
                 ),
-              );
-            },
+              ),
+            ),
           ),
         );
       },
@@ -583,6 +592,16 @@ class _SecondaryScreenState extends State<SecondaryScreen> {
       ),
     );
   }
+
+  /// Pagination lives under the grid now that the results are a SliverGrid.
+  Widget _paginationBlock(BuildContext context) => FutureBuilder<Paginated<PropertyListing>>(
+    future: _future,
+    builder: (context, snapshot) {
+      final page = snapshot.data;
+      if (page == null || page.items.isEmpty) return const SizedBox.shrink();
+      return Padding(padding: const EdgeInsets.only(top: 24), child: _pagination(context, page));
+    },
+  );
 
   Widget _pagination(BuildContext context, Paginated<PropertyListing> page) {
     if (page.pages <= 1) return const SizedBox.shrink();
