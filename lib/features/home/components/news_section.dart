@@ -66,7 +66,8 @@ class _NewsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final image = absoluteMediaUrl(item.image);
+    // The site substitutes a stock photo rather than leaving the card imageless.
+    final image = absoluteMediaUrl(item.image) ?? NewsItem.fallbackImage;
 
     return GestureDetector(
       onTap: () => context.go('/news/${item.id}'),
@@ -117,16 +118,15 @@ class _NewsCard extends StatelessWidget {
                 ],
               ),
             ),
-            if (image != null)
-              AspectRatio(
-                aspectRatio: 4 / 3,
-                child: CachedNetworkImage(
-                  imageUrl: image,
-                  fit: BoxFit.cover,
-                  placeholder: (_, _) => const ColoredBox(color: AppColors.surfaceMutedLight),
-                  errorWidget: (_, _, _) => const ColoredBox(color: AppColors.surfaceMutedLight),
-                ),
+            AspectRatio(
+              aspectRatio: 4 / 3,
+              child: CachedNetworkImage(
+                imageUrl: image,
+                fit: BoxFit.cover,
+                placeholder: (_, _) => const ColoredBox(color: AppColors.surfaceMutedLight),
+                errorWidget: (_, _, _) => const ColoredBox(color: AppColors.surfaceMutedLight),
               ),
+            ),
           ],
         ),
       ),

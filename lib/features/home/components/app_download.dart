@@ -47,7 +47,7 @@ class AppDownload extends StatelessWidget {
             Text(
               "O'zbekistonning eng ishonchli mulk qidiruv ilovasini yuklab oling",
               style: theme.textTheme.displaySmall?.copyWith(
-                fontSize: 28, // text-3xl
+                fontSize: 30, // text-3xl
                 color: AppColors.dark,
                 height: 1.2,
               ),

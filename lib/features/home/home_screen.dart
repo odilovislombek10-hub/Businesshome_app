@@ -13,6 +13,7 @@ import '../../core/models/property_listing.dart';
 import '../../core/models/reel.dart';
 import '../../core/models/region.dart';
 import '../../core/models/specialist.dart';
+import '../../shared/widgets/ai_assistant.dart';
 import '../../shared/widgets/site_header.dart';
 import 'components/featured_buildings.dart';
 import 'components/developers_slider.dart';
@@ -22,6 +23,7 @@ import 'components/hero_section.dart';
 import 'components/home_top_picks.dart';
 import 'components/news_section.dart';
 import 'components/promo_banner.dart';
+import 'components/property_price_map.dart';
 import 'components/reels_section.dart';
 import 'components/site_footer.dart';
 import 'components/property_categories.dart';
@@ -85,6 +87,8 @@ class _HomeScreenState extends State<HomeScreen> {
       _repo.topMasters(),
       RegionsService.instance.regions(),
       _repo.settings(),
+      _repo.priceMap(rent: true),
+      _repo.priceMap(rent: false),
     ]);
     final categories = results[2] as List<PropertyCategory>;
 
@@ -112,6 +116,8 @@ class _HomeScreenState extends State<HomeScreen> {
       topMasters: results[11] as List<Specialist>,
       regions: results[12] as List<Region>,
       settings: results[13] as Map<String, String>,
+      rentPrices: results[14] as Map<String, RegionPrice>,
+      buyPrices: results[15] as Map<String, RegionPrice>,
     );
   }
 
@@ -139,6 +145,8 @@ class _HomeScreenState extends State<HomeScreen> {
               onSearch: (q) => context.go('/secondary?search=$q'),
             ),
           ),
+          // Aziza floats over everything, `fixed bottom-6 right-6` on the site.
+          const AiAssistant(),
         ],
       ),
     );
@@ -160,6 +168,7 @@ class _HomeScreenState extends State<HomeScreen> {
             if (data.featured.isNotEmpty) FeaturedBuildings(projects: data.featured),
             if (data.hero?.bannerEnabled ?? false) PromoBanner(content: data.hero!),
             if (data.developers.isNotEmpty) DevelopersSlider(developers: data.developers),
+            PropertyPriceMap(rentPrices: data.rentPrices, buyPrices: data.buyPrices),
             if (data.categories.isNotEmpty)
               PropertyCategories(categories: data.categories, topListings: data.topListings),
             HomeTopPicks(
@@ -201,6 +210,8 @@ class _HomeData {
     required this.topMasters,
     required this.regions,
     required this.settings,
+    required this.rentPrices,
+    required this.buyPrices,
   });
 
   const _HomeData.empty()
@@ -218,7 +229,9 @@ class _HomeData {
       topDesigners = const [],
       topMasters = const [],
       regions = const [],
-      settings = const {};
+      settings = const {},
+      rentPrices = const {},
+      buyPrices = const {};
 
   final PageContent? hero;
   final List<Project> featured;
@@ -237,4 +250,8 @@ class _HomeData {
 
   /// Admin key/value pairs: `contact_phone`, `app_store_url`, `google_play_url`, …
   final Map<String, String> settings;
+
+  /// Region price statistics behind the map's two tabs.
+  final Map<String, RegionPrice> rentPrices;
+  final Map<String, RegionPrice> buyPrices;
 }

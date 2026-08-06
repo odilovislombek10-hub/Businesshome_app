@@ -7,6 +7,7 @@ import '../../core/models/project.dart';
 import '../../core/models/property_listing.dart';
 import '../../core/models/reel.dart';
 import '../../core/models/specialist.dart';
+import 'components/property_price_map.dart' show RegionPrice;
 
 /// Everything the front page needs, in the same shape the site's `HomeComponent` assembles.
 ///
@@ -44,12 +45,26 @@ class HomeRepository {
     }
   }
 
+  /// Region price statistics for the map. `deal_type` picks rent (monthly) or the secondary
+  /// market (per m²) — the two tabs the site offers.
+  Future<Map<String, RegionPrice>> priceMap({required bool rent}) async {
+    try {
+      final res = await _api.get<dynamic>(
+        '/market/regions/price-map',
+        query: {'deal_type': rent ? 'rent' : 'secondary'},
+      );
+      return RegionPrice.parseList(res.data);
+    } catch (_) {
+      return const {};
+    }
+  }
+
   Future<List<FeatureItem>> features() => _list('/market/content/features', FeatureItem.fromJson);
 
   Future<List<NewsItem>> news() =>
-      _list('/market/content/news', NewsItem.fromJson, query: {'per_page': 3});
+      _list('/market/content/news', NewsItem.fromJson, query: {'limit': 6});
 
-  Future<List<Reel>> reels() => _list('/market/reels', Reel.fromJson, query: {'per_page': 10});
+  Future<List<Reel>> reels() => _list('/market/reels', Reel.fromJson, query: {'limit': 10});
 
   /// The four "top picks" strips. Counts match the site: 4 listings each, 6 specialists each.
   Future<List<PropertyListing>> topSecondary() =>

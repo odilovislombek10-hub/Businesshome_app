@@ -48,13 +48,31 @@ class NewsItem {
   final String? image;
   final DateTime? publishedAt;
 
-  /// `dd.MM.yyyy`, the format the site prints under a news card.
+  /// "15 yanvar 2026" — the site spells the month out rather than printing a numeric date.
   String get dateLabel {
     final date = publishedAt;
     if (date == null) return '';
-    String two(int v) => v.toString().padLeft(2, '0');
-    return '${two(date.day)}.${two(date.month)}.${date.year}';
+    return '${date.day} ${_months[date.month - 1]} ${date.year}';
   }
+
+  static const _months = [
+    'yanvar',
+    'fevral',
+    'mart',
+    'aprel',
+    'may',
+    'iyun',
+    'iyul',
+    'avgust',
+    'sentabr',
+    'oktabr',
+    'noyabr',
+    'dekabr',
+  ];
+
+  /// The site falls back to this photo when a news item has no image of its own.
+  static const fallbackImage =
+      'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80';
 
   factory NewsItem.fromJson(Map<String, dynamic> json) => NewsItem(
     id: (json['id'] as num?)?.toInt() ?? 0,

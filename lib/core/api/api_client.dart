@@ -74,7 +74,14 @@ class ApiClient {
   Future<Response<T>> get<T>(String path, {Map<String, dynamic>? query}) =>
       _dio.get<T>(path, queryParameters: query);
 
-  Future<Response<T>> post<T>(String path, {Object? data}) => _dio.post<T>(path, data: data);
+  /// [headers] carries the per-request extras the API expects, such as the AI assistant's
+  /// `X-Anon-Key` for signed-out visitors.
+  Future<Response<T>> post<T>(String path, {Object? data, Map<String, String>? headers}) =>
+      _dio.post<T>(
+        path,
+        data: data,
+        options: Options(headers: headers),
+      );
 
   Future<Response<T>> put<T>(String path, {Object? data}) => _dio.put<T>(path, data: data);
 
