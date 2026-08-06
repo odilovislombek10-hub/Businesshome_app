@@ -14,6 +14,7 @@ import '../../shared/widgets/entrance.dart';
 import '../../shared/widgets/property_card.dart';
 import '../../shared/widgets/site_header.dart';
 import '../../shared/widgets/site_icon.dart';
+import 'listings_config.dart';
 import 'secondary_filter_sheet.dart';
 import 'secondary_repository.dart';
 import 'secondary_texts.dart';
@@ -28,7 +29,15 @@ import 'secondary_texts.dart';
 /// The filter panel is a full-screen overlay on phones (`lg:hidden fixed inset-0`), opened from
 /// the button inside the search card — see [SecondaryFilterSheet].
 class SecondaryScreen extends StatefulWidget {
-  const SecondaryScreen({super.key, this.initialCity, this.openFilters = false});
+  const SecondaryScreen({
+    super.key,
+    this.config = ListingsConfig.secondary,
+    this.initialCity,
+    this.openFilters = false,
+  });
+
+  /// Which of the two listing pages this is — see [ListingsConfig].
+  final ListingsConfig config;
 
   /// From `/secondary?city=` — the map and the footer link in with this.
   final String? initialCity;
@@ -41,7 +50,7 @@ class SecondaryScreen extends StatefulWidget {
 }
 
 class _SecondaryScreenState extends State<SecondaryScreen> {
-  final _repo = SecondaryRepository();
+  late final _repo = SecondaryRepository(endpoint: widget.config.endpoint);
   final _searchController = TextEditingController();
   final _scroll = ScrollController();
 
@@ -96,7 +105,8 @@ class _SecondaryScreenState extends State<SecondaryScreen> {
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      builder: (_) => SecondaryFilterSheet(filter: _filter, regions: _regions),
+      builder: (_) =>
+          SecondaryFilterSheet(filter: _filter, regions: _regions, config: widget.config),
     );
     if (result != null) _apply(result);
   }
@@ -140,7 +150,7 @@ class _SecondaryScreenState extends State<SecondaryScreen> {
     return Stack(
       children: [
         Positioned.fill(
-          child: CachedNetworkImage(imageUrl: SecondaryTexts.heroImage, fit: BoxFit.cover),
+          child: CachedNetworkImage(imageUrl: widget.config.heroImage, fit: BoxFit.cover),
         ),
         Positioned.fill(
           child: DecoratedBox(
@@ -165,7 +175,7 @@ class _SecondaryScreenState extends State<SecondaryScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                SecondaryTexts.heroTitle,
+                widget.config.heroTitle,
                 style: theme.textTheme.displayMedium?.copyWith(
                   fontSize: 30, // text-3xl
                   color: Colors.white,
@@ -174,7 +184,7 @@ class _SecondaryScreenState extends State<SecondaryScreen> {
               ),
               const SizedBox(height: 12), // mb-3
               Text(
-                SecondaryTexts.heroDesc,
+                widget.config.heroDesc,
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w400,
                   color: Colors.white.withValues(alpha: 0.7),
@@ -255,7 +265,7 @@ class _SecondaryScreenState extends State<SecondaryScreen> {
                     color: AppColors.dark,
                   ),
                   decoration: InputDecoration(
-                    hintText: SecondaryTexts.searchPlaceholder,
+                    hintText: widget.config.searchPlaceholder,
                     hintStyle: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w400,
                       color: AppColors.dark.withValues(alpha: 0.4),
@@ -379,7 +389,7 @@ class _SecondaryScreenState extends State<SecondaryScreen> {
               .$2,
           onRemove: () => _apply(_filter.copyWith(seller: '')),
         ),
-      if (_filter.payment.isNotEmpty)
+      if (widget.config.hasPaymentFilter && _filter.payment.isNotEmpty)
         _FilterChip(
           background: const Color(0xFFFFFBEB),
           foreground: const Color(0xFFB45309),
@@ -548,7 +558,7 @@ class _SecondaryScreenState extends State<SecondaryScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            SecondaryTexts.noResultsDesc,
+            widget.config.noResultsDesc,
             textAlign: TextAlign.center,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: AppColors.dark.withValues(alpha: 0.5),

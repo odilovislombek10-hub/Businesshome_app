@@ -68,6 +68,30 @@ abstract final class SecondaryTexts {
     ('cash', 'Foizsiz'),
   ];
 
+  /// `rent.furnishedYes/No` and `rent.repairYes/No` — not a plain yes/no pair.
+  static const furnishedOptions = <(String, String)>[
+    ('', allOption),
+    ('yes', 'Meblangan'),
+    ('no', 'Mebelsiz'),
+  ];
+
+  static const repairOptions = <(String, String)>[
+    ('', allOption),
+    ('yes', 'Remontli'),
+    ('no', 'Remontsiz'),
+  ];
+
+  /// The single checkbox under "Qo'shimcha".
+  static const hasVirtualTour = '3D virtual tur mavjud';
+
+  /// Range input placeholders (`rent.from` / `rent.to`).
+  static const rangeFrom = 'dan';
+  static const rangeTo = 'gacha';
+
+  /// `areaLabelKey()` swaps the label when every selected type is house or land.
+  static const areaM2 = 'Kvadratura (m²)';
+  static const areaLand = 'Yer maydoni (sotix)';
+
   static const roomOptions = [1, 2, 3, 4, 5];
   static const bathroomOptions = [1, 2, 3, 4];
 

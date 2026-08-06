@@ -5,6 +5,7 @@ import '../../app/theme.dart';
 import '../../core/models/region.dart';
 import '../../shared/widgets/entrance.dart';
 import '../../shared/widgets/site_icon.dart';
+import 'listings_config.dart';
 import 'secondary_repository.dart';
 import 'secondary_texts.dart';
 
@@ -15,10 +16,18 @@ import 'secondary_texts.dart';
 /// the site's: type, segment, rooms, bathrooms, price, area, floor, seller, payment, furnished,
 /// repair, extras.
 class SecondaryFilterSheet extends StatefulWidget {
-  const SecondaryFilterSheet({super.key, required this.filter, required this.regions});
+  const SecondaryFilterSheet({
+    super.key,
+    required this.filter,
+    required this.regions,
+    required this.config,
+  });
 
   final SecondaryFilter filter;
   final List<Region> regions;
+
+  /// Decides which optional fields appear — see [ListingsConfig.hasPaymentFilter].
+  final ListingsConfig config;
 
   @override
   State<SecondaryFilterSheet> createState() => _SecondaryFilterSheetState();
@@ -33,6 +42,10 @@ class _SecondaryFilterSheetState extends State<SecondaryFilterSheet> {
   late final _areaMax = TextEditingController(text: _text(_draft.areaMax));
   late final _floorMin = TextEditingController(text: _text(_draft.floorMin));
   late final _floorMax = TextEditingController(text: _text(_draft.floorMax));
+
+  /// The site swaps the area label when every selected type is house or land.
+  bool get _areaIsLand =>
+      _draft.types.isNotEmpty && _draft.types.every((t) => t == 'house' || t == 'land');
 
   static String _text(num? value) => value == null ? '' : '${value.toInt()}';
   static num? _num(TextEditingController c) => num.tryParse(c.text.trim());
@@ -178,7 +191,13 @@ class _SecondaryFilterSheetState extends State<SecondaryFilterSheet> {
                   max: _priceMax,
                   suffix: "so'm",
                 ),
-                _RangeField(label: 'Maydon', min: _areaMin, max: _areaMax, suffix: 'm²'),
+                // `areaLabelKey()`: land types get a different label and unit.
+                _RangeField(
+                  label: _areaIsLand ? SecondaryTexts.areaLand : SecondaryTexts.areaM2,
+                  min: _areaMin,
+                  max: _areaMax,
+                  suffix: _areaIsLand ? 'sotix' : 'm²',
+                ),
                 _RangeField(label: SecondaryTexts.floor, min: _floorMin, max: _floorMax),
 
                 _Select(
@@ -187,22 +206,24 @@ class _SecondaryFilterSheetState extends State<SecondaryFilterSheet> {
                   options: [('', SecondaryTexts.allOption), ...SecondaryTexts.sellers],
                   onChanged: (v) => setState(() => _draft = _draft.copyWith(seller: v)),
                 ),
-                _Select(
-                  label: SecondaryTexts.payment,
-                  value: _draft.payment,
-                  options: [('', SecondaryTexts.allOption), ...SecondaryTexts.payments],
-                  onChanged: (v) => setState(() => _draft = _draft.copyWith(payment: v)),
-                ),
+                // Payment method is a secondary-market field; the rent page has no such filter.
+                if (widget.config.hasPaymentFilter)
+                  _Select(
+                    label: SecondaryTexts.payment,
+                    value: _draft.payment,
+                    options: [('', SecondaryTexts.allOption), ...SecondaryTexts.payments],
+                    onChanged: (v) => setState(() => _draft = _draft.copyWith(payment: v)),
+                  ),
                 _Select(
                   label: SecondaryTexts.furnished,
                   value: _draft.furnished,
-                  options: const [('', SecondaryTexts.allOption), ('yes', 'Ha'), ('no', "Yo'q")],
+                  options: SecondaryTexts.furnishedOptions,
                   onChanged: (v) => setState(() => _draft = _draft.copyWith(furnished: v)),
                 ),
                 _Select(
                   label: SecondaryTexts.repair,
                   value: _draft.repair,
-                  options: const [('', SecondaryTexts.allOption), ('yes', 'Ha'), ('no', "Yo'q")],
+                  options: SecondaryTexts.repairOptions,
                   onChanged: (v) => setState(() => _draft = _draft.copyWith(repair: v)),
                 ),
 
@@ -213,7 +234,7 @@ class _SecondaryFilterSheetState extends State<SecondaryFilterSheet> {
                   contentPadding: EdgeInsets.zero,
                   controlAffinity: ListTileControlAffinity.leading,
                   activeColor: AppColors.olive,
-                  title: const Text('3D tur'),
+                  title: const Text(SecondaryTexts.hasVirtualTour),
                 ),
               ],
             ),
@@ -338,7 +359,7 @@ class _RangeField extends StatelessWidget {
                   controller: min,
                   keyboardType: TextInputType.number,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  decoration: decoration('dan'),
+                  decoration: decoration(SecondaryTexts.rangeFrom),
                 ),
               ),
               const SizedBox(width: 12),
@@ -347,7 +368,7 @@ class _RangeField extends StatelessWidget {
                   controller: max,
                   keyboardType: TextInputType.number,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  decoration: decoration('gacha'),
+                  decoration: decoration(SecondaryTexts.rangeTo),
                 ),
               ),
             ],

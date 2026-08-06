@@ -145,19 +145,25 @@ class SecondaryFilter {
   };
 }
 
+/// Shared by `/secondary` and `/rent` — the two endpoints take the same filter.
 class SecondaryRepository {
-  final _api = ApiClient.instance;
+  const SecondaryRepository({this.endpoint = '/market/secondary'});
+
+  /// `/market/secondary` or `/market/rent`.
+  final String endpoint;
+
+  ApiClient get _api => ApiClient.instance;
 
   /// The list endpoint answers with the `{items, total, page, pages}` envelope.
   Future<Paginated<PropertyListing>> list(SecondaryFilter filter) async {
-    final res = await _api.get<dynamic>('/market/secondary', query: filter.toQuery());
+    final res = await _api.get<dynamic>(endpoint, query: filter.toQuery());
     final data = res.data;
     if (data is! Map<String, dynamic>) return const Paginated.empty();
     return Paginated.fromJson(data, PropertyListing.fromJson);
   }
 
   Future<PropertyListing?> byId(int id) async {
-    final res = await _api.get<dynamic>('/market/secondary/$id');
+    final res = await _api.get<dynamic>('$endpoint/$id');
     final data = res.data;
     return data is Map<String, dynamic> ? PropertyListing.fromJson(data) : null;
   }
@@ -166,7 +172,7 @@ class SecondaryRepository {
   /// rather than a guess.
   Future<Map<String, num>> ranges() async {
     try {
-      final res = await _api.get<dynamic>('/market/secondary/ranges');
+      final res = await _api.get<dynamic>('$endpoint/ranges');
       final data = res.data;
       if (data is! Map) return const {};
       return {

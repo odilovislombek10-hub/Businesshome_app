@@ -54,6 +54,32 @@ Tailwind birligi 4px. `py-10` = vertical 40, `p-5` = all 20, `gap-3` = 12, `mb-8
 | `line-clamp-2` | `maxLines: 2, overflow: TextOverflow.ellipsis` |
 | `absolute inset-0` | `Positioned.fill` / `Stack(fit: StackFit.expand)` |
 
+### 2.5. Ikki o'xshash sahifani HECH QACHON bir xil deb hisoblama
+
+Ikkita sahifa (masalan `/secondary` va `/rent`) bir xil ko'rinsa ham, **birini ikkinchisiga
+nusxalab qo'yma**. Ular orasida ataylab qilingan farqlar bor va ular ko'zga tashlanmaydi.
+
+Har doim ikkalasini **dastur bilan** solishtir — ko'z bilan emas:
+
+```python
+# har bir shablondan chiqarib, yonma-yon qo'y:
+#  - filtr maydonlari va ularning TARTIBI
+#  - har bir <option> ro'yxati (const propertyTypes, segments, sellers, payments ...)
+#  - signal'lar ro'yxati (filterX = signal) — bittasi kam bo'lsa, o'sha maydon yo'q demakdir
+#  - saralash variantlari, perPage, roomOptions, bathroomOptions
+#  - har bir tugma/checkbox matni
+```
+
+Namuna farqlar (haqiqiy misollar):
+
+- `/secondary` da **To'lov** filtri bor, `/rent` da **yo'q** (`filterPayment` signali ham yo'q).
+- Mebel/remont variantlari `Ha`/`Yo'q` emas — `Meblangan`/`Mebelsiz`, `Remontli`/`Remontsiz`.
+- Maydon yorlig'i o'zgaruvchan: `areaLabelKey()` uy/yer tanlansa `Yer maydoni (sotix)`,
+  aks holda `Kvadratura (m²)`.
+
+**Bu qoida faqat filtrlarga emas** — sarlavha, kartalar, tugmalar, bo'limlar tartibi, endpoint,
+animatsiya, ikonka: hammasini shu tarzda tekshir. Yuzaki qarash katta xatoga olib keladi.
+
 ### 3. Matnlarni i18n'dan ol
 
 `{{ 'x.y' | translate }}` ko'rsang, `uz.ts` dan aynan qiymatni ol. **Tarjima qilma, qisqartirma,
