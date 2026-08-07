@@ -70,7 +70,12 @@ class _SecondaryDetailScreenState extends State<SecondaryDetailScreen> {
             top: 0,
             left: 0,
             right: 0,
-            child: SiteHeader(scrolled: _scrolled, showSearch: false),
+            // Detal yo'li `/property/secondary/:id` — `ownSearchRoutes` ga tushmaydi,
+            // shuning uchun header qidiruvi ko'rinadi.
+            child: SiteHeader(
+              scrolled: _scrolled,
+              onSearch: (q) => context.go('/secondary?search=$q'),
+            ),
           ),
         ],
       ),
@@ -115,7 +120,7 @@ class _SecondaryDetailScreenState extends State<SecondaryDetailScreen> {
       controller: _scroll,
       padding: EdgeInsets.fromLTRB(
         16,
-        80 + MediaQuery.paddingOf(context).top, // pt-20 under the fixed header
+        124 + MediaQuery.paddingOf(context).top, // pt-20; header qidiruv qatori bilan keladi
         16,
         48,
       ),

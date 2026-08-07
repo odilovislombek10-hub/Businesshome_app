@@ -114,7 +114,11 @@ class _BirjaScreenState extends State<BirjaScreen> {
             top: 0,
             left: 0,
             right: 0,
-            child: SiteHeader(scrolled: _scrolled, showSearch: false),
+            // `/birja` saytdagi `ownSearchRoutes` ro'yxatida yo'q — header qidiruvi ko'rinadi.
+            child: SiteHeader(
+              scrolled: _scrolled,
+              onSearch: (q) => context.go('/secondary?search=$q'),
+            ),
           ),
         ],
       ),
@@ -126,7 +130,9 @@ class _BirjaScreenState extends State<BirjaScreen> {
   Widget _hero(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: EdgeInsets.fromLTRB(16, 76 + MediaQuery.paddingOf(context).top, 16, 20),
+      // Bu sahifada header qidiruv qatori bilan keladi (56 + 54), shuning uchun hero pastroqdan
+      // boshlanadi — boshqa sahifalarda 76 yetardi.
+      padding: EdgeInsets.fromLTRB(16, 120 + MediaQuery.paddingOf(context).top, 16, 20),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(26), // rounded-[26px]
         child: Stack(
