@@ -112,6 +112,8 @@ Bular allaqachon bor, ishlat:
 | Xato/bo'sh holat | `shared/widgets/error_view.dart` |
 | Narx formati | `core/services/currency_service.dart` |
 | Viloyatlar | `core/services/regions_service.dart` |
+| Shahar kodi → nomi | `core/constants/city_labels.dart` — backend `city` da **kod** qaytaradi (`tashkent_city`), saytda u `t(getCityLabel(...))` bilan yorliqqa aylanadi |
+| Raqam ajratish | `core/utils/format.dart` — `formatNumber`, saytning `formatPrice` i (valyutasiz) |
 | Rasm yo'li | `core/api/media_url.dart` — `absoluteMediaUrl()` |
 
 Animatsiya klasslarining mosligi: `animate-fade-in` → `Entrance.fadeIn`, `animate-slide-up` →
@@ -194,6 +196,26 @@ noto'g'ri joyni tuzatasan.
 Haqiqiy misol: `/rent` route'i almashtirilmay qolgan (formatter qatorni bo'lib yuborgan edi),
 skript `ok` yozgan, `analyze` toza, lekin ilovada "Tayyorlanmoqda" chiqardi. Emulyatorda
 tekshirmasdan "tayyor" deb aytilgandi.
+
+### 13. Telefonga moslash — kelishilgan chekinishlar
+
+Bular saytdan **ataylab** farq qiladi, foydalanuvchi so'ragan. Yangi sahifada ham shunday qil:
+
+- **E'lon kartalari 2 ustunda** (`PropertyCard.compact`) — bir ekranda 4 ta karta.
+- **Filtr paneli har doim pastki oynada**, qidiruv qatoridagi "Filterlar" tugmasi bilan ochiladi
+  — saytda mobilda doim ochiq `aside` bo'lsa ham (dizayner/usta shunday). Ochiq panel telefonda
+  ekranning yarmini egallaydi.
+- **Hero'ning ustki-ostki bo'shliqlari qisqartirilgan** (`pt-32 py-12` → ~88px + 20px), toolbar
+  `py-5` → `py-2.5`, ro'yxat `mt-6` → `mt-3`.
+
+Qolgan hamma narsa shablonday. Bu ro'yxatga o'zingdan yangi chekinish **qo'shma** — avval so'ra.
+
+### 14. Yuklanish holati
+
+Saytda ro'yxat sahifalarida spinner **yo'q**: yangi so'rov ketganda eski ro'yxat ekranda
+turaveradi, `loading()` faqat "topilmadi" blokini bosib turadi. `FutureBuilder` bunday
+qilmaydi — oxirgi javobni `_last` da saqlab, `snapshot.data ?? _last` bilan chiz. Spinner faqat
+birinchi yuklashda (hali hech qanday ma'lumot yo'q).
 
 ## Tuzoqlar
 
