@@ -171,7 +171,9 @@ class _SecondaryScreenState extends State<SecondaryScreen> {
         ),
         Padding(
           // `pt-32 … py-12` plus the status bar, so the title clears the fixed header.
-          padding: EdgeInsets.fromLTRB(16, 128 + MediaQuery.paddingOf(context).top, 16, 48),
+          // Tight to the header above and to the toolbar below — the site's `pt-32 py-12`
+          // left a dead band at both ends on a phone.
+          padding: EdgeInsets.fromLTRB(16, 88 + MediaQuery.paddingOf(context).top, 16, 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -191,7 +193,7 @@ class _SecondaryScreenState extends State<SecondaryScreen> {
                   color: Colors.white.withValues(alpha: 0.7),
                 ),
               ),
-              const SizedBox(height: 32), // mb-8
+              const SizedBox(height: 20),
               _searchCard(context),
               const SizedBox(height: 16), // mt-4
               Pressable(
@@ -219,7 +221,7 @@ class _SecondaryScreenState extends State<SecondaryScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 32), // mt-8
+              const SizedBox(height: 20),
               FutureBuilder<Paginated<PropertyListing>>(
                 future: _future,
                 builder: (context, snapshot) => Wrap(
@@ -402,7 +404,8 @@ class _SecondaryScreenState extends State<SecondaryScreen> {
     ];
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20), // py-5
+      // py-5 on the site; halved here so the first row of cards starts higher up the screen.
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
         border: Border(bottom: BorderSide(color: AppColors.borderLight)),
       ),
@@ -522,7 +525,7 @@ class _SecondaryScreenState extends State<SecondaryScreen> {
           return SliverToBoxAdapter(child: _empty(context));
         }
         return SliverPadding(
-          padding: const EdgeInsets.fromLTRB(16, 24, 16, 0), // mt-6
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 0), // mt-6, tightened for the phone
           // Two per row so four cards fit one screen.
           sliver: SliverGrid.builder(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(

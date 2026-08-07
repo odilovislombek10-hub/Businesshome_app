@@ -1,3 +1,5 @@
+import '../constants/city_labels.dart';
+
 /// A rent or secondary-market listing, as returned by `/api/market/rent` and
 /// `/api/market/secondary`.
 ///
@@ -61,9 +63,13 @@ class PropertyListing {
   String? get thumbnail => images.isEmpty ? null : images.first;
 
   /// Human-readable location, skipping the parts the backend left empty.
-  String get locationLabel => [
+  ///
+  /// The city arrives as a code (`tashkent_city`); the site's card renders
+  /// `{{ property.district }}, {{ t(getCityLabel(property.city)) }}`, so it goes through
+  /// [CityLabels] here too — otherwise the raw code shows up on the card.
+  String get locationLabel => <String?>[
     district,
-    city,
+    CityLabels.label(city),
   ].where((s) => s != null && s.trim().isNotEmpty).map((s) => s!.trim()).join(', ');
 
   factory PropertyListing.fromJson(Map<String, dynamic> json) => PropertyListing(
