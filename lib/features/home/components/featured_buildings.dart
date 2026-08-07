@@ -40,10 +40,12 @@ class FeaturedBuildings extends StatelessWidget {
                 color: AppColors.dark.withValues(alpha: 0.6),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             // Two per row so four cards fit one screen — the app's own choice, not the site's
             // single column. `animation-delay: (i * 100)ms` staggering is kept.
             GridView.count(
+              // Explicit zero: a nested GridView otherwise inherits the ambient padding.
+              padding: EdgeInsets.zero,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               crossAxisCount: 2,
