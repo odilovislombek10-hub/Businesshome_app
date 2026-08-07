@@ -13,6 +13,7 @@ import '../../core/utils/format.dart';
 import '../../shared/widgets/entrance.dart';
 import '../../shared/widgets/site_header.dart';
 import '../../shared/widgets/site_icon.dart';
+import '../../shared/widgets/specialist_bits.dart';
 import 'designers_filter_sheet.dart';
 import 'designers_repository.dart';
 import 'designers_texts.dart';
@@ -187,7 +188,7 @@ class _DesignersScreenState extends State<DesignersScreen> {
               ),
             ),
             // 18×18 nuqtali naqsh, opacity-50.
-            Positioned.fill(child: CustomPaint(painter: _DotPatternPainter())),
+            Positioned.fill(child: CustomPaint(painter: const DotPatternPainter())),
             // `-right-1 -bottom-8` dagi w-48 h-48 palitra suv belgisi, `text-white/[0.09]`.
             Positioned(
               right: -4,
@@ -741,25 +742,6 @@ class _DesignersScreenState extends State<DesignersScreen> {
   }
 }
 
-/// Hero fonidagi 18×18 nuqtali naqsh — `radial-gradient(rgba(255,255,255,0.15) 1px, transparent 1px)`.
-class _DotPatternPainter extends CustomPainter {
-  static const _step = 18.0;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    // Naqsh butun blokda `opacity-50` bilan chiziladi, ya'ni 0.15 × 0.5.
-    final paint = Paint()..color = Colors.white.withValues(alpha: 0.075);
-    for (var y = _step / 2; y < size.height; y += _step) {
-      for (var x = _step / 2; x < size.width; x += _step) {
-        canvas.drawCircle(Offset(x, y), 1, paint);
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(_DotPatternPainter oldDelegate) => false;
-}
-
 /// Bitta dizayner kartasi.
 ///
 /// Shablonda `flex flex-col md:flex-row` — mobilda avatar bloki tepada, tafsilotlar pastda.
@@ -869,10 +851,10 @@ class _DesignerCard extends StatelessWidget {
         ? circle(CachedNetworkImage(imageUrl: designer.avatar, fit: BoxFit.cover))
         : circle(
             DecoratedBox(
-              decoration: BoxDecoration(gradient: _avatarGradient(designer.fullName)),
+              decoration: BoxDecoration(gradient: avatarGradient(designer.fullName)),
               child: Center(
                 child: Text(
-                  _initials(designer.fullName),
+                  initialsOf(designer.fullName),
                   style: theme.textTheme.displaySmall?.copyWith(
                     fontSize: 30, // text-3xl
                     fontWeight: FontWeight.w700,
@@ -1209,32 +1191,4 @@ class _HalfClipper extends CustomClipper<Rect> {
 
   @override
   bool shouldReclip(_HalfClipper oldClipper) => false;
-}
-
-String _initials(String name) {
-  final parts = name.trim().split(RegExp(r'\s+')).where((p) => p.isNotEmpty).toList();
-  if (parts.isEmpty) return '?';
-  if (parts.length == 1) return parts.first[0].toUpperCase();
-  return (parts[0][0] + parts[1][0]).toUpperCase();
-}
-
-/// Ismdan deterministik gradient — saytdagi `getAvatarGradient` ning aynan o'zi.
-LinearGradient _avatarGradient(String name) {
-  const palette = <List<Color>>[
-    [Color(0xFF999966), Color(0xFF4F6E3A)],
-    [Color(0xFF6366F1), Color(0xFF4338CA)],
-    [Color(0xFFEC4899), Color(0xFFBE185D)],
-    [Color(0xFF14B8A6), Color(0xFF0F766E)],
-    [Color(0xFFF59E0B), Color(0xFFB45309)],
-    [Color(0xFF8B5CF6), Color(0xFF6D28D9)],
-    [Color(0xFFEF4444), Color(0xFFB91C1C)],
-    [Color(0xFF10B981), Color(0xFF047857)],
-  ];
-  var h = 0;
-  for (final unit in name.codeUnits) {
-    // JS `(h << 5) - h + code` 32 bitli — Dart'da int 64 bitli, shuning uchun qirqiladi.
-    h = ((h << 5) - h + unit).toSigned(32);
-  }
-  final colors = palette[h.abs() % palette.length];
-  return LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: colors);
 }

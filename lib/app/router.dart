@@ -5,6 +5,7 @@ import '../features/auth/login_screen.dart';
 import '../features/auth/register_screen.dart';
 import '../features/designers/designers_screen.dart';
 import '../features/home/home_screen.dart';
+import '../features/masters/masters_screen.dart';
 import '../features/secondary/secondary_detail_screen.dart';
 import '../features/secondary/listings_config.dart';
 import '../features/secondary/secondary_screen.dart';
@@ -138,10 +139,7 @@ final appRouter = GoRouter(
       path: '/designers/:id',
       builder: (_, _) => const PlaceholderScreen(title: 'Dizayner'),
     ),
-    GoRoute(
-      path: '/masters',
-      builder: (_, _) => const PlaceholderScreen(title: 'Ustalar'),
-    ),
+    GoRoute(path: '/masters', builder: (_, _) => const MastersScreen()),
     GoRoute(
       path: '/masters/:id',
       builder: (_, _) => const PlaceholderScreen(title: 'Usta'),
