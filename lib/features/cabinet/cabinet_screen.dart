@@ -422,8 +422,8 @@ class _Sidebar extends StatelessWidget {
 /// Rolga qarab menyu — saytdagi `sidebarItems()` ning aynan tartibi.
 List<String> sidebarTabsFor(MarketRole role) {
   final items = <String>['dashboard'];
-  // `canCreateListing()` — e'lon qo'sha oladigan rollar.
-  if (role == MarketRole.agent || role == MarketRole.user || role == MarketRole.developer) {
+  // `canCreateListing()` — "Mulk e'lonlari faqat user/agent uchun".
+  if (role == MarketRole.user || role == MarketRole.agent) {
     items.add('listings');
   }
 
