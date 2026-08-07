@@ -117,6 +117,43 @@ abstract final class SiteIcons {
     'M3 3m0 5a5 5 0 0 1 5-5h8a5 5 0 0 1 5 5v8a5 5 0 0 1-5 5H8a5 5 0 0 1-5-5z',
     'M10 9.5v5l4-2.5-4-2.5z',
   ]);
+
+  // ── dizaynerlar / ustalar ────────────────────────────────────────────────
+  /// Reyting yulduzi. Kartada uchta holatda chiziladi: to'la (amber, `fill`), yarim (yarmigacha
+  /// qirqilgan to'lasi) va bo'sh (`stroke`, kulrang) — shuning uchun bitta path ikki variantda.
+  static const _starPolygon =
+      'M12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26Z';
+  static const ratingStar = SiteIconData([_starPolygon], filled: true);
+  static const ratingStarOutline = SiteIconData([_starPolygon]);
+
+  static const phone = SiteIconData([
+    'M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z',
+  ]);
+
+  /// Yon paneldagi filtr voronkasi.
+  static const funnel = SiteIconData(['M22 3 2 3 10 12.46 10 19 14 21 14 12.46Z']);
+
+  /// Bo'sh holatdagi "odamlar" belgisi.
+  static const users = SiteIconData([
+    'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2',
+    'M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0',
+    'M22 21v-2a4 4 0 0 0-3-3.87',
+    'M16 3.13a4 4 0 0 1 0 7.75',
+  ]);
+
+  /// Reels nishonchasidagi to'ldirilgan uchburchak.
+  static const play = SiteIconData(['M6 3 20 12 6 21Z'], filled: true);
+
+  /// Dizaynerlar hero'sining o'ng pastidagi suv belgisi — rassom palitrasi. Shablonda bitta
+  /// `<svg>` ichida konturi chiziladi, uchta nuqtasi to'ldiriladi, shuning uchun ikki bo'lak.
+  static const paletteOutline = SiteIconData([
+    'M12 2a10 10 0 0 0 0 20c1.6 0 2-1.2 1.2-2-.8-.9-.3-2 .8-2H17a5 5 0 0 0 5-5c0-5-4.5-9-10-9z',
+  ]);
+  static const paletteDots = SiteIconData([
+    'M7.5 11m-1.1 0a1.1 1.1 0 1 0 2.2 0a1.1 1.1 0 1 0 -2.2 0',
+    'M11 7m-1.1 0a1.1 1.1 0 1 0 2.2 0a1.1 1.1 0 1 0 -2.2 0',
+    'M15.5 8m-1.1 0a1.1 1.1 0 1 0 2.2 0a1.1 1.1 0 1 0 -2.2 0',
+  ], filled: true);
 }
 
 /// Draws a [SiteIconData] at [size], scaled from the 24×24 viewBox.

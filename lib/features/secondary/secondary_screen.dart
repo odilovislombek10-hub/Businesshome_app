@@ -55,7 +55,14 @@ class _SecondaryScreenState extends State<SecondaryScreen> {
   final _scroll = ScrollController();
 
   late SecondaryFilter _filter = SecondaryFilter(city: widget.initialCity ?? '');
-  late Future<Paginated<PropertyListing>> _future = _repo.list(_filter);
+  late Future<Paginated<PropertyListing>> _future = _load(_filter);
+
+  /// Oxirgi muvaffaqiyatli javob. Saytda shablonda spinner yo'q — yangi so'rov ketayotganda
+  /// eski ro'yxat ekranda turaveradi, `loading()` faqat "topilmadi" blokini bosib turadi.
+  Paginated<PropertyListing>? _last;
+
+  Future<Paginated<PropertyListing>> _load(SecondaryFilter filter) =>
+      _repo.list(filter).then((page) => _last = page);
 
   List<Region> _regions = const [];
   Timer? _debounce;
@@ -88,7 +95,7 @@ class _SecondaryScreenState extends State<SecondaryScreen> {
   void _apply(SecondaryFilter next, {bool keepPage = false}) {
     setState(() {
       _filter = keepPage ? next : next.copyWith(page: 1);
-      _future = _repo.list(_filter);
+      _future = _load(_filter);
     });
   }
 
@@ -230,7 +237,9 @@ class _SecondaryScreenState extends State<SecondaryScreen> {
                   children: [
                     _HeroStat(
                       dotColor: const Color(0xFF34D399), // emerald-400
-                      label: '${snapshot.data?.total ?? 0} ${SecondaryTexts.activeListings}',
+                      label:
+                          '${snapshot.data?.total ?? _last?.total ?? 0} '
+                          '${SecondaryTexts.activeListings}',
                     ),
                     const _HeroStat(dotColor: AppColors.olive, label: SecondaryTexts.updatedToday),
                   ],
@@ -512,15 +521,19 @@ class _SecondaryScreenState extends State<SecondaryScreen> {
     return FutureBuilder<Paginated<PropertyListing>>(
       future: _future,
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 64),
-              child: Center(child: CircularProgressIndicator()),
-            ),
-          );
+        // Yangi so'rov ketayotganda eski ro'yxat qoladi; spinner faqat birinchi yuklashda.
+        final page = snapshot.data ?? _last;
+        if (page == null) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 64),
+                child: Center(child: CircularProgressIndicator()),
+              ),
+            );
+          }
+          return SliverToBoxAdapter(child: _empty(context));
         }
-        final page = snapshot.data ?? const Paginated<PropertyListing>.empty();
         if (page.items.isEmpty) {
           return SliverToBoxAdapter(child: _empty(context));
         }
@@ -600,7 +613,7 @@ class _SecondaryScreenState extends State<SecondaryScreen> {
   Widget _paginationBlock(BuildContext context) => FutureBuilder<Paginated<PropertyListing>>(
     future: _future,
     builder: (context, snapshot) {
-      final page = snapshot.data;
+      final page = snapshot.data ?? _last;
       if (page == null || page.items.isEmpty) return const SizedBox.shrink();
       return Padding(padding: const EdgeInsets.only(top: 24), child: _pagination(context, page));
     },

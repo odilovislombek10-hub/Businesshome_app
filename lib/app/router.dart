@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../features/auth/forgot_password_screen.dart';
 import '../features/auth/login_screen.dart';
 import '../features/auth/register_screen.dart';
+import '../features/designers/designers_screen.dart';
 import '../features/home/home_screen.dart';
 import '../features/secondary/secondary_detail_screen.dart';
 import '../features/secondary/listings_config.dart';
@@ -132,10 +133,7 @@ final appRouter = GoRouter(
       path: '/agent/:id',
       builder: (_, _) => const PlaceholderScreen(title: 'Agent'),
     ),
-    GoRoute(
-      path: '/designers',
-      builder: (_, _) => const PlaceholderScreen(title: 'Dizaynerlar'),
-    ),
+    GoRoute(path: '/designers', builder: (_, _) => const DesignersScreen()),
     GoRoute(
       path: '/designers/:id',
       builder: (_, _) => const PlaceholderScreen(title: 'Dizayner'),
