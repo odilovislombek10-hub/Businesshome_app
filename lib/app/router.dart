@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../features/auth/forgot_password_screen.dart';
 import '../features/auth/login_screen.dart';
 import '../features/auth/register_screen.dart';
+import '../features/birja/birja_screen.dart';
 import '../features/designers/designers_screen.dart';
 import '../features/home/home_screen.dart';
 import '../features/masters/masters_screen.dart';
@@ -148,13 +149,7 @@ final appRouter = GoRouter(
       path: '/specialists/create',
       builder: (_, _) => const PlaceholderScreen(title: 'Mutaxassis yaratish'),
     ),
-    GoRoute(
-      path: '/birja',
-      builder: (_, _) => const PlaceholderScreen(
-        title: 'Birja',
-        note: 'Mijoz buyurtmalari — ustalar va dizaynerlar uchun.',
-      ),
-    ),
+    GoRoute(path: '/birja', builder: (_, _) => const BirjaScreen()),
 
     // ── Content ───────────────────────────────────────────────────────────────
     GoRoute(
