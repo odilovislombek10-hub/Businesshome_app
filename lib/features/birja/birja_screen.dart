@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../app/theme.dart';
+import '../../core/constants/city_labels.dart';
 import '../../core/models/brief.dart';
 import '../../core/models/market_user.dart';
 import '../../core/models/region.dart';
@@ -731,7 +732,7 @@ class _BriefCard extends StatelessWidget {
   /// `obyekt turi · shahar · maydon` — bo'sh maydonlar tushib qoladi.
   String _infoLine() => [
     if (brief.projectType != null) BirjaTexts.typeLabel(brief.projectType),
-    if (brief.city != null) brief.city!,
+    if (brief.city != null) CityLabels.label(brief.city),
     if (brief.areaM2 != null) '${formatNumber(brief.areaM2)} m²',
   ].join(' · ');
 
@@ -1049,7 +1050,9 @@ class _BriefDetailSheet extends StatelessWidget {
       if (brief.city != null)
         box(
           BirjaTexts.location,
-          brief.district == null ? brief.city! : '${brief.city}, ${brief.district}',
+          brief.district == null
+              ? CityLabels.label(brief.city)
+              : '${CityLabels.label(brief.city)}, ${brief.district}',
         ),
       if (brief.areaM2 != null) box(BirjaTexts.area, '${formatNumber(brief.areaM2)} m²'),
       if (brief.deadline != null) box(BirjaTexts.deadline, brief.deadline!),
@@ -1059,13 +1062,17 @@ class _BriefDetailSheet extends StatelessWidget {
       children: [
         for (var i = 0; i < cells.length; i += 2) ...[
           if (i > 0) const SizedBox(height: 12),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(child: cells[i]),
-              const SizedBox(width: 12),
-              if (i + 1 < cells.length) Expanded(child: cells[i + 1]) else const Spacer(),
-            ],
+          // `stretch` ishlatib bo'lmaydi: ListView bolalariga cheksiz balandlik beradi va
+          // qator o'zini o'lchay olmay, butun ro'yxat chizilmay qoladi.
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(child: cells[i]),
+                const SizedBox(width: 12),
+                if (i + 1 < cells.length) Expanded(child: cells[i + 1]) else const Spacer(),
+              ],
+            ),
           ),
         ],
         if (cells.isNotEmpty) const SizedBox(height: 12),

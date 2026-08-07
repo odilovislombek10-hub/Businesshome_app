@@ -226,3 +226,8 @@ birinchi yuklashda (hali hech qanday ma'lumot yo'q).
 - Heredoc ichida uzun Dart kodi bo'lsa bash yiqiladi — skriptni faylga yozib, `python fayl.py`
   bilan ishlat.
 - Dart formatter fayllarni qayta formatlaydi; `replace` qilishdan oldin joriy holatni o'qi.
+- **`ListView` ichida `Row(crossAxisAlignment: stretch)` qo'yma** — bola cheksiz balandlik oladi va
+  butun ro'yxat **xatosiz, jimgina** chizilmay qoladi (logda ham hech nima yo'q). `IntrinsicHeight`
+  bilan o'rab qo'y. Shu sabab birja tafsilot oynasi bo'm-bo'sh chiqqan edi.
+- **Bo'sh ekran ko'rsang darrov kodni ayblama, lekin skrinshotni albatta oxirigacha ko'r** — bu xato
+  faqat ekranda bilinadi, `flutter analyze` ham, `flutter test` ham tutmaydi.
