@@ -1,3 +1,5 @@
+import 'package:flutter/painting.dart';
+
 import '../../core/models/market_user.dart';
 
 /// Kabinet matnlari — `cabinet.*` kalitlari `core/i18n/translations/uz.ts` dan aynan olingan.
@@ -84,4 +86,39 @@ abstract final class CabinetTexts {
   };
 
   static const greeting = 'Assalomu alaykum';
+
+  // ── sevimlilar ────────────────────────────────────────────────────────────
+  static const noFavorites = "Hali sevimlilar yo'q";
+  static const noFavoritesDesc =
+      "Yoqtirgan e'lonlaringizni saqlab qo'ying — ularni bu yerda topasiz";
+  static const noFavoritesInCategory = "Bu kategoriyada sevimlilar yo'q";
+  static const startSearch = 'Qidirishni boshlash';
+
+  /// `cabinet.favFilter.*` — filtr tugmalari; tartibi shablondagidek.
+  static const _favFilters = <(String, String)>[
+    ('new-project', 'Yangi loyihalar'),
+    ('secondary', 'Ikkilamchi'),
+    ('rent', 'Ijara'),
+    ('viewer-apartment', '3D kvartiralar'),
+    ('ads', "E'lonlar"),
+    ('designer', 'Dizaynerlar'),
+    ('master', 'Ustalar'),
+  ];
+
+  static List<(String, String)> favoriteTabsFor(Set<String> sources) => [
+    ('all', 'Hammasi'),
+    for (final (key, label) in _favFilters)
+      if (sources.contains(key)) (key, label),
+  ];
+
+  /// `cabinet.favBadge.*` + rasm ustidagi rangi.
+  static (String, Color)? favoriteBadge(String source) => switch (source) {
+    'viewer-apartment' => ('3D', Color(0x99000000)),
+    'new-project' => ('Yangi loyiha', Color(0xE687885C)),
+    'rent' => ('Ijara', Color(0xCC3B82F6)),
+    'secondary' => ('Ikkilamchi', Color(0xCCF59E0B)),
+    'designer' => ('Dizayner', Color(0xCCA855F7)),
+    'master' => ('Usta', Color(0xCC14B8A6)),
+    _ => null,
+  };
 }

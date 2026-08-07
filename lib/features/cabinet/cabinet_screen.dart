@@ -11,6 +11,8 @@ import '../../shared/widgets/entrance.dart';
 import '../../shared/widgets/site_icon.dart';
 import '../../shared/widgets/specialist_bits.dart';
 import 'cabinet_dashboard.dart';
+import 'cabinet_favorites.dart';
+import 'cabinet_viewed.dart';
 import 'cabinet_repository.dart';
 import 'cabinet_texts.dart';
 
@@ -59,6 +61,11 @@ class _CabinetScreenState extends State<CabinetScreen> {
   final _repo = const CabinetRepository();
 
   late Future<List<RoleStat>> _stats = _repo.roleStats();
+
+  /// Bo'limlar ochilgandagina so'raladi — saytda hammasi birdan yuklanadi, telefonda esa
+  /// keraksiz so'rovlarni oldini olgan ma'qul.
+  Future<List<FavoriteItem>>? _favorites;
+  Future<List<ViewedItem>>? _viewed;
 
   String get _tab => CabinetScreen.tabs.contains(widget.tab) ? widget.tab : 'dashboard';
 
@@ -159,15 +166,24 @@ class _CabinetScreenState extends State<CabinetScreen> {
   }
 
   Widget _content(BuildContext context, MarketUser user) {
-    if (_tab == 'dashboard') {
-      return CabinetDashboard(
-        user: user,
-        stats: _stats,
-        onOpenTab: (id) => context.go('/cabinet/$id'),
-        onRetry: () => setState(() => _stats = _repo.roleStats()),
-      );
+    switch (_tab) {
+      case 'dashboard':
+        return CabinetDashboard(
+          user: user,
+          stats: _stats,
+          onOpenTab: (id) => context.go('/cabinet/$id'),
+          onRetry: () => setState(() => _stats = _repo.roleStats()),
+        );
+      case 'favorites':
+        return CabinetFavorites(
+          future: _favorites ??= _repo.favorites(),
+          onRetry: () => setState(() => _favorites = _repo.favorites()),
+        );
+      case 'viewed':
+        return CabinetViewed(future: _viewed ??= _repo.viewed());
+      default:
+        return _NotPortedYet(tab: _tab);
     }
-    return _NotPortedYet(tab: _tab);
   }
 
   Future<void> _confirmLogout() async {
