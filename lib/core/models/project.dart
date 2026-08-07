@@ -27,6 +27,12 @@ class Project {
   final double? latitude;
   final double? longitude;
   final bool isTop;
+
+  /// `/new-projects` kartasi shu uchtasini ko'rsatadi: 3D nishonchasi, segment yorlig'i va
+  /// "Tasdiqlangan" belgisi.
+  final bool hasTour;
+  final bool verified;
+  final String? segment;
   final Developer? developer;
 
   const Project({
@@ -53,6 +59,9 @@ class Project {
     this.latitude,
     this.longitude,
     this.isTop = false,
+    this.hasTour = false,
+    this.verified = false,
+    this.segment,
     this.developer,
   });
 
@@ -80,6 +89,9 @@ class Project {
     latitude: (json['latitude'] as num?)?.toDouble(),
     longitude: (json['longitude'] as num?)?.toDouble(),
     isTop: (json['is_top'] as bool?) ?? false,
+    hasTour: json['has_tour'] == true,
+    verified: json['verified'] == true,
+    segment: json['segment']?.toString(),
     developer: json['developer'] is Map<String, dynamic>
         ? Developer.fromJson(json['developer'] as Map<String, dynamic>)
         : null,
@@ -92,6 +104,15 @@ class Project {
       if (candidate != null && candidate.isNotEmpty) return candidate;
     }
     return null;
+  }
+
+  /// Topshirish yili — saytdagi `apiToProjectItem`: tugash sanasining yili, bo'lmasa boshlanish.
+  String get completionYear {
+    final end = endDate ?? '';
+    if (end.length >= 4) return end.substring(0, 4);
+    final start = startDate ?? '';
+    if (start.length >= 4) return start.substring(0, 4);
+    return '';
   }
 
   /// Human-readable location, skipping the parts the backend left empty.

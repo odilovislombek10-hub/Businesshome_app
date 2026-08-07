@@ -199,6 +199,13 @@ abstract final class SiteIcons {
     'M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16',
   ]);
 
+  /// `/new-projects` dagi "Xaritadan qidirish" havolasi — qatlamlar belgisi.
+  static const map = SiteIconData([
+    'M3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21Z',
+    'M9 3v15',
+    'M15 6v15',
+  ]);
+
   static const arrowLeft = SiteIconData(['M19 12H5', 'm12 19-7-7 7-7']);
 
   static const logout = SiteIconData([
