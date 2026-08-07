@@ -572,13 +572,24 @@ class _MastersScreenState extends State<MastersScreen> {
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
           child: Column(
             children: [
-              for (final (i, master) in items.indexed) ...[
-                if (i > 0) const SizedBox(height: 18), // gap-[18px]
-                Entrance.fadeIn(
-                  delay: Duration(milliseconds: i * 100),
-                  child: _MasterCard(master: master),
+              // Bir ekranda to'rtta karta ko'rinishi uchun ikki ustun.
+              GridView.builder(
+                // Ichma-ich GridView atrofdagi paddingni meros qiladi — aniq nol qo'yiladi.
+                padding: EdgeInsets.zero,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 18, // gap-[18px]
+                  crossAxisSpacing: 18,
+                  mainAxisExtent: _MasterCard.extent,
                 ),
-              ],
+                itemCount: items.length,
+                itemBuilder: (context, i) => Entrance.fadeIn(
+                  delay: Duration(milliseconds: i * 100),
+                  child: _MasterCard(master: items[i]),
+                ),
+              ),
               if (page.pages > 1) ...[
                 const SizedBox(height: 32), // mt-8
                 _pagination(context, page),
@@ -606,10 +617,16 @@ class _MastersScreenState extends State<MastersScreen> {
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-      child: Column(
+      child: GridView.count(
+        padding: EdgeInsets.zero,
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        crossAxisCount: 2,
+        mainAxisSpacing: 18,
+        crossAxisSpacing: 18,
+        childAspectRatio: 172 / _MasterCard.extent,
         children: [
-          for (var i = 0; i < 6; i++) ...[
-            if (i > 0) const SizedBox(height: 18),
+          for (var i = 0; i < 6; i++)
             Pulse(
               child: Container(
                 decoration: BoxDecoration(
@@ -621,17 +638,17 @@ class _MastersScreenState extends State<MastersScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(height: 84, color: const Color(0xFFF1EFE8)),
+                    Container(height: 52, color: const Color(0xFFF1EFE8)),
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(18, 40, 18, 18),
+                      padding: const EdgeInsets.fromLTRB(12, 28, 12, 12),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          bar(0.6, 18),
-                          const SizedBox(height: 12),
-                          bar(0.4, 14),
-                          const SizedBox(height: 12),
-                          bar(1, 34),
+                          bar(0.6, 16),
+                          const SizedBox(height: 10),
+                          bar(0.4, 12),
+                          const SizedBox(height: 10),
+                          bar(1, 30),
                         ],
                       ),
                     ),
@@ -639,7 +656,6 @@ class _MastersScreenState extends State<MastersScreen> {
                 ),
               ),
             ),
-          ],
         ],
       ),
     );
@@ -781,6 +797,9 @@ String _trim(double value) => value == value.roundToDouble() ? '${value.toInt()}
 class _MasterCard extends StatelessWidget {
   const _MasterCard({required this.master});
 
+  /// Ikki ustunli to'rda bitta katakning balandligi.
+  static const extent = 250.0;
+
   final Master master;
 
   @override
@@ -807,21 +826,24 @@ class _MasterCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _cover(context),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(18, 0, 18, 18),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _avatarRow(context),
-                  const SizedBox(height: 11), // gap-[11px]
-                  _nameAndCity(context),
-                  const SizedBox(height: 11),
-                  _specAndTags(context),
-                  const SizedBox(height: 11),
-                  const Divider(height: 1, color: Color(0xFFE7E3D8)),
-                  const SizedBox(height: 12), // pt-3
-                  _priceRow(context),
-                ],
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _avatarRow(context),
+                    const SizedBox(height: 8), // gap-[11px] → yarim kenglikda 8
+                    _nameAndCity(context),
+                    const SizedBox(height: 8),
+                    _specAndTags(context),
+                    const Spacer(),
+                    const SizedBox(height: 8),
+                    const Divider(height: 1, color: Color(0xFFE7E3D8)),
+                    const SizedBox(height: 8), // pt-3
+                    _priceRow(context),
+                  ],
+                ),
               ),
             ),
           ],
@@ -833,7 +855,7 @@ class _MasterCard extends StatelessWidget {
   Widget _cover(BuildContext context) {
     final theme = Theme.of(context);
     return SizedBox(
-      height: 84,
+      height: 52,
       child: Stack(
         children: [
           Positioned.fill(
@@ -852,20 +874,20 @@ class _MasterCard extends StatelessWidget {
             child: CustomPaint(painter: DotPatternPainter(step: 14, alpha: 0.072)),
           ),
           Positioned(
-            right: 12,
-            bottom: 10,
+            right: 8,
+            bottom: -4,
             child: SiteIcon(
               SiteIcons.wrench,
-              size: 58,
+              size: 40,
               strokeWidth: 1.3,
               color: Colors.white.withValues(alpha: 0.16),
             ),
           ),
           Positioned(
-            top: 12,
-            left: 12,
+            top: 8,
+            left: 8,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.9),
                 borderRadius: BorderRadius.circular(AppRadius.pill),
@@ -873,7 +895,7 @@ class _MasterCard extends StatelessWidget {
               child: Text(
                 master.isAvailable ? MastersTexts.availableBadge : MastersTexts.busyBadge,
                 style: theme.textTheme.labelSmall?.copyWith(
-                  fontSize: 11.5,
+                  fontSize: 10,
                   fontWeight: FontWeight.w700,
                   color: const Color(0xFF3A3A28),
                 ),
@@ -890,19 +912,19 @@ class _MasterCard extends StatelessWidget {
     // `-mt-8` — avatar muqovaning ustiga yarim chiqib turadi. Qator 64px baland, lekin joylashuvda
     // atigi 32px egallaydi: qolgan yarmi muqova ustiga chiqadi.
     return SizedBox(
-      height: 32,
+      height: 22,
       child: OverflowBox(
         alignment: Alignment.bottomCenter,
-        maxHeight: 64,
+        maxHeight: 44,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             _avatar(context),
             const Spacer(),
             Padding(
-              padding: const EdgeInsets.only(bottom: 4), // mb-1
+              padding: const EdgeInsets.only(bottom: 2), // mb-1
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                 decoration: BoxDecoration(
                   color: const Color(0xFFF5F3EC),
                   borderRadius: BorderRadius.circular(AppRadius.pill),
@@ -911,21 +933,21 @@ class _MasterCard extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text('★', style: TextStyle(color: Color(0xFFE0A93B), fontSize: 13)),
-                    const SizedBox(width: 4),
+                    const Text('★', style: TextStyle(color: Color(0xFFE0A93B), fontSize: 11)),
+                    const SizedBox(width: 3),
                     Text(
                       '${master.rating}',
                       style: theme.textTheme.bodySmall?.copyWith(
-                        fontSize: 13,
+                        fontSize: 11,
                         fontWeight: FontWeight.w800,
                         color: AppColors.dark,
                       ),
                     ),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: 2),
                     Text(
                       '(${master.reviewsCount})',
                       style: theme.textTheme.labelSmall?.copyWith(
-                        fontSize: 11.5,
+                        fontSize: 9.5,
                         color: AppColors.dark.withValues(alpha: 0.4),
                       ),
                     ),
@@ -943,8 +965,8 @@ class _MasterCard extends StatelessWidget {
     final theme = Theme.of(context);
     // w-16 h-16 rounded-full border-[3px] border-white
     Widget ring(Widget child) => Container(
-      width: 64,
-      height: 64,
+      width: 44,
+      height: 44,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(color: Colors.white, width: 3),
@@ -969,7 +991,7 @@ class _MasterCard extends StatelessWidget {
           child: Text(
             initialsOf(master.fullName),
             style: theme.textTheme.displaySmall?.copyWith(
-              fontSize: 22, // text-[22px]
+              fontSize: 16, // text-[22px] → yarim kenglikda 16
               fontWeight: FontWeight.w700,
               color: Colors.white,
             ),
@@ -991,17 +1013,17 @@ class _MasterCard extends StatelessWidget {
                 master.fullName,
                 overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.displaySmall?.copyWith(
-                  fontSize: 18, // text-[18px]
+                  fontSize: 14, // text-[18px] → yarim kenglikda 14
                   fontWeight: FontWeight.w700,
                   color: AppColors.dark,
                 ),
               ),
             ),
             if (master.isVerified) ...[
-              const SizedBox(width: 6), // gap-1.5
+              const SizedBox(width: 4), // gap-1.5
               Container(
-                width: 17,
-                height: 17,
+                width: 14,
+                height: 14,
                 decoration: const BoxDecoration(color: AppColors.olive, shape: BoxShape.circle),
                 child: const Center(
                   child: SiteIcon(SiteIcons.check, size: 9, color: Colors.white, strokeWidth: 3),
@@ -1013,8 +1035,10 @@ class _MasterCard extends StatelessWidget {
         const SizedBox(height: 2), // mt-0.5
         Text(
           '📍 ${CityLabels.label(master.city)}',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: theme.textTheme.bodySmall?.copyWith(
-            fontSize: 12.5,
+            fontSize: 11,
             fontWeight: FontWeight.w500,
             color: AppColors.dark.withValues(alpha: 0.5),
           ),
@@ -1026,19 +1050,21 @@ class _MasterCard extends StatelessWidget {
   Widget _specAndTags(BuildContext context) {
     final theme = Theme.of(context);
     return Wrap(
-      spacing: 6, // gap-1.5
-      runSpacing: 6,
+      spacing: 5, // gap-1.5
+      runSpacing: 5,
       children: [
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
           decoration: BoxDecoration(
             color: const Color(0xFFB5694C).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(AppRadius.pill),
           ),
           child: Text(
             MastersTexts.specLabel(master.specialization),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: theme.textTheme.labelSmall?.copyWith(
-              fontSize: 11.5,
+              fontSize: 10.5,
               fontWeight: FontWeight.w700,
               color: const Color(0xFF9A5E3C),
             ),
@@ -1047,7 +1073,7 @@ class _MasterCard extends StatelessWidget {
         // Shablon faqat dastlabki ikkitasini oladi: `master.tags.slice(0, 2)`.
         for (final tag in master.tags.take(2))
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(
               color: const Color(0xFFF5F3EC),
               borderRadius: BorderRadius.circular(AppRadius.pill),
@@ -1055,8 +1081,10 @@ class _MasterCard extends StatelessWidget {
             ),
             child: Text(
               tag,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: theme.textTheme.labelSmall?.copyWith(
-                fontSize: 11.5,
+                fontSize: 10.5,
                 fontWeight: FontWeight.w600,
                 color: AppColors.dark.withValues(alpha: 0.5),
               ),
@@ -1068,45 +1096,56 @@ class _MasterCard extends StatelessWidget {
 
   Widget _priceRow(BuildContext context) {
     final theme = Theme.of(context);
-    return Row(
+    // Saytda narx va tugma yonma-yon; yarim kenglikda tugma pastga tushadi.
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                MastersTexts.priceLabel.toUpperCase(),
-                style: theme.textTheme.labelSmall?.copyWith(
-                  fontSize: 10.5,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.63, // tracking-[0.06em]
-                  color: AppColors.dark.withValues(alpha: 0.4),
-                ),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
+          children: [
+            Text(
+              MastersTexts.priceLabel.toUpperCase(),
+              style: theme.textTheme.labelSmall?.copyWith(
+                fontSize: 9.5,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.63, // tracking-[0.06em]
+                color: AppColors.dark.withValues(alpha: 0.4),
               ),
-              // Saytda `formatPrice()` — valyuta konvertatsiyasisiz.
-              Text(
+            ),
+            const SizedBox(width: 6),
+            // Saytda `formatPrice()` — valyuta konvertatsiyasisiz.
+            Expanded(
+              child: Text(
                 formatNumber(master.priceFrom),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.displaySmall?.copyWith(
-                  fontSize: 16,
+                  fontSize: 14,
                   fontWeight: FontWeight.w800,
                   color: AppColors.dark,
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
+        const SizedBox(height: 6),
         Pressable(
           onTap: () => context.push('/masters/${master.id}'),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            width: double.infinity,
+            height: 30,
+            alignment: Alignment.center,
             decoration: BoxDecoration(
               color: AppColors.olive,
-              borderRadius: BorderRadius.circular(11), // rounded-[11px]
+              borderRadius: BorderRadius.circular(9), // rounded-[11px]
             ),
             child: Text(
               MastersTexts.viewProfile,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: theme.textTheme.bodySmall?.copyWith(
-                fontSize: 13,
+                fontSize: 11.5,
                 fontWeight: FontWeight.w700,
                 color: Colors.white,
               ),

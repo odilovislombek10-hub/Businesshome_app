@@ -592,19 +592,33 @@ class _DesignersScreenState extends State<DesignersScreen> {
           padding: const EdgeInsets.fromLTRB(16, 20, 16, 0), // gap-8 → telefonda ixchamroq
           child: Column(
             children: [
-              for (final (i, designer) in page.items.indexed) ...[
-                if (i > 0) const SizedBox(height: 20), // space-y-5
-                Entrance.fadeIn(
-                  delay: Duration(milliseconds: i * 100),
-                  child: _DesignerCard(
-                    designer: designer,
-                    isFavorite: _favorites.contains(designer.id),
-                    onFavorite: () => setState(() {
-                      if (!_favorites.remove(designer.id)) _favorites.add(designer.id);
-                    }),
-                  ),
+              // Bir ekranda to'rtta karta ko'rinishi uchun ikki ustun.
+              GridView.builder(
+                // Ichma-ich GridView atrofdagi paddingni meros qiladi — aniq nol qo'yiladi.
+                padding: EdgeInsets.zero,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 16,
+                  crossAxisSpacing: 16,
+                  mainAxisExtent: _DesignerCard.extent,
                 ),
-              ],
+                itemCount: page.items.length,
+                itemBuilder: (context, i) {
+                  final designer = page.items[i];
+                  return Entrance.fadeIn(
+                    delay: Duration(milliseconds: i * 100),
+                    child: _DesignerCard(
+                      designer: designer,
+                      isFavorite: _favorites.contains(designer.id),
+                      onFavorite: () => setState(() {
+                        if (!_favorites.remove(designer.id)) _favorites.add(designer.id);
+                      }),
+                    ),
+                  );
+                },
+              ),
               if (page.pages > 1) ...[
                 const SizedBox(height: 48), // mt-12
                 _pagination(context, page),
@@ -742,11 +756,21 @@ class _DesignersScreenState extends State<DesignersScreen> {
   }
 }
 
-/// Bitta dizayner kartasi.
+/// Bitta dizayner kartasi — kompozitsiyasi usta kartasi bilan bir xil.
 ///
-/// Shablonda `flex flex-col md:flex-row` — mobilda avatar bloki tepada, tafsilotlar pastda.
+/// Foydalanuvchi so'rovi bo'yicha shablondagi keng, yozuvli kartadan voz kechildi: bir ekranda
+/// to'rttasi ko'rinishi uchun karta usta kartasi shaklida (muqova + chiqib turgan avatar +
+/// reyting tabletkasi + ma'lumot qatorlari) va ikki ustunda chiziladi.
+///
+/// Shablondagi barcha ma'lumot saqlangan — ism, mutaxassislik, reyting va sharhlar soni, shahar,
+/// teglar, uchta ko'rsatkich (loyiha / tajriba / narx), portfolio va uchala amal tugmasi.
+/// Faqat tavsif matni chiqarib tashlandi: yarim kenglikda u kartani bir necha barobar
+/// cho'zib yuborar edi.
 class _DesignerCard extends StatelessWidget {
   const _DesignerCard({required this.designer, required this.isFavorite, required this.onFavorite});
+
+  /// Ikki ustunli to'rda bitta katakning balandligi.
+  static const extent = 322.0;
 
   final Designer designer;
   final bool isFavorite;
@@ -754,151 +778,109 @@ class _DesignerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppRadius.lg), // rounded-2xl
-        border: Border.all(color: AppColors.borderLight),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 2,
-            offset: const Offset(0, 1),
-          ),
-        ],
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Column(children: [_head(context), _body(context)]),
-    );
-  }
-
-  Widget _head(BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24), // p-6
-      color: AppColors.surfaceAltLight.withValues(alpha: 0.3), // bg-gray-50/30
-      child: Column(
-        children: [
-          _avatar(context),
-          const SizedBox(height: 16), // mt-4
-          Text(
-            designer.fullName,
-            textAlign: TextAlign.center,
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontSize: 18, // text-lg
-              fontWeight: FontWeight.w700,
-              color: AppColors.dark,
+    return Pressable(
+      scale: 0.99,
+      onTap: () => context.push('/designers/${designer.id}'),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(AppRadius.lg), // rounded-2xl
+          border: Border.all(color: AppColors.borderLight),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 2,
+              offset: const Offset(0, 1),
             ),
-          ),
-          const SizedBox(height: 4), // mt-1
-          Text(
-            DesignersTexts.specLabel(designer.specialization),
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: AppColors.olive,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 12), // mt-3
-          _stars(context),
-          const SizedBox(height: 8), // mt-2
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SiteIcon(SiteIcons.mapPin, size: 14, color: AppColors.dark.withValues(alpha: 0.3)),
-              const SizedBox(width: 6), // gap-1.5
-              Flexible(
-                child: Text(
-                  CityLabels.label(designer.city),
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: AppColors.dark.withValues(alpha: 0.5),
-                  ),
+          ],
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _cover(context),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _avatarRow(context),
+                    const SizedBox(height: 8),
+                    _nameAndCity(context),
+                    const SizedBox(height: 8),
+                    _specAndTags(context),
+                    const SizedBox(height: 8),
+                    _stats(context),
+                    if (designer.portfolio.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      _portfolio(context),
+                    ],
+                    const Spacer(),
+                    const SizedBox(height: 8),
+                    _actions(context),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _avatar(BuildContext context) {
-    final theme = Theme.of(context);
-    // w-24 h-24 rounded-full ring-4 ring-white shadow-lg
-    //
-    // `ring-*` rasmning tashqarisiga chiziladi, ya'ni suratni kesmaydi — shuning uchun kesish
-    // (ClipOval) va halqa (border) ikkita alohida qatlam. Container'ning o'zida shape+clip
-    // qilinsa, rasm to'rtburchak burchakli bo'lib qolar edi.
-    Widget circle(Widget child) => Container(
-      width: 96,
-      height: 96,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(color: Colors.white, width: 4),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.12),
-            blurRadius: 15,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: ClipOval(child: child),
-    );
-
-    final avatar = designer.avatar.isNotEmpty
-        ? circle(CachedNetworkImage(imageUrl: designer.avatar, fit: BoxFit.cover))
-        : circle(
-            DecoratedBox(
-              decoration: BoxDecoration(gradient: avatarGradient(designer.fullName)),
-              child: Center(
-                child: Text(
-                  initialsOf(designer.fullName),
-                  style: theme.textTheme.displaySmall?.copyWith(
-                    fontSize: 30, // text-3xl
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          );
-
+  /// Muqova — hero'ning olive→bronza gradienti, nuqtali naqsh va palitra suv belgisi bilan.
+  Widget _cover(BuildContext context) {
     return SizedBox(
-      width: 110,
-      height: 104,
+      height: 52,
       child: Stack(
-        alignment: Alignment.center,
-        clipBehavior: Clip.none,
         children: [
-          avatar,
-          // -bottom-1 -right-1: tasdiq nishonchasi.
-          Positioned(
-            right: 3,
-            bottom: 0,
-            child: Container(
-              width: 24,
-              height: 24,
-              decoration: BoxDecoration(
-                color: const Color(0xFF10B981), // bg-emerald-500
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 2),
-              ),
-              child: const Center(
-                child: SiteIcon(SiteIcons.check, size: 12, color: Colors.white, strokeWidth: 3),
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment(-0.87, -0.5),
+                  end: Alignment(0.87, 0.5),
+                  colors: [Color(0xFF8C8D60), Color(0xFF9A6E4F)],
+                ),
               ),
             ),
           ),
+          const Positioned.fill(
+            child: CustomPaint(painter: DotPatternPainter(step: 14, alpha: 0.072)),
+          ),
+          Positioned(
+            right: 8,
+            bottom: -6,
+            child: SizedBox.square(
+              dimension: 52,
+              child: Stack(
+                children: [
+                  SiteIcon(
+                    SiteIcons.paletteOutline,
+                    size: 52,
+                    strokeWidth: 1.3,
+                    color: Colors.white.withValues(alpha: 0.16),
+                  ),
+                  SiteIcon(
+                    SiteIcons.paletteDots,
+                    size: 52,
+                    color: Colors.white.withValues(alpha: 0.16),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // Video bo'lsa — reels nishonchasi, shablondagidek `/reels/designer-<id>` ga.
           if (designer.videoUrl != null)
             Positioned(
-              right: 1,
-              top: 0,
+              top: 8,
+              left: 8,
               child: Pressable(
                 onTap: () => context.push('/reels/designer-${designer.id}'),
                 child: Container(
-                  width: 28,
-                  height: 28,
+                  width: 24,
+                  height: 24,
                   decoration: BoxDecoration(
                     color: const Color(0xFFDC2626), // bg-red-600
                     shape: BoxShape.circle,
@@ -907,7 +889,7 @@ class _DesignerCard extends StatelessWidget {
                   child: const Center(
                     child: Padding(
                       padding: EdgeInsets.only(left: 2), // ml-0.5
-                      child: SiteIcon(SiteIcons.play, size: 12, color: Colors.white),
+                      child: SiteIcon(SiteIcons.play, size: 9, color: Colors.white),
                     ),
                   ),
                 ),
@@ -918,133 +900,221 @@ class _DesignerCard extends StatelessWidget {
     );
   }
 
-  Widget _stars(BuildContext context) {
+  /// Avatar muqovaga yarim chiqib turadi; o'ng tomonda reyting tabletkasi.
+  Widget _avatarRow(BuildContext context) {
     final theme = Theme.of(context);
-    const amber = Color(0xFFFBBF24); // text-amber-400
-    const grey = Color(0xFFD1D5DB); // text-gray-300
-
-    Widget star(int index) {
-      final rating = designer.rating;
-      if (rating >= index) {
-        return const SiteIcon(SiteIcons.ratingStar, size: 16, color: amber);
-      }
-      if (rating >= index - 0.5) {
-        // Yarim yulduz: to'la yulduzning chap yarmi bo'sh kontur ustiga qo'yiladi.
-        return SizedBox.square(
-          dimension: 16,
-          child: Stack(
-            children: [
-              const SiteIcon(SiteIcons.ratingStarOutline, size: 16, color: amber, strokeWidth: 1),
-              ClipRect(
-                clipper: _HalfClipper(),
-                child: const SiteIcon(SiteIcons.ratingStar, size: 16, color: amber),
+    return SizedBox(
+      height: 22,
+      child: OverflowBox(
+        alignment: Alignment.bottomCenter,
+        maxHeight: 44,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            _avatar(context),
+            const Spacer(),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 2),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceAltLight,
+                  borderRadius: BorderRadius.circular(AppRadius.pill),
+                  border: Border.all(color: AppColors.borderLight),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SiteIcon(SiteIcons.ratingStar, size: 10, color: Color(0xFFFBBF24)),
+                    const SizedBox(width: 3),
+                    Text(
+                      '${designer.rating}',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.dark,
+                      ),
+                    ),
+                    const SizedBox(width: 2),
+                    Text(
+                      '(${designer.reviewsCount})',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        fontSize: 9.5,
+                        color: AppColors.dark.withValues(alpha: 0.4),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ],
-          ),
-        );
-      }
-      return const SiteIcon(SiteIcons.ratingStarOutline, size: 16, color: grey, strokeWidth: 1.5);
-    }
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        for (var i = 1; i <= 5; i++) ...[
-          if (i > 1) const SizedBox(width: 4), // gap-1
-          star(i),
-        ],
-        const SizedBox(width: 8), // gap-1 + ml-1
-        Text(
-          '${designer.rating}',
-          style: theme.textTheme.bodyMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-            color: AppColors.dark,
-          ),
+            ),
+          ],
         ),
-        const SizedBox(width: 4),
-        Text(
-          '(${designer.reviewsCount})',
-          style: theme.textTheme.labelSmall?.copyWith(
-            fontSize: 12,
-            color: AppColors.dark.withValues(alpha: 0.4),
-          ),
-        ),
-      ],
+      ),
     );
   }
 
-  Widget _body(BuildContext context) {
+  Widget _avatar(BuildContext context) {
     final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.all(24), // p-6
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (designer.description.isNotEmpty) ...[
-            Text(
-              designer.description,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                height: 1.6,
-                color: AppColors.dark.withValues(alpha: 0.7),
+    Widget ring(Widget child) => Container(
+      width: 44,
+      height: 44,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: Colors.white, width: 3),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.12),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: ClipOval(child: child),
+    );
+
+    final avatar = designer.avatar.isNotEmpty
+        ? ring(CachedNetworkImage(imageUrl: designer.avatar, fit: BoxFit.cover))
+        : ring(
+            DecoratedBox(
+              decoration: BoxDecoration(gradient: avatarGradient(designer.fullName)),
+              child: Center(
+                child: Text(
+                  initialsOf(designer.fullName),
+                  style: theme.textTheme.displaySmall?.copyWith(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
               ),
             ),
-            const SizedBox(height: 16), // mb-4
-          ],
-          _stats(context),
-          if (designer.portfolio.isNotEmpty) ...[const SizedBox(height: 16), _portfolio(context)],
-          if (designer.tags.isNotEmpty) ...[
-            const SizedBox(height: 16),
-            Wrap(
-              spacing: 6, // gap-1.5
-              runSpacing: 6,
-              children: [
-                for (final tag in designer.tags)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: AppColors.surfaceAltLight,
-                      borderRadius: BorderRadius.circular(AppRadius.sm),
-                    ),
-                    child: Text(
-                      tag,
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.dark.withValues(alpha: 0.5),
-                      ),
-                    ),
-                  ),
-              ],
+          );
+
+    // Shablondagi yashil tasdiq nishonchasi — avatarning o'ng pastida.
+    return SizedBox(
+      width: 48,
+      height: 44,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          avatar,
+          Positioned(
+            right: 0,
+            bottom: 0,
+            child: Container(
+              width: 15,
+              height: 15,
+              decoration: BoxDecoration(
+                color: const Color(0xFF10B981), // bg-emerald-500
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 2),
+              ),
+              child: const Center(
+                child: SiteIcon(SiteIcons.check, size: 8, color: Colors.white, strokeWidth: 3),
+              ),
             ),
-          ],
-          const SizedBox(height: 16),
-          const Divider(height: 1, color: AppColors.borderLight),
-          const SizedBox(height: 12), // pt-3
-          _actions(context),
+          ),
         ],
       ),
     );
   }
 
+  Widget _nameAndCity(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          designer.fullName,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: theme.textTheme.displaySmall?.copyWith(
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+            color: AppColors.dark,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Row(
+          children: [
+            SiteIcon(SiteIcons.mapPin, size: 11, color: AppColors.dark.withValues(alpha: 0.3)),
+            const SizedBox(width: 4),
+            Flexible(
+              child: Text(
+                CityLabels.label(designer.city),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.dark.withValues(alpha: 0.5),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _specAndTags(BuildContext context) {
+    final theme = Theme.of(context);
+    Widget pill(String text, {bool accent = false}) => Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: accent ? AppColors.olive.withValues(alpha: 0.1) : AppColors.surfaceAltLight,
+        borderRadius: BorderRadius.circular(AppRadius.pill),
+        border: accent ? null : Border.all(color: AppColors.borderLight),
+      ),
+      child: Text(
+        text,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: theme.textTheme.labelSmall?.copyWith(
+          fontSize: 10.5,
+          fontWeight: accent ? FontWeight.w700 : FontWeight.w600,
+          color: accent ? AppColors.olive : AppColors.dark.withValues(alpha: 0.5),
+        ),
+      ),
+    );
+
+    return Wrap(
+      spacing: 5,
+      runSpacing: 5,
+      children: [
+        pill(DesignersTexts.specLabel(designer.specialization), accent: true),
+        // Yarim kenglikda usta kartasidagidek dastlabki ikkita teg ko'rsatiladi.
+        for (final tag in designer.tags.take(2)) pill(tag),
+      ],
+    );
+  }
+
+  /// Uchta ko'rsatkich: bajarilgan loyihalar, tajriba va boshlang'ich narx.
   Widget _stats(BuildContext context) {
     final theme = Theme.of(context);
 
-    Widget cell(String value, String label, {Color? color}) => Expanded(
+    Widget cell(String value, String label, {Color? color, int flex = 2}) => Expanded(
+      flex: flex,
       child: Column(
         children: [
           Text(
             value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: theme.textTheme.titleMedium?.copyWith(
-              fontSize: 18, // text-lg
+              // Narx uch xonali guruhlar bilan yoziladi — uchdan bir kenglikka sig'ishi uchun 11.
+              fontSize: 11,
               fontWeight: FontWeight.w700,
               color: color ?? AppColors.dark,
             ),
           ),
           Text(
             label.toUpperCase(),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: theme.textTheme.labelSmall?.copyWith(
-              fontSize: 11,
-              letterSpacing: 0.5, // tracking-wide
+              fontSize: 8,
+              letterSpacing: 0.3,
               color: AppColors.dark.withValues(alpha: 0.4),
             ),
           ),
@@ -1054,27 +1124,29 @@ class _DesignerCard extends StatelessWidget {
 
     const separator = SizedBox(
       width: 1,
-      height: 40,
+      height: 26,
       child: ColoredBox(color: AppColors.borderLight),
     );
 
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12), // py-3
+      padding: const EdgeInsets.symmetric(vertical: 6),
       decoration: BoxDecoration(
         color: AppColors.surfaceAltLight,
-        borderRadius: BorderRadius.circular(AppRadius.md), // rounded-xl
+        borderRadius: BorderRadius.circular(AppRadius.sm),
       ),
       child: Row(
         children: [
           cell('${designer.completedProjects}', DesignersTexts.projects),
           separator,
           cell('${designer.experience}', DesignersTexts.years),
-          // Saytda `formatPrice()` — valyuta konvertatsiyasisiz, faqat raqam ajratiladi.
           separator,
+          // Saytda `formatPrice()` — valyuta konvertatsiyasisiz.
           cell(
             formatNumber(designer.priceFrom),
             DesignersTexts.priceFromLabel,
             color: AppColors.olive,
+            // Narx eng uzun qiymat — unga qo'shni ikki katakdan kengroq joy beriladi.
+            flex: 3,
           ),
         ],
       ),
@@ -1082,41 +1154,25 @@ class _DesignerCard extends StatelessWidget {
   }
 
   Widget _portfolio(BuildContext context) {
-    final theme = Theme.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
       children: [
-        Text(
-          DesignersTexts.portfolio.toUpperCase(),
-          style: theme.textTheme.labelSmall?.copyWith(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.5,
-            color: AppColors.dark.withValues(alpha: 0.5),
-          ),
-        ),
-        const SizedBox(height: 8), // mb-2
-        Row(
-          children: [
-            for (final (i, image) in designer.portfolio.indexed) ...[
-              if (i > 0) const SizedBox(width: 8), // gap-2
-              Expanded(
-                child: AspectRatio(
-                  aspectRatio: 4 / 3,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(AppRadius.sm), // rounded-lg
-                    child: CachedNetworkImage(
-                      imageUrl: image,
-                      fit: BoxFit.cover,
-                      placeholder: (_, _) => const ColoredBox(color: AppColors.surfaceAltLight),
-                      errorWidget: (_, _, _) => const ColoredBox(color: AppColors.surfaceAltLight),
-                    ),
-                  ),
+        for (final (i, image) in designer.portfolio.take(3).indexed) ...[
+          if (i > 0) const SizedBox(width: 5),
+          Expanded(
+            child: AspectRatio(
+              aspectRatio: 4 / 3,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(6), // rounded-lg
+                child: CachedNetworkImage(
+                  imageUrl: image,
+                  fit: BoxFit.cover,
+                  placeholder: (_, _) => const ColoredBox(color: AppColors.surfaceAltLight),
+                  errorWidget: (_, _, _) => const ColoredBox(color: AppColors.surfaceAltLight),
                 ),
               ),
-            ],
-          ],
-        ),
+            ),
+          ),
+        ],
       ],
     );
   }
@@ -1127,20 +1183,20 @@ class _DesignerCard extends StatelessWidget {
     Widget iconButton(SiteIconData icon, {VoidCallback? onTap, bool active = false}) => Pressable(
       onTap: onTap,
       child: Container(
-        width: 48,
-        height: 48,
+        width: 30,
+        height: 30,
         decoration: BoxDecoration(
           color: active ? const Color(0xFFFEF2F2) : Colors.transparent, // bg-red-50
-          borderRadius: BorderRadius.circular(AppRadius.md),
+          borderRadius: BorderRadius.circular(9),
           border: Border.all(
             color: active ? const Color(0xFFFCA5A5) : AppColors.borderLight, // border-red-300
-            width: 2,
+            width: 1.5,
           ),
         ),
         child: Center(
           child: SiteIcon(
             icon,
-            size: 20,
+            size: 14,
             color: active ? const Color(0xFFEF4444) : AppColors.dark.withValues(alpha: 0.5),
           ),
         ),
@@ -1154,41 +1210,35 @@ class _DesignerCard extends StatelessWidget {
             scale: 0.98,
             onTap: () => context.push('/designers/${designer.id}'),
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 12), // py-3
+              height: 30,
+              alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: AppColors.olive,
-                borderRadius: BorderRadius.circular(AppRadius.md),
+                borderRadius: BorderRadius.circular(9),
               ),
               child: Text(
                 DesignersTexts.viewProfile,
-                textAlign: TextAlign.center,
-                style: theme.textTheme.bodyMedium?.copyWith(
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  fontSize: 11.5,
                   color: Colors.white,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ),
           ),
         ),
-        const SizedBox(width: 12), // gap-3
+        const SizedBox(width: 5),
         iconButton(
           SiteIcons.phone,
           onTap: designer.phone.isEmpty
               ? null
               : () => launchUrl(Uri.parse('tel:${designer.phone}')),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: 5),
         iconButton(SiteIcons.heart, onTap: onFavorite, active: isFavorite),
       ],
     );
   }
-}
-
-/// Yarim yulduz uchun — kenglikning chap yarmi.
-class _HalfClipper extends CustomClipper<Rect> {
-  @override
-  Rect getClip(Size size) => Rect.fromLTWH(0, 0, size.width / 2, size.height);
-
-  @override
-  bool shouldReclip(_HalfClipper oldClipper) => false;
 }
