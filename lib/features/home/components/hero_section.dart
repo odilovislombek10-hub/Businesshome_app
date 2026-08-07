@@ -1,6 +1,6 @@
+import '../../../shared/widgets/app_image.dart';
 import 'dart:async';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -148,7 +148,7 @@ class _HeroSectionState extends State<HeroSection> {
           Positioned.fill(
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 2000),
-              child: CachedNetworkImage(
+              child: AppImage(
                 key: ValueKey(background),
                 imageUrl: background,
                 fit: BoxFit.cover,

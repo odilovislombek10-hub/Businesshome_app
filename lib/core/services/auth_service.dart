@@ -33,18 +33,33 @@ class AuthService extends ChangeNotifier {
   /// stays signed in; anything else (expired, revoked, account deleted) clears it silently.
   Future<void> restore() async {
     if (!await _api.isLoggedIn) return;
-    try {
-      final res = await _api.get<dynamic>('$_base/me');
-      if (res.statusCode == 200 && res.data is Map<String, dynamic>) {
-        _user = MarketUser.fromJson(res.data as Map<String, dynamic>);
-        notifyListeners();
+
+    // Ilova sovuq ishga tushganda bir vaqtda o'nlab so'rov ketadi va `me` shulardan biri sifatida
+    // yiqilib qolishi mumkin. Bitta urinish bilan cheklansak, token joyida turgani holda ilova
+    // butun sessiya davomida "kirilmagan" bo'lib qoladi — shuning uchun bir necha marta uriniladi.
+    const delays = [Duration(seconds: 1), Duration(seconds: 3)];
+    for (var attempt = 0; attempt <= delays.length; attempt++) {
+      try {
+        final res = await _api.get<dynamic>('$_base/me');
+        if (res.statusCode == 200 && res.data is Map<String, dynamic>) {
+          _user = MarketUser.fromJson(res.data as Map<String, dynamic>);
+          notifyListeners();
+          return;
+        }
+        // 200 emas, lekin javob keldi — token yaroqsiz, tozalanadi.
+        await logout();
         return;
+      } on DioException catch (e) {
+        // 401/403 — token haqiqatan ham yaroqsiz; qolgani (tarmoq, timeout) qayta uriniladi.
+        final code = e.response?.statusCode;
+        if (code == 401 || code == 403) {
+          await logout();
+          return;
+        }
+        if (attempt == delays.length) return; // urinishlar tugadi, token saqlanadi
+        await Future<void>.delayed(delays[attempt]);
       }
-    } on DioException {
-      // Offline at launch is not a reason to sign the user out — keep the token and retry later.
-      return;
     }
-    await logout();
   }
 
   /// Phone + password. Pass [role] when the number holds more than one account and the user has

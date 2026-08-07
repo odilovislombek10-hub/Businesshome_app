@@ -1,8 +1,8 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../shared/widgets/app_image.dart';
 import '../../../app/theme.dart';
 import '../../../shared/widgets/entrance.dart';
 import '../../../core/api/media_url.dart';
@@ -47,7 +47,7 @@ class StatsBanner extends StatelessWidget {
         child: Stack(
           children: [
             Positioned.fill(
-              child: CachedNetworkImage(
+              child: AppImage(
                 imageUrl: background,
                 fit: BoxFit.cover,
                 placeholder: (_, _) => const ColoredBox(color: AppColors.olive),
@@ -218,7 +218,7 @@ class _VideoPreview extends StatelessWidget {
             children: [
               ZoomOnPress(
                 pressed: pressed,
-                child: CachedNetworkImage(imageUrl: thumbnail, fit: BoxFit.cover),
+                child: AppImage(imageUrl: thumbnail, fit: BoxFit.cover),
               ),
               ColoredBox(color: AppColors.dark.withValues(alpha: 0.3)),
               Center(

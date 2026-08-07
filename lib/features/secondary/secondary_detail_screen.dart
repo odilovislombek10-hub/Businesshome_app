@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../shared/widgets/app_image.dart';
 import '../../app/theme.dart';
 import '../../core/api/media_url.dart';
 import '../../core/models/property_listing.dart';
@@ -583,7 +584,7 @@ class _GalleryState extends State<_Gallery> {
               controller: _controller,
               itemCount: images.length,
               onPageChanged: (i) => setState(() => _index = i),
-              itemBuilder: (context, i) => CachedNetworkImage(
+              itemBuilder: (context, i) => AppImage(
                 imageUrl: images[i],
                 fit: BoxFit.cover,
                 placeholder: (_, _) => const ColoredBox(color: AppColors.surfaceMutedLight),

@@ -87,6 +87,45 @@ abstract final class CabinetTexts {
 
   static const greeting = 'Assalomu alaykum';
 
+  // ── mening e'lonlarim ─────────────────────────────────────────────────────
+  static const newListing = "Yangi e'lon berish";
+  static const createListing = "E'lon yaratish";
+  static const noListings = "Sizda hali e'lonlar yo'q";
+  static const noListingsDesc = "Birinchi e'loningizni yarating va mijozlar bilan bog'laning";
+  static const edit = 'Tahrirlash';
+  static const cancel = 'Bekor qilish';
+  static const deleteConfirmTitle = "E'lonni o'chirish";
+  static const deleteConfirmMessage = "Bu e'lonni o'chirmoqchimisiz?";
+  static const deleteConfirmYes = "Ha, o'chirish";
+
+  /// `cabinet.dealType.*`
+  static String dealTypeLabel(String value) => switch (value) {
+    'sell' => 'Sotuv',
+    'rent' => 'Ijara',
+    'exchange' => 'Almashish',
+    _ => value,
+  };
+
+  /// Moderatsiya holati — saytdagi `modBadgeLabel`.
+  static String modLabel(String value) => switch (value) {
+    'active' => 'Aktiv',
+    'pending' => 'Tasdiqlanmoqda',
+    'rejected' => 'Rad etilgan',
+    'paused' => 'Yashirilgan',
+    'sold' => 'Yopilgan',
+    _ => value,
+  };
+
+  /// Nishoncha rangi — saytdagi `modBadgeClass` (`/85` shaffofligi bilan).
+  static Color modColor(String value) => switch (value) {
+    'active' => const Color(0xD910B981),
+    'pending' => const Color(0xD9F59E0B),
+    'rejected' => const Color(0xD9EF4444),
+    'paused' => const Color(0xD9F97316),
+    'sold' => const Color(0xD93B82F6),
+    _ => const Color(0xD96B7280),
+  };
+
   // ── sevimlilar ────────────────────────────────────────────────────────────
   static const noFavorites = "Hali sevimlilar yo'q";
   static const noFavoritesDesc =

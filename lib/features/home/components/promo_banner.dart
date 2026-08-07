@@ -1,7 +1,7 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../shared/widgets/app_image.dart';
 import '../../../app/theme.dart';
 import '../../../shared/widgets/entrance.dart';
 import '../../../core/api/media_url.dart';
@@ -41,7 +41,7 @@ class PromoBanner extends StatelessWidget {
                 children: [
                   ZoomOnPress(
                     pressed: pressed,
-                    child: CachedNetworkImage(
+                    child: AppImage(
                       imageUrl: image,
                       fit: BoxFit.cover,
                       placeholder: (_, _) => const ColoredBox(color: AppColors.oliveMuted),

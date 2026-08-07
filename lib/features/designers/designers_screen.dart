@@ -1,6 +1,6 @@
+import '../../shared/widgets/app_image.dart';
 import 'dart:async';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -976,7 +976,7 @@ class _DesignerCard extends StatelessWidget {
     );
 
     final avatar = designer.avatar.isNotEmpty
-        ? ring(CachedNetworkImage(imageUrl: designer.avatar, fit: BoxFit.cover))
+        ? ring(AppImage(imageUrl: designer.avatar, fit: BoxFit.cover))
         : ring(
             DecoratedBox(
               decoration: BoxDecoration(gradient: avatarGradient(designer.fullName)),
@@ -1166,7 +1166,7 @@ class _DesignerCard extends StatelessWidget {
               aspectRatio: 4 / 3,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(6), // rounded-lg
-                child: CachedNetworkImage(
+                child: AppImage(
                   imageUrl: image,
                   fit: BoxFit.cover,
                   placeholder: (_, _) => const ColoredBox(color: AppColors.surfaceAltLight),

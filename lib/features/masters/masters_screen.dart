@@ -1,6 +1,6 @@
+import '../../shared/widgets/app_image.dart';
 import 'dart:async';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -985,7 +985,7 @@ class _MasterCard extends StatelessWidget {
     );
 
     if (master.avatar.isNotEmpty) {
-      return ring(CachedNetworkImage(imageUrl: master.avatar, fit: BoxFit.cover));
+      return ring(AppImage(imageUrl: master.avatar, fit: BoxFit.cover));
     }
     return ring(
       DecoratedBox(

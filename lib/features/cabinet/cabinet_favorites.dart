@@ -1,7 +1,7 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../shared/widgets/app_image.dart';
 import '../../app/theme.dart';
 import '../../core/utils/format.dart';
 import '../../shared/widgets/entrance.dart';
@@ -225,7 +225,7 @@ class _FavoriteCard extends StatelessWidget {
                 fit: StackFit.expand,
                 children: [
                   if (item.image != null)
-                    CachedNetworkImage(
+                    AppImage(
                       imageUrl: item.image!,
                       fit: BoxFit.cover,
                       placeholder: (_, _) => const ColoredBox(color: AppColors.surfaceAltLight),

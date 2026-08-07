@@ -1,7 +1,7 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'app_image.dart';
 import '../../app/theme.dart';
 import '../../core/services/currency_service.dart';
 import '../models/property_view.dart';
@@ -60,7 +60,7 @@ class _PropertyCardState extends State<PropertyCard> {
                 AnimatedOpacity(
                   opacity: _active == i ? 1 : 0,
                   duration: const Duration(milliseconds: 500),
-                  child: CachedNetworkImage(
+                  child: AppImage(
                     imageUrl: images[i],
                     fit: BoxFit.cover,
                     width: double.infinity,
@@ -257,7 +257,7 @@ class _Info extends StatelessWidget {
             if (!compact && property.projectLogo != null) ...[
               ClipRRect(
                 borderRadius: BorderRadius.circular(AppRadius.sm),
-                child: CachedNetworkImage(
+                child: AppImage(
                   imageUrl: property.projectLogo!,
                   width: 32,
                   height: 32,
@@ -288,12 +288,7 @@ class _Info extends StatelessWidget {
               if (property.developerLogo case final logo?) ...[
                 ClipRRect(
                   borderRadius: BorderRadius.circular(4),
-                  child: CachedNetworkImage(
-                    imageUrl: logo,
-                    width: 16,
-                    height: 16,
-                    fit: BoxFit.cover,
-                  ),
+                  child: AppImage(imageUrl: logo, width: 16, height: 16, fit: BoxFit.cover),
                 ),
                 const SizedBox(width: 6),
               ],

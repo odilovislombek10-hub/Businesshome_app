@@ -1,6 +1,6 @@
+import '../../shared/widgets/app_image.dart';
 import 'dart:async';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -157,7 +157,7 @@ class _NewProjectsScreenState extends State<NewProjectsScreen> {
     return Stack(
       children: [
         Positioned.fill(
-          child: CachedNetworkImage(
+          child: AppImage(
             imageUrl: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1920&q=80',
             fit: BoxFit.cover,
           ),
@@ -658,7 +658,7 @@ class _ProjectCard extends StatelessWidget {
                 fit: StackFit.expand,
                 children: [
                   if (images.isNotEmpty)
-                    CachedNetworkImage(
+                    AppImage(
                       imageUrl: _absolute(images.first),
                       fit: BoxFit.cover,
                       placeholder: (_, _) => const ColoredBox(color: AppColors.surfaceAltLight),

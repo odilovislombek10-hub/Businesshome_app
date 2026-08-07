@@ -1,6 +1,6 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
+import '../../../shared/widgets/app_image.dart';
 import '../../../app/theme.dart';
 import '../../../core/api/media_url.dart';
 import '../../../core/models/developer_summary.dart';
@@ -197,7 +197,7 @@ class _DeveloperCard extends StatelessWidget {
                             ),
                           ),
                         )
-                      : CachedNetworkImage(
+                      : AppImage(
                           imageUrl: logo,
                           fit: BoxFit.contain,
                           errorWidget: (_, _, _) =>

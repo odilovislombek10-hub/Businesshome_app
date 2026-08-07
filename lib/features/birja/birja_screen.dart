@@ -1,8 +1,8 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../../shared/widgets/app_image.dart';
 import '../../app/theme.dart';
 import '../../core/constants/city_labels.dart';
 import '../../core/models/brief.dart';
@@ -761,7 +761,7 @@ class _BriefCard extends StatelessWidget {
             Expanded(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(4),
-                child: CachedNetworkImage(
+                child: AppImage(
                   imageUrl: image,
                   fit: BoxFit.cover,
                   placeholder: (_, _) => const ColoredBox(color: Color(0xFFE7E3D8)),
@@ -885,7 +885,7 @@ class _BriefDetailSheet extends StatelessWidget {
                       for (final image in brief.images)
                         ClipRRect(
                           borderRadius: BorderRadius.circular(AppRadius.md),
-                          child: CachedNetworkImage(imageUrl: image, fit: BoxFit.cover),
+                          child: AppImage(imageUrl: image, fit: BoxFit.cover),
                         ),
                     ],
                   ),
@@ -954,7 +954,7 @@ class _BriefDetailSheet extends StatelessWidget {
           height: 40,
           child: ClipOval(
             child: brief.authorAvatar != null
-                ? CachedNetworkImage(imageUrl: brief.authorAvatar!, fit: BoxFit.cover)
+                ? AppImage(imageUrl: brief.authorAvatar!, fit: BoxFit.cover)
                 : DecoratedBox(
                     decoration: BoxDecoration(gradient: avatarGradient(name)),
                     child: Center(

@@ -1,8 +1,8 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../../shared/widgets/app_image.dart';
 import '../../app/theme.dart';
 import '../../core/models/market_user.dart';
 import '../../core/services/auth_service.dart';
@@ -12,6 +12,7 @@ import '../../shared/widgets/site_icon.dart';
 import '../../shared/widgets/specialist_bits.dart';
 import 'cabinet_dashboard.dart';
 import 'cabinet_favorites.dart';
+import 'cabinet_listings.dart';
 import 'cabinet_viewed.dart';
 import 'cabinet_repository.dart';
 import 'cabinet_texts.dart';
@@ -66,6 +67,7 @@ class _CabinetScreenState extends State<CabinetScreen> {
   /// keraksiz so'rovlarni oldini olgan ma'qul.
   Future<List<FavoriteItem>>? _favorites;
   Future<List<ViewedItem>>? _viewed;
+  Future<List<MyListing>>? _listings;
 
   String get _tab => CabinetScreen.tabs.contains(widget.tab) ? widget.tab : 'dashboard';
 
@@ -181,6 +183,20 @@ class _CabinetScreenState extends State<CabinetScreen> {
         );
       case 'viewed':
         return CabinetViewed(future: _viewed ??= _repo.viewed());
+      case 'listings':
+        return CabinetListings(
+          future: _listings ??= _repo.myListings(),
+          canCreate: user.role == MarketRole.user || user.role == MarketRole.agent,
+          onDelete: (listing) async {
+            final messenger = ScaffoldMessenger.of(context);
+            try {
+              await _repo.deleteListing(listing);
+              setState(() => _listings = _repo.myListings());
+            } catch (_) {
+              messenger.showSnackBar(const SnackBar(content: Text("E'lonni o'chirib bo'lmadi")));
+            }
+          },
+        );
       default:
         return _NotPortedYet(tab: _tab);
     }
@@ -373,7 +389,7 @@ class _Sidebar extends StatelessWidget {
                   height: 50,
                   child: ClipOval(
                     child: user.avatar != null && user.avatar!.isNotEmpty
-                        ? CachedNetworkImage(imageUrl: user.avatar!, fit: BoxFit.cover)
+                        ? AppImage(imageUrl: user.avatar!, fit: BoxFit.cover)
                         : ColoredBox(
                             color: Colors.white.withValues(alpha: 0.9),
                             child: Center(

@@ -44,6 +44,8 @@ dependencies:
   go_router: ^17.0.0
   # Sayt Inter + Playfair Display ishlatadi (tailwind.config.js fontFamily)
   google_fonts: ^6.3.3
+  # Rasm keshini o'zimiz sozlashimiz uchun (cached_network_image shuni ishlatadi)
+  flutter_cache_manager: ^3.4.1
   url_launcher: ^6.3.2
   shimmer: ^3.0.0
   # Saytning SVG viloyat chizmalarini Flutter Path'ga aylantirish uchun

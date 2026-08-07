@@ -133,6 +133,72 @@ String? _text(dynamic value) {
   return s == null || s.isEmpty ? null : s;
 }
 
+/// `/api/market/cabinet/my-listings` dagi bitta e'lon.
+class MyListing {
+  const MyListing({
+    required this.id,
+    required this.title,
+    required this.price,
+    required this.source,
+    required this.views,
+    required this.inquiries,
+    required this.images,
+    this.currency,
+    this.dealType,
+    this.area,
+    this.city,
+    this.moderationStatus,
+    this.rejectedReason,
+    this.createdAt,
+  });
+
+  final int id;
+  final String title;
+  final num price;
+
+  /// `secondary` | `rent` | `ads` — tahrirlash havolasiga `?kind=` bo'lib boradi.
+  final String source;
+  final int views;
+  final int inquiries;
+
+  /// Mutlaq manzillar.
+  final List<String> images;
+
+  /// `uzs` | `usd`
+  final String? currency;
+
+  /// `sell` | `rent` | `exchange`
+  final String? dealType;
+  final num? area;
+  final String? city;
+
+  /// `pending` | `active` | `rejected` | `paused` | `sold`
+  final String? moderationStatus;
+  final String? rejectedReason;
+  final DateTime? createdAt;
+
+  factory MyListing.fromJson(Map<String, dynamic> json) => MyListing(
+    id: (json['id'] as num?)?.toInt() ?? 0,
+    title: json['title']?.toString() ?? '',
+    price: (json['price'] as num?) ?? 0,
+    source: json['source']?.toString() ?? '',
+    views: (json['views'] as num?)?.toInt() ?? 0,
+    inquiries: (json['inquiries'] as num?)?.toInt() ?? 0,
+    images: <String>[
+      // Ba'zi javoblarda faqat `image`, ba'zilarida `images` massivi keladi.
+      for (final item in (json['images'] as List?) ?? const []) ?absoluteMediaUrl(_text(item)),
+      ?absoluteMediaUrl(_text(json['image'])),
+    ],
+    currency: _text(json['currency']),
+    dealType: _text(json['dealType']),
+    area: json['area'] as num?,
+    city: _text(json['city']),
+    moderationStatus: _text(json['moderationStatus']),
+    rejectedReason: _text(json['rejectedReason']),
+    createdAt: DateTime.tryParse(json['createdAt']?.toString() ?? ''),
+  );
+}
+
 /// Kabinetning umumiy so'rovlari. Har bir bo'lim o'z ma'lumotini alohida oladi — saytda ham
 /// shunday, bitta so'rov yiqilsa qolgani chiziladi.
 class CabinetRepository {
@@ -153,6 +219,22 @@ class CabinetRepository {
     final data = res.data;
     if (data is! List) return const [];
     return data.whereType<Map<String, dynamic>>().map(ViewedItem.fromJson).toList();
+  }
+
+  Future<List<MyListing>> myListings() async {
+    final res = await _api.get<dynamic>('/market/cabinet/my-listings');
+    final data = res.data;
+    if (data is! List) return const [];
+    return data.whereType<Map<String, dynamic>>().map(MyListing.fromJson).toList();
+  }
+
+  /// O'chirish manbaga qarab ikki xil yo'ldan boradi — saytdagi `deleteAd` va
+  /// `deleteUserListing`.
+  Future<void> deleteListing(MyListing listing) async {
+    final path = listing.source == 'ads'
+        ? '/market/ads/${listing.id}'
+        : '/market/my-listings/${listing.source}/${listing.id}';
+    await _api.delete<dynamic>(path);
   }
 
   Future<List<RoleStat>> roleStats() async {
