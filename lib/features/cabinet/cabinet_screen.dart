@@ -327,8 +327,11 @@ class _Sidebar extends StatelessWidget {
   /// Rol banneri: gradient, nuqtali naqsh, suv belgisi, avatar va rol nishonchasi.
   Widget _banner(BuildContext context) {
     final theme = Theme.of(context);
+    // Yon panel Drawer sifatida ochiladi va status paneli ostidan boshlanadi — banner o'sha
+    // balandlikka cho'ziladi, matni esa pastroqdan boshlanadi.
+    final safeTop = MediaQuery.paddingOf(context).top;
     return SizedBox(
-      height: 92,
+      height: 92 + safeTop,
       child: Stack(
         fit: StackFit.expand,
         children: [
@@ -346,7 +349,7 @@ class _Sidebar extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(18, 20, 18, 20), // padding: 20px 18px
+            padding: EdgeInsets.fromLTRB(18, 20 + safeTop, 18, 20), // padding: 20px 18px
             child: Row(
               children: [
                 SizedBox(
