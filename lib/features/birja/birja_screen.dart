@@ -13,6 +13,7 @@ import '../../core/services/regions_service.dart';
 import '../../core/utils/format.dart';
 import '../../shared/widgets/entrance.dart';
 import '../../shared/widgets/site_header.dart';
+import '../../shared/widgets/site_footer_section.dart';
 import '../../shared/widgets/site_icon.dart';
 import '../../shared/widgets/specialist_bits.dart';
 import 'birja_create_sheet.dart';
@@ -105,6 +106,8 @@ class _BirjaScreenState extends State<BirjaScreen> {
               SliverToBoxAdapter(child: _toolbar(context)),
               SliverToBoxAdapter(child: _results(context)),
               const SliverToBoxAdapter(child: SizedBox(height: 64)), // pb-16
+              // Shablon `<app-footer />` bilan tugaydi — har bir sahifada.
+              const SliverToBoxAdapter(child: SiteFooterSection()),
             ],
           ),
           Positioned(

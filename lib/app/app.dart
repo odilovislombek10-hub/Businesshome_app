@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../core/services/auth_service.dart';
 import '../core/services/theme_controller.dart';
+import '../shared/widgets/ai_assistant.dart';
 import 'router.dart';
 import 'theme.dart';
 
@@ -27,6 +28,9 @@ class BusinessHomeApp extends StatelessWidget {
           darkTheme: AppTheme.dark,
           themeMode: theme.mode,
           routerConfig: appRouter,
+          // Saytda `app.component.ts` shabloni `<app-ai-assistant />` ni router'dan tashqarida
+          // chizadi — ya'ni suzuvchi tugma **har bir sahifada** turadi, faqat bosh sahifada emas.
+          builder: (context, child) => Stack(children: [?child, const AiAssistant()]),
         ),
       ),
     );

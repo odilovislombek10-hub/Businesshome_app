@@ -12,6 +12,7 @@ import '../../core/models/property_listing.dart';
 import '../../core/utils/format.dart';
 import '../../shared/widgets/entrance.dart';
 import '../../shared/widgets/site_header.dart';
+import '../../shared/widgets/site_footer_section.dart';
 import '../../shared/widgets/site_icon.dart';
 import '../../shared/widgets/specialist_bits.dart';
 import 'designers_filter_sheet.dart';
@@ -125,6 +126,8 @@ class _DesignersScreenState extends State<DesignersScreen> {
               SliverToBoxAdapter(child: _toolbar(context)),
               SliverToBoxAdapter(child: _results(context)),
               const SliverToBoxAdapter(child: SizedBox(height: 64)), // pb-16
+              // Shablon `<app-footer />` bilan tugaydi — har bir sahifada.
+              const SliverToBoxAdapter(child: SiteFooterSection()),
             ],
           ),
           Positioned(

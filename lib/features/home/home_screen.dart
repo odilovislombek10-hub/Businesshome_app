@@ -13,7 +13,6 @@ import '../../core/models/property_listing.dart';
 import '../../core/models/reel.dart';
 import '../../core/models/region.dart';
 import '../../core/models/specialist.dart';
-import '../../shared/widgets/ai_assistant.dart';
 import '../../shared/widgets/site_header.dart';
 import 'components/featured_buildings.dart';
 import 'components/developers_slider.dart';
@@ -146,7 +145,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           // Aziza floats over everything, `fixed bottom-6 right-6` on the site.
-          const AiAssistant(),
         ],
       ),
     );

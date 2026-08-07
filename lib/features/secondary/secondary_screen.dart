@@ -13,6 +13,7 @@ import '../../shared/models/property_view.dart';
 import '../../shared/widgets/entrance.dart';
 import '../../shared/widgets/property_card.dart';
 import '../../shared/widgets/site_header.dart';
+import '../../shared/widgets/site_footer_section.dart';
 import '../../shared/widgets/site_icon.dart';
 import 'listings_config.dart';
 import 'secondary_filter_sheet.dart';
@@ -139,6 +140,8 @@ class _SecondaryScreenState extends State<SecondaryScreen> {
               _results(context),
               SliverToBoxAdapter(child: _paginationBlock(context)),
               const SliverToBoxAdapter(child: SizedBox(height: 64)), // pb-16
+              // Shablon `<app-footer />` bilan tugaydi — har bir sahifada.
+              const SliverToBoxAdapter(child: SiteFooterSection()),
             ],
           ),
           Positioned(
