@@ -194,16 +194,7 @@ class _HeroSectionState extends State<HeroSection> {
                   ),
                 ),
                 const SizedBox(height: 32),
-                Entrance.slideUp(
-                  child: GridView.count(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 12,
-                    crossAxisSpacing: 12,
-                    children: [for (final sector in _sectors) _SectorTile(sector: sector)],
-                  ),
-                ),
+                Entrance.slideUp(child: const _SectorBento(sectors: _sectors)),
                 const SizedBox(height: 48),
                 Entrance.fadeIn(
                   delay: const Duration(milliseconds: 300), // animate-delay-300
@@ -240,6 +231,54 @@ class _HeroSectionState extends State<HeroSection> {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Compact bento for the eight sector tiles.
+///
+/// Eight squares in two columns filled four screenfuls. This packs the same eight into roughly
+/// one: the first two lead as wide cards, the next four sit two-up in a shorter row pair, and
+/// the last two close the block. Nothing is dropped — only the proportions change.
+class _SectorBento extends StatelessWidget {
+  const _SectorBento({required this.sectors});
+
+  final List<_Sector> sectors;
+
+  static const _gap = 10.0;
+
+  /// Lead cards are wide and short; the rest are shorter still.
+  static const _leadHeight = 118.0;
+  static const _restHeight = 96.0;
+
+  @override
+  Widget build(BuildContext context) {
+    if (sectors.isEmpty) return const SizedBox.shrink();
+
+    Widget row(List<_Sector> items, double height) => SizedBox(
+      height: height,
+      child: Row(
+        children: [
+          for (final (i, sector) in items.indexed) ...[
+            if (i > 0) const SizedBox(width: _gap),
+            Expanded(child: _SectorTile(sector: sector)),
+          ],
+        ],
+      ),
+    );
+
+    final lead = sectors.take(2).toList();
+    final rest = sectors.skip(2).toList();
+
+    return Column(
+      children: [
+        row(lead, _leadHeight),
+        // Two per row for everything after the lead pair.
+        for (var i = 0; i < rest.length; i += 2) ...[
+          const SizedBox(height: _gap),
+          row(rest.skip(i).take(2).toList(), _restHeight),
+        ],
+      ],
     );
   }
 }
@@ -303,7 +342,7 @@ class _SectorTile extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(14),
               child: Align(
                 alignment: Alignment.topLeft,
                 child: FractionallySizedBox(
