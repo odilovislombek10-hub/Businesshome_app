@@ -4,6 +4,7 @@ import '../features/auth/forgot_password_screen.dart';
 import '../features/auth/login_screen.dart';
 import '../features/auth/register_screen.dart';
 import '../features/birja/birja_screen.dart';
+import '../features/cabinet/cabinet_screen.dart';
 import '../features/designers/designers_screen.dart';
 import '../features/home/home_screen.dart';
 import '../features/masters/masters_screen.dart';
@@ -107,7 +108,7 @@ final appRouter = GoRouter(
     GoRoute(path: '/cabinet', redirect: (_, _) => '/cabinet/dashboard'),
     GoRoute(
       path: '/cabinet/:tab',
-      builder: (_, _) => const PlaceholderScreen(title: 'Shaxsiy kabinet'),
+      builder: (_, state) => CabinetScreen(tab: state.pathParameters['tab'] ?? 'dashboard'),
     ),
     GoRoute(
       path: '/cabinet-preview',

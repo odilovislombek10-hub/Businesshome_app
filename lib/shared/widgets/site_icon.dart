@@ -155,6 +155,58 @@ abstract final class SiteIcons {
     'M14.7 6.3a4 4 0 0 0-5 5L3 18l3 3 6.7-6.7a4 4 0 0 0 5-5l-2.4 2.4-2.3-.6-.6-2.3 2.3-2.5z',
   ]);
 
+  // ── kabinet yon paneli ───────────────────────────────────────────────────
+  // Barchasi `cabinet.component.ts` dagi `getIconSvg()` dan.
+  static const list = SiteIconData([
+    'M8 6h13',
+    'M8 12h13',
+    'M8 18h13',
+    'M3 6h.01',
+    'M3 12h.01',
+    'M3 18h.01',
+  ]);
+
+  static const clock = SiteIconData([
+    'M12 12m-10 0a10 10 0 1 0 20 0a10 10 0 1 0 -20 0',
+    'M12 6v6l4 2',
+  ]);
+
+  static const message = SiteIconData([
+    'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z',
+  ]);
+
+  static const image = SiteIconData([
+    'M3 3m0 2a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z',
+    'M9 9m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0',
+    'm21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21',
+  ]);
+
+  static const wallet = SiteIconData([
+    'M21 12V7H5a2 2 0 0 1 0-4h14v4',
+    'M3 5v14a2 2 0 0 0 2 2h16v-5',
+    'M18 12a2 2 0 0 0 0 4h4v-4Z',
+  ]);
+
+  static const settings = SiteIconData([
+    'M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z',
+    'M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0',
+  ]);
+
+  static const shield = SiteIconData(['M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z']);
+
+  static const briefcase = SiteIconData([
+    'M2 7m0 2a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2z',
+    'M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16',
+  ]);
+
+  static const arrowLeft = SiteIconData(['M19 12H5', 'm12 19-7-7 7-7']);
+
+  static const logout = SiteIconData([
+    'M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4',
+    'm16 17 5-5-5-5',
+    'M21 12H9',
+  ]);
+
   static const paletteDots = SiteIconData([
     'M7.5 11m-1.1 0a1.1 1.1 0 1 0 2.2 0a1.1 1.1 0 1 0 -2.2 0',
     'M11 7m-1.1 0a1.1 1.1 0 1 0 2.2 0a1.1 1.1 0 1 0 -2.2 0',
