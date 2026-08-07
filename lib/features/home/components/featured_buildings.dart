@@ -22,7 +22,7 @@ class FeaturedBuildings extends StatelessWidget {
     return ColoredBox(
       color: AppColors.cream,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 32, 16, 24),
+        padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -33,14 +33,14 @@ class FeaturedBuildings extends StatelessWidget {
                 color: AppColors.dark,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             Text(
               "Yangi qurilayotgan loyihalarni kashf eting va doimo xabarda bo'ling.",
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: AppColors.dark.withValues(alpha: 0.6),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 12),
             // Two per row so four cards fit one screen — the app's own choice, not the site's
             // single column. `animation-delay: (i * 100)ms` staggering is kept.
             GridView.count(

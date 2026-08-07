@@ -138,9 +138,10 @@ class _HeroSectionState extends State<HeroSection> {
             PageStat(value: '10K+', label: 'Baxtli oilalar'),
           ];
 
-    return ConstrainedBox(
-      // `min-h-screen` — the hero fills the viewport, and the header floats over its top.
-      constraints: BoxConstraints(minHeight: MediaQuery.sizeOf(context).height),
+    // The site's hero is `min-h-screen`, but with the tiles packed into a mosaic that leaves a
+    // dead band under the stats. Sizing to content instead lets the listings start right below.
+    return DecoratedBox(
+      decoration: const BoxDecoration(),
       child: Stack(
         fit: StackFit.passthrough,
         children: [
@@ -178,7 +179,7 @@ class _HeroSectionState extends State<HeroSection> {
           Padding(
             // `pt-32 pb-16 px-4`. The site's 128px clears a header that starts at y=0; on a phone
             // the status bar sits above it, so add that inset or the title lands under the bar.
-            padding: EdgeInsets.fromLTRB(16, 128 + MediaQuery.paddingOf(context).top, 16, 64),
+            padding: EdgeInsets.fromLTRB(16, 118 + MediaQuery.paddingOf(context).top, 16, 24),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -193,9 +194,9 @@ class _HeroSectionState extends State<HeroSection> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 16),
                 Entrance.slideUp(child: const _SectorBento(sectors: _sectors)),
-                const SizedBox(height: 48),
+                const SizedBox(height: 20),
                 Entrance.fadeIn(
                   delay: const Duration(milliseconds: 300), // animate-delay-300
                   child: Wrap(
@@ -235,50 +236,82 @@ class _HeroSectionState extends State<HeroSection> {
   }
 }
 
-/// Compact bento for the eight sector tiles.
+/// Asymmetric mosaic for the eight sector tiles.
 ///
-/// Eight squares in two columns filled four screenfuls. This packs the same eight into roughly
-/// one: the first two lead as wide cards, the next four sit two-up in a shorter row pair, and
-/// the last two close the block. Nothing is dropped — only the proportions change.
+/// Two columns of unequal weight rather than a uniform grid: the lead category takes a tall cell
+/// down the left, and the right side steps through a pair, a pair and a trio, each row shorter
+/// than the last. The whole set lands in the height four square tiles used to need, and the
+/// varying cell sizes give the block a reading order instead of eight equal boxes.
 class _SectorBento extends StatelessWidget {
   const _SectorBento({required this.sectors});
 
   final List<_Sector> sectors;
 
-  static const _gap = 10.0;
+  static const _gap = 8.0;
 
-  /// Lead cards are wide and short; the rest are shorter still.
-  static const _leadHeight = 118.0;
-  static const _restHeight = 96.0;
+  /// Total height of the block — what two rows of the old square grid occupied.
+  static const _height = 236.0;
+
+  /// The three right-hand bands, tallest first.
+  static const _bandFlex = [34, 33, 33];
 
   @override
   Widget build(BuildContext context) {
     if (sectors.isEmpty) return const SizedBox.shrink();
 
-    Widget row(List<_Sector> items, double height) => SizedBox(
-      height: height,
+    final hero = sectors.first;
+    final rest = sectors.skip(1).toList();
+    // 2 + 2 + 3 fills the right column for the usual eight; a shorter list just leaves
+    // whatever fits.
+    const shape = [2, 2, 3];
+
+    final bands = <List<_Sector>>[];
+    var taken = 0;
+    for (final count in shape) {
+      if (taken >= rest.length) break;
+      bands.add(rest.skip(taken).take(count).toList());
+      taken += count;
+    }
+    // Anything beyond the shape joins the last band rather than being dropped.
+    if (taken < rest.length && bands.isNotEmpty) {
+      bands.last = [...bands.last, ...rest.skip(taken)];
+    }
+
+    return SizedBox(
+      height: _height,
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          for (final (i, sector) in items.indexed) ...[
-            if (i > 0) const SizedBox(width: _gap),
-            Expanded(child: _SectorTile(sector: sector)),
+          Expanded(flex: 42, child: _SectorTile(sector: hero)),
+          if (bands.isNotEmpty) ...[
+            const SizedBox(width: _gap),
+            Expanded(
+              flex: 58,
+              child: Column(
+                children: [
+                  for (final (i, band) in bands.indexed) ...[
+                    if (i > 0) const SizedBox(height: _gap),
+                    Expanded(
+                      flex: _bandFlex[i % _bandFlex.length],
+                      child: Row(
+                        children: [
+                          for (final (j, sector) in band.indexed) ...[
+                            if (j > 0) const SizedBox(width: _gap),
+                            Expanded(
+                              // Only the tall lead cell has room for a description.
+                              child: _SectorTile(sector: sector, dense: true),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
           ],
         ],
       ),
-    );
-
-    final lead = sectors.take(2).toList();
-    final rest = sectors.skip(2).toList();
-
-    return Column(
-      children: [
-        row(lead, _leadHeight),
-        // Two per row for everything after the lead pair.
-        for (var i = 0; i < rest.length; i += 2) ...[
-          const SizedBox(height: _gap),
-          row(rest.skip(i).take(2).toList(), _restHeight),
-        ],
-      ],
     );
   }
 }
@@ -297,9 +330,12 @@ class _Sector {
 }
 
 class _SectorTile extends StatelessWidget {
-  const _SectorTile({required this.sector});
+  const _SectorTile({required this.sector, this.dense = false});
 
   final _Sector sector;
+
+  /// The three-up band: title only, and smaller — there is no room for the description.
+  final bool dense;
 
   /// `drop-shadow-sm` — what keeps the caption legible where a tile's photo is bright.
   static const _textShadow = [Shadow(color: Colors.black54, blurRadius: 4, offset: Offset(0, 1))];
@@ -316,7 +352,8 @@ class _SectorTile extends StatelessWidget {
       child: Container(
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(AppRadius.xl), // rounded-3xl
+          // Tighter than the site's `rounded-3xl`: at mosaic sizes a 24px radius eats the corners.
+          borderRadius: BorderRadius.circular(AppRadius.md),
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -342,33 +379,41 @@ class _SectorTile extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(14),
+              padding: EdgeInsets.all(dense ? 8 : 12),
               child: Align(
                 alignment: Alignment.topLeft,
                 child: FractionallySizedBox(
-                  widthFactor: 0.78, // max-w-[78%]
+                  widthFactor: dense ? 1 : 0.82,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         sector.title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.titleMedium?.copyWith(
+                          fontSize: dense ? 11 : 14,
                           color: Colors.white,
                           fontWeight: FontWeight.w700,
                           height: 1.15,
                           shadows: _textShadow,
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        sector.description,
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: Colors.white.withValues(alpha: 0.9),
-                          height: 1.3,
-                          shadows: _textShadow,
+                      if (!dense) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          sector.description,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            fontSize: 11,
+                            color: Colors.white.withValues(alpha: 0.9),
+                            height: 1.25,
+                            shadows: _textShadow,
+                          ),
                         ),
-                      ),
+                      ],
                     ],
                   ),
                 ),
