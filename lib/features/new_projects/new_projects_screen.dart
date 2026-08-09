@@ -12,6 +12,7 @@ import '../../shared/widgets/entrance.dart';
 import '../../shared/widgets/site_footer_section.dart';
 import '../../shared/widgets/site_header.dart';
 import '../../shared/widgets/site_icon.dart';
+import '../../shared/widgets/skeleton.dart';
 import 'new_projects_filter_sheet.dart';
 import 'new_projects_repository.dart';
 import 'new_projects_texts.dart';
@@ -105,10 +106,21 @@ class _NewProjectsScreenState extends State<NewProjectsScreen> {
                   SliverToBoxAdapter(child: _hero(context, filtered.length)),
                   SliverToBoxAdapter(child: _toolbar(context, filtered.length)),
                   if (loading)
-                    const SliverToBoxAdapter(
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 64),
-                        child: Center(child: CircularProgressIndicator()),
+                    // Aylanuvchi belgi o'rniga kartalarning shakli — javob kelganda sahifa
+                    // sakramaydi.
+                    SliverPadding(
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                      sliver: SliverGrid.count(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 20,
+                        crossAxisSpacing: 20,
+                        childAspectRatio: 172 / _ProjectCard.extent,
+                        children: [
+                          for (var i = 0; i < 4; i++)
+                            const Pulse(
+                              child: Skeleton(height: double.infinity, radius: AppRadius.lg),
+                            ),
+                        ],
                       ),
                     )
                   else if (page.isEmpty)

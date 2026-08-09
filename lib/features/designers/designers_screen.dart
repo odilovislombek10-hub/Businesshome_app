@@ -14,6 +14,7 @@ import '../../shared/widgets/entrance.dart';
 import '../../shared/widgets/site_header.dart';
 import '../../shared/widgets/site_footer_section.dart';
 import '../../shared/widgets/site_icon.dart';
+import '../../shared/widgets/skeleton.dart';
 import '../../shared/widgets/specialist_bits.dart';
 import 'designers_filter_sheet.dart';
 import 'designers_repository.dart';
@@ -582,10 +583,7 @@ class _DesignersScreenState extends State<DesignersScreen> {
         final page = snapshot.data ?? _last;
         if (page == null) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Padding(
-              padding: EdgeInsets.symmetric(vertical: 64),
-              child: Center(child: CircularProgressIndicator()),
-            );
+            return _skeletons(context);
           }
           return _empty(context);
         }
@@ -630,6 +628,28 @@ class _DesignersScreenState extends State<DesignersScreen> {
           ),
         );
       },
+    );
+  }
+
+  /// Yuklanish paytida kartalarning shakli turadi — sahifa sakramasin.
+  Widget _skeletons(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+      child: GridView.count(
+        padding: EdgeInsets.zero,
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        crossAxisCount: 2,
+        mainAxisSpacing: 16,
+        crossAxisSpacing: 16,
+        childAspectRatio: 172 / _DesignerCard.extent,
+        children: [
+          for (var i = 0; i < 4; i++)
+            const Pulse(
+              child: Skeleton(height: double.infinity, radius: AppRadius.lg),
+            ),
+        ],
+      ),
     );
   }
 

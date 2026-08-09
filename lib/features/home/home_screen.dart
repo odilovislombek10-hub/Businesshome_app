@@ -14,6 +14,7 @@ import '../../core/models/reel.dart';
 import '../../core/models/region.dart';
 import '../../core/models/specialist.dart';
 import '../../shared/widgets/site_header.dart';
+import '../../shared/widgets/skeleton.dart';
 import 'components/featured_buildings.dart';
 import 'components/developers_slider.dart';
 import 'components/app_download.dart';
@@ -157,28 +158,84 @@ class _HomeScreenState extends State<HomeScreen> {
         // No full-page spinner: the hero is static copy and renders straight away, exactly as on
         // the site. Sections below it simply appear once their data lands.
         final data = snapshot.data ?? const _HomeData.empty();
+        // Javob kelmaguncha bo'limni yashirib qo'yish sahifani sakratadi — quyidagilari
+        // yuqoriga chiqib ketadi, ma'lumot kelgach hammasi siljiydi. O'lchamlar oldindan
+        // ma'lum, shuning uchun har bir bo'lim yuklanguncha o'z shaklini saqlab turadi.
+        final loading = snapshot.connectionState == ConnectionState.waiting;
+
         return ListView(
           controller: _scroll,
           padding: const EdgeInsets.only(bottom: 32),
           children: [
             // Section order is `home.component.ts` line for line.
             HeroSection(content: data.hero),
-            if (data.featured.isNotEmpty) FeaturedBuildings(projects: data.featured),
-            if (data.hero?.bannerEnabled ?? false) PromoBanner(content: data.hero!),
-            if (data.developers.isNotEmpty) DevelopersSlider(developers: data.developers),
+
+            if (data.featured.isNotEmpty)
+              FeaturedBuildings(projects: data.featured)
+            else if (loading)
+              const SkeletonCardGrid(count: 4),
+
+            if (data.hero?.bannerEnabled ?? false)
+              PromoBanner(content: data.hero!)
+            else if (loading)
+              const SkeletonBand(height: 160),
+
+            if (data.developers.isNotEmpty)
+              DevelopersSlider(developers: data.developers)
+            else if (loading)
+              const SkeletonRowSection(itemWidth: 200, itemHeight: 150),
+
             PropertyPriceMap(rentPrices: data.rentPrices, buyPrices: data.buyPrices),
+
             if (data.categories.isNotEmpty)
-              PropertyCategories(categories: data.categories, topListings: data.topListings),
-            HomeTopPicks(
-              secondary: data.topSecondary,
-              rent: data.topRent,
-              designers: data.topDesigners,
-              masters: data.topMasters,
-            ),
-            ReelsSection(reels: data.reels),
-            if (data.stats != null) StatsBanner(stats: data.stats!),
-            if (data.features.isNotEmpty) FeaturesSection(features: data.features),
-            if (data.news.isNotEmpty) NewsSection(news: data.news),
+              PropertyCategories(categories: data.categories, topListings: data.topListings)
+            else if (loading)
+              const SkeletonCardGrid(count: 4, headingWidth: 240),
+
+            if (loading)
+              const SkeletonCardGrid(
+                count: 4,
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 40),
+                headingWidth: 180,
+              )
+            else
+              HomeTopPicks(
+                secondary: data.topSecondary,
+                rent: data.topRent,
+                designers: data.topDesigners,
+                masters: data.topMasters,
+              ),
+
+            if (data.reels.isNotEmpty)
+              ReelsSection(reels: data.reels)
+            else if (loading)
+              // `aspect-[9/16]` — reels kartasi baland.
+              const SkeletonRowSection(itemWidth: 160, itemHeight: 284),
+
+            if (data.stats != null)
+              StatsBanner(stats: data.stats!)
+            else if (loading)
+              const SkeletonBand(
+                height: 220,
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 40),
+              ),
+
+            if (data.features.isNotEmpty)
+              FeaturesSection(features: data.features)
+            else if (loading)
+              const SkeletonBand(
+                height: 300,
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 48),
+              ),
+
+            if (data.news.isNotEmpty)
+              NewsSection(news: data.news)
+            else if (loading)
+              const SkeletonBand(
+                height: 320,
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 40),
+              ),
+
             AppDownload(
               appStoreUrl: data.settings['app_store_url'],
               googlePlayUrl: data.settings['google_play_url'],

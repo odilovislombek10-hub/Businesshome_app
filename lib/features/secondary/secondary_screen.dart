@@ -15,6 +15,7 @@ import '../../shared/widgets/property_card.dart';
 import '../../shared/widgets/site_header.dart';
 import '../../shared/widgets/site_footer_section.dart';
 import '../../shared/widgets/site_icon.dart';
+import '../../shared/widgets/skeleton.dart';
 import 'listings_config.dart';
 import 'secondary_filter_sheet.dart';
 import 'secondary_repository.dart';
@@ -528,10 +529,16 @@ class _SecondaryScreenState extends State<SecondaryScreen> {
         final page = snapshot.data ?? _last;
         if (page == null) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 64),
-                child: Center(child: CircularProgressIndicator()),
+            // Aylanuvchi belgi o'rniga kartalarning o'z shakli — javob kelganda sahifa
+            // sakramaydi, chunki joy allaqachon egallangan.
+            return SliverPadding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+              sliver: SliverGrid.count(
+                crossAxisCount: 2,
+                mainAxisSpacing: 16,
+                crossAxisSpacing: 16,
+                childAspectRatio: PropertyCard.compactAspectRatio,
+                children: [for (var i = 0; i < 4; i++) const Pulse(child: PropertyCardSkeleton())],
               ),
             );
           }
