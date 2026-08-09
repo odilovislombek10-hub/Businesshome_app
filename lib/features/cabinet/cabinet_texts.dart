@@ -1,6 +1,7 @@
 import 'package:flutter/painting.dart';
 
 import '../../core/models/market_user.dart';
+import 'cabinet_repository.dart';
 
 /// Kabinet matnlari — `cabinet.*` kalitlari `core/i18n/translations/uz.ts` dan aynan olingan.
 abstract final class CabinetTexts {
@@ -124,6 +125,72 @@ abstract final class CabinetTexts {
     'paused' => const Color(0xD9F97316),
     'sold' => const Color(0xD93B82F6),
     _ => const Color(0xD96B7280),
+  };
+
+  // ── mening buyurtmalarim ──────────────────────────────────────────────────
+  static const noOrders = "Hech qanday buyurtma yo'q";
+
+  /// `cabinet.orderStatus.*`
+  static String orderStatusLabel(String status) => switch (status) {
+    'pending' => 'Kutilmoqda',
+    'accepted' => 'Qabul qilindi',
+    'in_progress' => 'Jarayonda',
+    'completed' => 'Tugatilgan',
+    'awaiting_confirm' => 'Tasdiqlash kutilmoqda',
+    'cancelled' => 'Bekor qilingan',
+    'rejected' => 'Rad etildi',
+    _ => status,
+  };
+
+  /// Saytdagi `getOrderStatusClass` — `bg-*-100 text-*-700`.
+  static Color orderStatusBackground(String status) => switch (status) {
+    'pending' => const Color(0xFFFEF3C7),
+    'in_progress' => const Color(0xFFDBEAFE),
+    'completed' => const Color(0xFFD1FAE5),
+    'cancelled' => const Color(0xFFFEE2E2),
+    _ => const Color(0xFFF3F4F6),
+  };
+
+  static Color orderStatusForeground(String status) => switch (status) {
+    'pending' => const Color(0xFFB45309),
+    'in_progress' => const Color(0xFF1D4ED8),
+    'completed' => const Color(0xFF047857),
+    'cancelled' => const Color(0xFFB91C1C),
+    _ => const Color(0xFF4B5563),
+  };
+
+  /// `dd.MM.yyyy` — saytdagi `formatDeadline`.
+  static String formatDeadline(String? iso) {
+    if (iso == null || iso.length < 10) return '';
+    final parts = iso.substring(0, 10).split('-');
+    if (parts.length != 3) return iso;
+    return '${parts[2]}.${parts[1]}.${parts[0]}';
+  }
+
+  /// Saytdagi `deadlineState` — ohang va matn.
+  static (String, String) deadlineState(ClientOrder order) {
+    final days = order.daysLeft;
+    if (days == null) return ('none', '');
+    if (order.isClosed) return ('closed', formatDeadline(order.deadlineAt));
+    if (days < 0) return ('overdue', '${-days} kun kechikdi');
+    if (days == 0) return ('overdue', 'Bugun muddati');
+    if (days <= 3) return ('soon', '$days kun qoldi');
+    return ('ok', '$days kun qoldi');
+  }
+
+  /// `deadlineBadgeClass` ranglari.
+  static Color deadlineBackground(String tone) => switch (tone) {
+    'overdue' => const Color(0xFFFEE2E2),
+    'soon' => const Color(0xFFFEF3C7),
+    'ok' => const Color(0xFFE0F2FE),
+    _ => const Color(0xFFF1F5F9),
+  };
+
+  static Color deadlineForeground(String tone) => switch (tone) {
+    'overdue' => const Color(0xFFB91C1C),
+    'soon' => const Color(0xFFB45309),
+    'ok' => const Color(0xFF0369A1),
+    _ => const Color(0xFF475569),
   };
 
   // ── sevimlilar ────────────────────────────────────────────────────────────

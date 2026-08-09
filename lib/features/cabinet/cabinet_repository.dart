@@ -199,6 +199,62 @@ class MyListing {
   );
 }
 
+/// `/api/market/cabinet/orders?role=client` dagi bitta buyurtma.
+///
+/// Mijozning o'z buyurtmalari — kabinetdagi "Mening buyurtmalarim" bo'limi shundan chiziladi.
+class ClientOrder {
+  const ClientOrder({
+    required this.id,
+    required this.title,
+    required this.status,
+    required this.price,
+    required this.progress,
+    this.providerName,
+    this.deadlineAt,
+    this.conversationId,
+    this.hasReview = false,
+  });
+
+  final int id;
+  final String title;
+
+  /// `pending` | `accepted` | `in_progress` | `awaiting_confirm` | `completed` |
+  /// `cancelled` | `rejected`
+  final String status;
+  final num price;
+  final int progress;
+  final String? providerName;
+  final String? deadlineAt;
+  final int? conversationId;
+  final bool hasReview;
+
+  /// Yopilgan buyurtmada muddat rangi neytral bo'ladi — saytdagi `isOrderClosed`.
+  bool get isClosed => status == 'completed' || status == 'cancelled' || status == 'rejected';
+
+  /// Muddatgacha necha kun qolgani; manfiy — kechikkan. Saytdagi `daysUntilDeadline`.
+  int? get daysLeft {
+    final iso = deadlineAt;
+    if (iso == null || iso.length < 10) return null;
+    final target = DateTime.tryParse(iso.substring(0, 10));
+    if (target == null) return null;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    return target.difference(today).inDays;
+  }
+
+  factory ClientOrder.fromJson(Map<String, dynamic> json) => ClientOrder(
+    id: (json['id'] as num?)?.toInt() ?? 0,
+    title: json['title']?.toString() ?? json['serviceName']?.toString() ?? '',
+    status: json['status']?.toString() ?? '',
+    price: (json['price'] as num?) ?? (json['amount'] as num?) ?? 0,
+    progress: (json['progress'] as num?)?.toInt() ?? 0,
+    providerName: _text(json['providerName']),
+    deadlineAt: _text(json['deadline_at']),
+    conversationId: (json['conversation_id'] as num?)?.toInt(),
+    hasReview: json['hasReview'] == true,
+  );
+}
+
 /// Kabinetning umumiy so'rovlari. Har bir bo'lim o'z ma'lumotini alohida oladi — saytda ham
 /// shunday, bitta so'rov yiqilsa qolgani chiziladi.
 class CabinetRepository {
@@ -235,6 +291,14 @@ class CabinetRepository {
         ? '/market/ads/${listing.id}'
         : '/market/my-listings/${listing.source}/${listing.id}';
     await _api.delete<dynamic>(path);
+  }
+
+  /// Saytda mijoz buyurtmalari `role=client` bilan so'raladi.
+  Future<List<ClientOrder>> myOrders() async {
+    final res = await _api.get<dynamic>('/market/cabinet/orders', query: {'role': 'client'});
+    final data = res.data;
+    if (data is! List) return const [];
+    return data.whereType<Map<String, dynamic>>().map(ClientOrder.fromJson).toList();
   }
 
   Future<List<RoleStat>> roleStats() async {

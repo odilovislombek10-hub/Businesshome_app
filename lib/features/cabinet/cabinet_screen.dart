@@ -13,6 +13,7 @@ import '../../shared/widgets/specialist_bits.dart';
 import 'cabinet_dashboard.dart';
 import 'cabinet_favorites.dart';
 import 'cabinet_listings.dart';
+import 'cabinet_my_orders.dart';
 import 'cabinet_viewed.dart';
 import 'cabinet_repository.dart';
 import 'cabinet_texts.dart';
@@ -68,6 +69,7 @@ class _CabinetScreenState extends State<CabinetScreen> {
   Future<List<FavoriteItem>>? _favorites;
   Future<List<ViewedItem>>? _viewed;
   Future<List<MyListing>>? _listings;
+  Future<List<ClientOrder>>? _orders;
 
   String get _tab => CabinetScreen.tabs.contains(widget.tab) ? widget.tab : 'dashboard';
 
@@ -183,6 +185,8 @@ class _CabinetScreenState extends State<CabinetScreen> {
         );
       case 'viewed':
         return CabinetViewed(future: _viewed ??= _repo.viewed());
+      case 'my-orders':
+        return CabinetMyOrders(future: _orders ??= _repo.myOrders());
       case 'listings':
         return CabinetListings(
           future: _listings ??= _repo.myListings(),
