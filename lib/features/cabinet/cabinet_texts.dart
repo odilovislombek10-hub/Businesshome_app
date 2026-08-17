@@ -251,6 +251,142 @@ abstract final class CabinetTexts {
     ('shop', "Do'kon"),
   ];
 
+  // ── xizmatlar (paketlar) ──────────────────────────────────────────────────
+  static const serviceAdd = "Paket qo'shish";
+  static const serviceEdit = 'Paketni tahrirlash';
+  static const servicesEmpty = "Paketlar hali yo'q";
+  static const servicesEmptyDesc = 'Birinchi xizmat paketingizni yarating';
+  static const serviceTitle = 'Nomi';
+  static const servicePrice = 'Narx';
+  static const serviceDelivery = 'Muddat (kun)';
+  static const serviceFeatures = 'Xususiyatlar';
+  static const serviceFeaturesHint = 'har birini yangi qatorda';
+  static const serviceDays = 'kun';
+  static const serviceRecommended = 'TAVSIYA ETILGAN';
+  static const serviceMakeRecommended = 'Tavsiya etilgan qilish';
+  static const servicesLoadError = "Paketlarni yuklab bo'lmadi";
+  static const serviceSaveError = "Paketni saqlab bo'lmadi";
+  static const delete = "O'chirish";
+
+  // ── so'rovlar (agent) ─────────────────────────────────────────────────────
+  static const inquiryReply = 'Javob berish';
+  static const inquiryCall = "Qo'ng'iroq";
+  static const inquiriesEmpty = "Hali so'rovlar yo'q";
+  static const inquiriesLoadError = "So'rovlarni yuklab bo'lmadi";
+  static const inquiryChatError = "Suhbatni ochib bo'lmadi";
+
+  /// `cabinet.inquiryStatus.*` — yorliq, matn rangi va foni.
+  static (String, Color, Color) inquiryStatusStyle(String status) => switch (status) {
+    'new' => ('Yangi', Color(0xFF1D4ED8), Color(0xFFDBEAFE)),
+    'in_progress' => ('Jarayonda', Color(0xFFB45309), Color(0xFFFEF3C7)),
+    'completed' => ('Yakunlangan', Color(0xFF047857), Color(0xFFD1FAE5)),
+    _ => (status, Color(0xFF4B5563), Color(0xFFF3F4F6)),
+  };
+
+  // ── agentlik profili ──────────────────────────────────────────────────────
+  static const agentDisplayName = "Ko'rsatiladigan ism";
+  static const agentAgency = 'Agentlik nomi';
+  static const agentBio = "O'zingiz haqida";
+  static const agentExperience = 'Tajriba (yil)';
+  static const agentLicense = 'Litsenziya raqami';
+  static const agentTelegram = 'Telegram';
+  static const agentInstagram = 'Instagram';
+  static const agentHandleHint = '@username';
+  static const agentLoadError = "Profilni yuklab bo'lmadi";
+
+  // ── KYC ───────────────────────────────────────────────────────────────────
+  static const kycIntro =
+      "KYC tasdiqlash uchun pasport va kasbiy hujjat yuklang. Admin ko'rib chiqadi.";
+  static const kycPassport = 'Pasport';
+  static const kycDiploma = 'Diplom';
+  static const kycLicense = 'Litsenziya';
+  static const kycSubmit = 'Tasdiqlash uchun yuborish';
+  static const kycChooseFile = 'Fayl tanlash';
+  static const kycSubmitError = "Hujjatlarni yuborib bo'lmadi";
+  static const kycNeedPassport = 'Avval pasport nusxasini tanlang';
+
+  /// `kyc.status.*` — yorliq, matn rangi va fon.
+  static (String, Color, Color) kycStatusStyle(String status) => switch (status) {
+    'approved' => ('Tasdiqlangan', Color(0xFF047857), Color(0xFFECFDF5)),
+    'pending' => ('Tekshirilmoqda', Color(0xFFB45309), Color(0xFFFFFBEB)),
+    'rejected' => ('Rad etilgan', Color(0xFFB91C1C), Color(0xFFFEF2F2)),
+    _ => ('Yuborilmagan', Color(0x993D3D3D), Color(0xFFF3F4F6)),
+  };
+
+  // ── sharhlar ──────────────────────────────────────────────────────────────
+  static const reviewReply = 'Javob berish';
+  static const reviewSendReply = 'Javob yuborish';
+  static const reviewSpecialistReply = 'Mutaxassis javobi';
+  static const reviewReplyPlaceholder = 'Mijozga javobingizni yozing...';
+  static const reviewsEmpty = "Hali sharhlar yo'q";
+  static const reviewsLoadError = "Sharhlarni yuklab bo'lmadi";
+  static const reviewReplyError = "Javobni yuborib bo'lmadi";
+
+  // ── daromad ───────────────────────────────────────────────────────────────
+  static const totalEarnings = 'Umumiy daromad';
+  static const earningsQuick = 'Tezkor:';
+  static const earningsFrom = 'Dan';
+  static const earningsTo = 'Gacha';
+  static const earningsGrouping = 'Guruhlash';
+  static const earningsChart = 'Daromad grafigi';
+  static const earningsEmpty = "Bu davrda daromad yo'q";
+  static const earningsLoadError = "Daromadni yuklab bo'lmadi";
+
+  /// Tezkor davr tugmalari — kalit, yorliq va sarlavha ostidagi izoh.
+  static const earningRanges = <(String, String, String)>[
+    ('week', 'Hafta', 'Oxirgi 7 kun'),
+    ('month', 'Oy', 'Oxirgi 30 kun'),
+    ('quarter', '3 oy', 'Oxirgi 3 oy'),
+    ('year', 'Yil', 'Oxirgi 1 yil'),
+    ('all', 'Hammasi', 'Barcha vaqt'),
+  ];
+
+  static const earningGranularities = <(String, String)>[
+    ('day', "Kun bo'yicha"),
+    ('month', "Oy bo'yicha"),
+    ('year', "Yil bo'yicha"),
+  ];
+
+  static String earningsUnit(String granularity) => switch (granularity) {
+    'day' => 'Kunlik',
+    'year' => 'Yillik',
+    _ => 'Oylik',
+  };
+
+  /// Saytdagi `formatEarningAmount` — 1.2B / 15M / 300K.
+  static String earningAmount(num n) {
+    if (n >= 1000000000) return '${(n / 1000000000).toStringAsFixed(1)}B';
+    if (n >= 1000000) return '${(n / 1000000).toStringAsFixed(0)}M';
+    if (n >= 1000) return '${(n / 1000).toStringAsFixed(0)}K';
+    return '$n';
+  }
+
+  static const _monthsShort = [
+    'Yan',
+    'Fev',
+    'Mar',
+    'Apr',
+    'May',
+    'Iyn',
+    'Iyl',
+    'Avg',
+    'Sen',
+    'Okt',
+    'Noy',
+    'Dek',
+  ];
+
+  /// Saytdagi `formatEarningPeriod` — `YYYY` | `YYYY-MM` | `YYYY-MM-DD`.
+  static String earningPeriod(String key) {
+    final parts = key.split('-');
+    if (parts.length == 1) return parts.first;
+    if (parts.length == 2) {
+      final month = int.tryParse(parts[1]) ?? 0;
+      return month >= 1 && month <= 12 ? _monthsShort[month - 1] : key;
+    }
+    return '${parts[2]}/${parts[1]}';
+  }
+
   // ── reels ─────────────────────────────────────────────────────────────────
   static const reelsSubtitle =
       "Qisqa video joylab portfoliongizni jonlantiring — admin tasdiqlagandan keyin reels "

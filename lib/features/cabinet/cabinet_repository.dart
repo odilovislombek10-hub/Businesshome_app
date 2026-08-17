@@ -445,6 +445,157 @@ class MyReel {
   );
 }
 
+/// `/api/market/cabinet/service-packages` — mutaxassisning xizmat paketi.
+class ServicePackage {
+  const ServicePackage({
+    required this.id,
+    required this.title,
+    required this.price,
+    required this.deliveryDays,
+    required this.features,
+    required this.isRecommended,
+    this.currency = 'UZS',
+  });
+
+  final int id;
+  final String title;
+  final num price;
+
+  /// Bajarish muddati — kartada "N kun" bo'lib chiqadi.
+  final int deliveryDays;
+  final List<String> features;
+
+  /// Tavsiya etilgan paket kartasi zaytun ramka va tepasida nishoncha oladi.
+  final bool isRecommended;
+  final String currency;
+
+  factory ServicePackage.fromJson(Map<String, dynamic> json) => ServicePackage(
+    id: (json['id'] as num?)?.toInt() ?? 0,
+    title: json['title']?.toString() ?? '',
+    price: (json['price'] as num?) ?? 0,
+    deliveryDays: (json['delivery_days'] as num?)?.toInt() ?? 0,
+    features: <String>[for (final item in (json['features'] as List?) ?? const []) ?_text(item)],
+    isRecommended: json['is_recommended'] == true,
+    currency: json['currency']?.toString() ?? 'UZS',
+  );
+}
+
+/// `/api/market/cabinet/reviews` — mutaxassisga qoldirilgan sharh.
+class CabinetReview {
+  const CabinetReview({
+    required this.id,
+    required this.clientName,
+    required this.rating,
+    required this.comment,
+    this.clientAvatar,
+    this.serviceName,
+    this.date,
+    this.replyText,
+  });
+
+  final int id;
+  final String clientName;
+  final int rating;
+  final String comment;
+  final String? clientAvatar;
+  final String? serviceName;
+  final String? date;
+
+  /// Mutaxassis javobi — bo'lsa sharh ostida zaytun chiziqli blokda chiqadi.
+  final String? replyText;
+
+  factory CabinetReview.fromJson(Map<String, dynamic> json) => CabinetReview(
+    id: (json['id'] as num?)?.toInt() ?? 0,
+    clientName: json['clientName']?.toString() ?? '',
+    rating: (json['rating'] as num?)?.toInt() ?? 0,
+    comment: json['comment']?.toString() ?? '',
+    clientAvatar: absoluteMediaUrl(_text(json['clientAvatar'])),
+    serviceName: _text(json['serviceName']),
+    date: _text(json['date']),
+    replyText: _text(json['replyText']),
+  );
+}
+
+/// `/api/market/cabinet/earnings` — bitta davr uchun summa.
+///
+/// [period] kaliti guruhlashga qarab `YYYY` | `YYYY-MM` | `YYYY-MM-DD` bo'ladi.
+class Earning {
+  const Earning({required this.period, required this.amount});
+
+  final String period;
+  final num amount;
+
+  factory Earning.fromJson(Map<String, dynamic> json) =>
+      Earning(period: json['month']?.toString() ?? '', amount: (json['amount'] as num?) ?? 0);
+}
+
+/// `/api/market/cabinet/inquiries` — agentga kelgan so'rov.
+class CabinetInquiry {
+  const CabinetInquiry({
+    required this.id,
+    required this.clientName,
+    required this.clientPhone,
+    required this.message,
+    required this.status,
+    this.clientAvatar,
+    this.propertyTitle,
+    this.createdAt,
+  });
+
+  final int id;
+  final String clientName;
+  final String clientPhone;
+  final String message;
+
+  /// `new` | `in_progress` | `completed`
+  final String status;
+  final String? clientAvatar;
+  final String? propertyTitle;
+  final String? createdAt;
+
+  factory CabinetInquiry.fromJson(Map<String, dynamic> json) => CabinetInquiry(
+    id: (json['id'] as num?)?.toInt() ?? 0,
+    clientName: json['clientName']?.toString() ?? '',
+    clientPhone: json['clientPhone']?.toString() ?? '',
+    message: json['message']?.toString() ?? '',
+    status: json['status']?.toString() ?? 'new',
+    clientAvatar: absoluteMediaUrl(_text(json['clientAvatar'])),
+    propertyTitle: _text(json['propertyTitle']),
+    createdAt: _text(json['createdAt']),
+  );
+}
+
+/// `/api/market/agent/me` — agentlik profili.
+class AgentProfile {
+  const AgentProfile({
+    this.displayName = '',
+    this.agencyName = '',
+    this.bio = '',
+    this.experienceYears,
+    this.licenseNumber = '',
+    this.telegram = '',
+    this.instagram = '',
+  });
+
+  final String displayName;
+  final String agencyName;
+  final String bio;
+  final int? experienceYears;
+  final String licenseNumber;
+  final String telegram;
+  final String instagram;
+
+  factory AgentProfile.fromJson(Map<String, dynamic> json) => AgentProfile(
+    displayName: json['display_name']?.toString() ?? '',
+    agencyName: json['agency_name']?.toString() ?? '',
+    bio: json['bio']?.toString() ?? '',
+    experienceYears: (json['experience_years'] as num?)?.toInt(),
+    licenseNumber: json['license_number']?.toString() ?? '',
+    telegram: json['telegram']?.toString() ?? '',
+    instagram: json['instagram']?.toString() ?? '',
+  );
+}
+
 /// `/api/market/chat/conversations` dagi bitta suhbat.
 class ChatConversation {
   const ChatConversation({
@@ -579,6 +730,104 @@ class CabinetRepository {
   /// Rad etilgan reelni qayta moderatsiyaga yuborish.
   Future<void> resubmitReel(int id) async {
     await _api.post<dynamic>('/market/cabinet/reels/$id/submit', data: const <String, dynamic>{});
+  }
+
+  Future<List<ServicePackage>> servicePackages() async {
+    final res = await _api.get<dynamic>('/market/cabinet/service-packages');
+    final data = res.data;
+    if (data is! List) return const [];
+    return data.whereType<Map<String, dynamic>>().map(ServicePackage.fromJson).toList();
+  }
+
+  Future<void> savePackage(Map<String, dynamic> payload, {int? id}) async {
+    if (id == null) {
+      await _api.post<dynamic>('/market/cabinet/service-packages', data: payload);
+    } else {
+      await _api.put<dynamic>('/market/cabinet/service-packages/$id', data: payload);
+    }
+  }
+
+  Future<void> deletePackage(int id) async {
+    await _api.delete<dynamic>('/market/cabinet/service-packages/$id');
+  }
+
+  /// Paketni "tavsiya etilgan" qilib belgilaydi — bittasi tanlanadi.
+  Future<void> markPackageRecommended(int id) async {
+    await _api.put<dynamic>('/market/cabinet/service-packages/$id/recommended');
+  }
+
+  Future<List<CabinetReview>> reviews() async {
+    final res = await _api.get<dynamic>('/market/cabinet/reviews');
+    final data = res.data;
+    if (data is! List) return const [];
+    return data.whereType<Map<String, dynamic>>().map(CabinetReview.fromJson).toList();
+  }
+
+  Future<void> replyToReview(int id, String text) async {
+    await _api.post<dynamic>('/market/cabinet/reviews/$id/reply', data: {'reply_text': text});
+  }
+
+  /// [granularity] — `day` | `month` | `year`.
+  Future<List<Earning>> earnings({String? from, String? to, String granularity = 'month'}) async {
+    final res = await _api.get<dynamic>(
+      '/market/cabinet/earnings',
+      query: {'date_from': ?from, 'date_to': ?to, 'granularity': granularity},
+    );
+    final data = res.data;
+    if (data is! List) return const [];
+    return data.whereType<Map<String, dynamic>>().map(Earning.fromJson).toList();
+  }
+
+  /// KYC holati — `{status, reject_reason}`.
+  Future<(String, String?)> kycStatus() async {
+    final res = await _api.get<dynamic>('/market/cabinet/specialist-profile/kyc-status');
+    final data = res.data;
+    if (data is! Map) return ('none', null);
+    return (data['status']?.toString() ?? 'none', _text(data['reject_reason']));
+  }
+
+  /// Pasport majburiy; diplom dizayner, litsenziya usta va agent uchun.
+  Future<void> submitKyc({String? passport, String? diploma, String? license}) async {
+    final form = FormData();
+    for (final (field, path) in [
+      ('passport', passport),
+      ('diploma', diploma),
+      ('license', license),
+    ]) {
+      if (path != null) {
+        form.files.add(MapEntry(field, await MultipartFile.fromFile(path)));
+      }
+    }
+    await _api.post<dynamic>('/market/cabinet/specialist-profile/kyc', data: form);
+  }
+
+  Future<List<CabinetInquiry>> inquiries() async {
+    final res = await _api.get<dynamic>('/market/cabinet/inquiries');
+    final data = res.data;
+    if (data is! List) return const [];
+    return data.whereType<Map<String, dynamic>>().map(CabinetInquiry.fromJson).toList();
+  }
+
+  /// So'rovdan suhbat ochish — javobda `conversation_id` keladi.
+  Future<int?> startChatFromInquiry(int id) async {
+    final res = await _api.post<dynamic>(
+      '/market/cabinet/inquiries/$id/start-chat',
+      data: const <String, dynamic>{},
+    );
+    final data = res.data;
+    if (data is! Map) return null;
+    return (data['conversation_id'] as num?)?.toInt();
+  }
+
+  Future<AgentProfile> agentProfile() async {
+    final res = await _api.get<dynamic>('/market/agent/me');
+    final data = res.data;
+    if (data is! Map<String, dynamic>) return const AgentProfile();
+    return AgentProfile.fromJson(data);
+  }
+
+  Future<void> saveAgentProfile(Map<String, dynamic> payload) async {
+    await _api.put<dynamic>('/market/agent/me', data: payload);
   }
 
   /// Mutaxassis profili — portfolio rasmlari shu javobda keladi.

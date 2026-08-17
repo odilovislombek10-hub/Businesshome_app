@@ -19,6 +19,12 @@ import 'cabinet_orders.dart';
 import 'cabinet_portfolio.dart';
 import 'cabinet_projects.dart';
 import 'cabinet_reels.dart';
+import 'cabinet_agent_profile.dart';
+import 'cabinet_earnings.dart';
+import 'cabinet_inquiries.dart';
+import 'cabinet_kyc.dart';
+import 'cabinet_reviews.dart';
+import 'cabinet_services.dart';
 import 'cabinet_profile.dart';
 import 'cabinet_settings.dart';
 import 'cabinet_viewed.dart';
@@ -82,6 +88,9 @@ class _CabinetScreenState extends State<CabinetScreen> {
   Future<List<String>>? _portfolio;
   Future<List<SpecialistProject>>? _projects;
   Future<List<MyReel>>? _reels;
+  Future<List<ServicePackage>>? _packages;
+  Future<List<CabinetReview>>? _reviews;
+  Future<List<CabinetInquiry>>? _inquiries;
 
   String get _tab => CabinetScreen.tabs.contains(widget.tab) ? widget.tab : 'dashboard';
 
@@ -235,6 +244,28 @@ class _CabinetScreenState extends State<CabinetScreen> {
           role: user.role,
           onChanged: () => setState(() => _reels = _repo.myReels()),
         );
+      case 'services':
+        return CabinetServices(
+          future: _packages ??= _repo.servicePackages(),
+          onChanged: () => setState(() => _packages = _repo.servicePackages()),
+        );
+      case 'reviews':
+        return CabinetReviews(
+          future: _reviews ??= _repo.reviews(),
+          onChanged: () => setState(() => _reviews = _repo.reviews()),
+        );
+      case 'earnings':
+        return const CabinetEarnings();
+      case 'kyc':
+        return CabinetKyc(role: user.role);
+      case 'inquiries':
+        return CabinetInquiries(
+          future: _inquiries ??= _repo.inquiries(),
+          onOpenChat: _openChatFromInquiry,
+          onRetry: () => setState(() => _inquiries = _repo.inquiries()),
+        );
+      case 'agent-profile':
+        return const CabinetAgentProfile();
       case 'messages':
         return CabinetMessages(
           future: _conversations ??= _repo.conversations(),
@@ -247,6 +278,22 @@ class _CabinetScreenState extends State<CabinetScreen> {
         return CabinetSettings(onDeleted: () => context.go('/'));
       default:
         return _NotPortedYet(tab: _tab);
+    }
+  }
+
+  /// Saytdagi `openChatFromInquiry` — suhbat ochilsa unga o'tiladi.
+  Future<void> _openChatFromInquiry(CabinetInquiry inquiry) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final router = GoRouter.of(context);
+    try {
+      final id = await _repo.startChatFromInquiry(inquiry.id);
+      if (id != null) {
+        router.go('/chat/$id');
+        return;
+      }
+      messenger.showSnackBar(const SnackBar(content: Text(CabinetTexts.inquiryChatError)));
+    } catch (_) {
+      messenger.showSnackBar(const SnackBar(content: Text(CabinetTexts.inquiryChatError)));
     }
   }
 
