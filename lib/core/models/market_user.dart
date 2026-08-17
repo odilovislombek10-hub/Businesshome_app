@@ -26,6 +26,19 @@ class MarketUser {
   final bool isVerified;
   final DateTime? createdAt;
 
+  /// Diskka saqlash uchun — kalitlar API bilan bir xil, shuning uchun `fromJson` qayta o'qiydi.
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'phone': phone,
+    'full_name': fullName,
+    'region': region,
+    'district': district,
+    'role': role.wire,
+    'avatar': avatar,
+    'is_verified': isVerified,
+    'created_at': createdAt?.toIso8601String(),
+  };
+
   factory MarketUser.fromJson(Map<String, dynamic> json) => MarketUser(
     id: (json['id'] as num?)?.toInt() ?? 0,
     phone: json['phone']?.toString() ?? '',

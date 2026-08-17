@@ -13,7 +13,14 @@ import '../../shared/widgets/specialist_bits.dart';
 import 'cabinet_dashboard.dart';
 import 'cabinet_favorites.dart';
 import 'cabinet_listings.dart';
+import 'cabinet_messages.dart';
 import 'cabinet_my_orders.dart';
+import 'cabinet_orders.dart';
+import 'cabinet_portfolio.dart';
+import 'cabinet_projects.dart';
+import 'cabinet_reels.dart';
+import 'cabinet_profile.dart';
+import 'cabinet_settings.dart';
 import 'cabinet_viewed.dart';
 import 'cabinet_repository.dart';
 import 'cabinet_texts.dart';
@@ -70,6 +77,11 @@ class _CabinetScreenState extends State<CabinetScreen> {
   Future<List<ViewedItem>>? _viewed;
   Future<List<MyListing>>? _listings;
   Future<List<ClientOrder>>? _orders;
+  Future<List<ChatConversation>>? _conversations;
+  Future<List<ProviderOrder>>? _providerOrders;
+  Future<List<String>>? _portfolio;
+  Future<List<SpecialistProject>>? _projects;
+  Future<List<MyReel>>? _reels;
 
   String get _tab => CabinetScreen.tabs.contains(widget.tab) ? widget.tab : 'dashboard';
 
@@ -201,6 +213,38 @@ class _CabinetScreenState extends State<CabinetScreen> {
             }
           },
         );
+      case 'orders':
+        return CabinetOrders(
+          future: _providerOrders ??= _repo.providerOrders(),
+          onOpen: (order) => context.go('/cabinet/orders/${order.id}'),
+          onRetry: () => setState(() => _providerOrders = _repo.providerOrders()),
+        );
+      case 'portfolio':
+        return CabinetPortfolio(
+          future: _portfolio ??= _repo.portfolio(),
+          onRetry: () => setState(() => _portfolio = _repo.portfolio()),
+        );
+      case 'projects':
+        return CabinetProjects(
+          future: _projects ??= _repo.myProjects(),
+          onChanged: () => setState(() => _projects = _repo.myProjects()),
+        );
+      case 'reels':
+        return CabinetReels(
+          future: _reels ??= _repo.myReels(),
+          role: user.role,
+          onChanged: () => setState(() => _reels = _repo.myReels()),
+        );
+      case 'messages':
+        return CabinetMessages(
+          future: _conversations ??= _repo.conversations(),
+          onOpen: (conv) => context.go('/chat/${conv.id}'),
+          onRetry: () => setState(() => _conversations = _repo.conversations()),
+        );
+      case 'profile':
+        return CabinetProfile(user: user);
+      case 'settings':
+        return CabinetSettings(onDeleted: () => context.go('/'));
       default:
         return _NotPortedYet(tab: _tab);
     }
@@ -371,14 +415,14 @@ class _Sidebar extends StatelessWidget {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          DecoratedBox(decoration: BoxDecoration(gradient: _roleGradient(user.role))),
+          DecoratedBox(decoration: BoxDecoration(gradient: roleGradient(user.role))),
           // `opacity-[0.16]`, 15×15 nuqtalar.
           const CustomPaint(painter: DotPatternPainter(step: 15, alpha: 0.16)),
           Positioned(
             right: 10,
             bottom: -14,
             child: SiteIcon(
-              _roleWatermark(user.role),
+              roleWatermark(user.role),
               size: 92,
               strokeWidth: 1.3,
               color: Colors.white.withValues(alpha: 0.13),
@@ -504,14 +548,14 @@ SiteIconData _tabIcon(String id) => switch (id) {
   _ => SiteIcons.list,
 };
 
-SiteIconData _roleWatermark(MarketRole role) => switch (role) {
+SiteIconData roleWatermark(MarketRole role) => switch (role) {
   MarketRole.master => SiteIcons.wrench,
   MarketRole.designer => SiteIcons.paletteOutline,
   _ => SiteIcons.house,
 };
 
 /// `getRoleGradient()` — har bir rol uchun o'ziga xos gradient.
-LinearGradient _roleGradient(MarketRole role) {
+LinearGradient roleGradient(MarketRole role) {
   const bronze = AppColors.bronze;
   final colors = switch (role) {
     MarketRole.designer => [AppColors.olive, AppColors.olive.withValues(alpha: 0.85), bronze],

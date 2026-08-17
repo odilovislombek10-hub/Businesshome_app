@@ -31,6 +31,16 @@ class PhoneField extends StatelessWidget {
   }
 }
 
+/// Saytdagi maydonning kirish qoidalari — faqat raqam, to'qqiz xona, `90 123 45 67` guruhlash.
+///
+/// [PhoneField] Material bezagi bilan keladi; kirish sahifasi esa shablondagi o'z bezagini
+/// chizadi, shuning uchun faqat shu qoidalarni oladi.
+List<TextInputFormatter> uzPhoneFormatters() => [
+  FilteringTextInputFormatter.digitsOnly,
+  LengthLimitingTextInputFormatter(9),
+  _UzPhoneFormatter(),
+];
+
 /// The backend's `normalize_phone` (helpers/otp.py) keeps digits only, prepends `998` to a
 /// nine-digit national number and returns it with a leading `+`. Send exactly that so the value
 /// the server stores matches whatever the field showed.

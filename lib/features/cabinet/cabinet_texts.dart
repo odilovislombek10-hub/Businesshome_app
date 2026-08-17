@@ -217,6 +217,189 @@ abstract final class CabinetTexts {
       if (sources.contains(key)) (key, label),
   ];
 
+  // ── loyihalarim ───────────────────────────────────────────────────────────
+  static const projectsSubtitle = "Bajargan loyihalaringizni qo'shing — mijozlar sizga ishonsin";
+  static const projectAddNew = 'Yangi loyiha';
+  static const projectAddFirst = "Birinchi loyihangizni qo'shing";
+  static const projectsEmpty = "Hali loyihalar yo'q";
+  static const projectEdit = 'Loyihani tahrirlash';
+  static const projectDraft = 'Qoralama';
+  static const projectTitle = 'Loyiha sarlavhasi';
+  static const projectTitlePlaceholder = 'Misol: Zamonaviy 3 xonali kvartira dizayni';
+  static const projectDescription = 'Tavsif';
+  static const projectDescPlaceholder = 'Loyiha haqida qisqacha. Qanday yechim toptingiz...';
+  static const projectImages = 'Rasmlar';
+  static const projectUploadImages = 'Rasm yuklash';
+  static const projectCover = 'Asosiy';
+  static const projectCity = 'Shahar';
+  static const projectDistrict = 'Tuman';
+  static const projectArea = 'Maydon';
+  static const projectType = 'Obyekt turi';
+  static const projectBudget = 'Smeta';
+  static const projectBudgetSuffix = "so'm dan";
+  static const projectCompletedAt = 'Tugatilgan sana';
+  static const projectSaveError = "Loyihani saqlab bo'lmadi";
+  static const projectDeleteError = "O'chirib bo'lmadi";
+  static const projectsLoadError = "Loyihalarni yuklab bo'lmadi";
+  static const save = 'Saqlash';
+
+  /// `createListing.type*` — obyekt turi ro'yxati.
+  static const projectTypes = <(String, String)>[
+    ('apartment', 'Kvartira'),
+    ('house', 'Hovli uy'),
+    ('office', 'Ofis'),
+    ('shop', "Do'kon"),
+  ];
+
+  // ── reels ─────────────────────────────────────────────────────────────────
+  static const reelsSubtitle =
+      "Qisqa video joylab portfoliongizni jonlantiring — admin tasdiqlagandan keyin reels "
+      "bo'limida ko'rinadi";
+  static const reelUpload = 'Reel yuklash';
+  static const reelUploading = 'Yuklanmoqda...';
+  static const reelsEmpty = "Hali reels yo'q";
+  static const reelsModerationNote =
+      "Yangi reel admin tomonidan tasdiqlanguncha jamoatga ko'rinmaydi. Rad etilsa, sababi "
+      "ko'rsatiladi.";
+  static const reelRejectReason = 'Sabab';
+  static const reelResubmit = 'Qayta yuborish';
+  static const reelViews = "ko'rishlar";
+  static const reelTitlePrompt = 'Reel sarlavhasi:';
+  static const reelTooBig = "Video 100 MB dan katta bo'lmasligi kerak";
+  static const reelSent = 'Reel yuborildi. Admin tasdiqlashini kuting.';
+  static const reelUploadError = "Reel yuklab bo'lmadi";
+  static const reelsLoadError = "Reelslarni yuklab bo'lmadi";
+
+  /// Moderatsiya nishonchasi — yorliq va foni.
+  static (String, Color)? reelStatus(String status) => switch (status) {
+    'pending' => ('Kutilmoqda', Color(0xFFF59E0B)),
+    'approved' => ('Tasdiqlangan', Color(0xFF10B981)),
+    'rejected' => ('Rad etilgan', Color(0xFFEF4444)),
+    _ => null,
+  };
+
+  // ── portfolio ─────────────────────────────────────────────────────────────
+  static const addProject = "Loyiha qo'shish";
+  static const noPortfolio = "Portfolio bo'sh";
+  static const portfolioRemoveConfirm = "Rasmni o'chirishni xohlaysizmi?";
+  static const portfolioUploadError = "Rasmlarni yuklab bo'lmadi";
+  static const portfolioRemoveError = "O'chirib bo'lmadi";
+  static const portfolioLoadError = "Portfolioni yuklab bo'lmadi";
+
+  // ── buyurtmalar (dizayner/usta) ────────────────────────────────────────────
+  static const activeOrders = 'Faol buyurtmalar';
+  static const activeOrdersHint = "Muddat bo'yicha tartiblangan";
+  static const amountLabel = 'Summa';
+  static const soum = "so'm";
+  static const deadlineLabel = 'Muddat:';
+  static const timeLabel = 'Vaqt:';
+  static const doneLabel = 'Bajarildi:';
+  static const doneShort = 'Bajarildi';
+  static const noDeadline = 'Muddat belgilanmagan';
+  static const noOrdersInCategory = "Bu kategoriyada buyurtmalar yo'q";
+
+  /// Saralash tugmalari — yorliq, holat kaliti va faol holatdagi rangi.
+  static const orderFilters = <(String, String, Color)>[
+    ('all', 'Hammasi', Color(0xFF87885C)),
+    ('pending', 'Yangi', Color(0xFFF59E0B)),
+    ('in_progress', 'Jarayonda', Color(0xFF87885C)),
+    ('completed', 'Tugatilgan', Color(0xFF10B981)),
+  ];
+
+  /// `orderProgressBarClass` — vaqt progressi chizig'ining rangi.
+  static Color progressBarColor(String tone) => switch (tone) {
+    'overdue' => const Color(0xFFEF4444), // bg-red-500
+    'soon' => const Color(0xFFF59E0B), // bg-amber-500
+    _ => const Color(0xFF0EA5E9), // bg-sky-500
+  };
+
+  // ── xabarlar ──────────────────────────────────────────────────────────────
+  static const noMessages = "Hali xabarlar yo'q";
+  static const noMessagesDesc = "Sizga kelgan xabarlar shu yerda ko'rsatiladi";
+
+  /// Saytdagi `formatRelativeTime` — `time.*` kalitlari bilan.
+  static String relativeTime(DateTime? at) {
+    if (at == null) return '';
+    final diff = DateTime.now().difference(at).inSeconds;
+    if (diff < 60) return 'hozir';
+    if (diff < 3600) return '${diff ~/ 60} daqiqa oldin';
+    if (diff < 86400) return '${diff ~/ 3600} soat oldin';
+    if (diff < 7 * 86400) return '${diff ~/ 86400} kun oldin';
+    final d = at.toLocal();
+    return '${d.day}.${d.month.toString().padLeft(2, '0')}.${d.year}';
+  }
+
+  // ── profil ────────────────────────────────────────────────────────────────
+  static const basicInfo = "Asosiy ma'lumotlar";
+  static const fullName = "To'liq ism";
+  static const phone = 'Telefon';
+  static const region = 'Viloyat';
+  static const roleFieldLabel = 'Rol';
+  static const saveChanges = "O'zgarishlarni saqlash";
+  static const saving = 'Saqlanmoqda...';
+  static const profileSaved = 'Profil muvaffaqiyatli saqlandi';
+  static const profileError = 'Profilni saqlashda xato yuz berdi';
+  static const allRegions = 'Viloyatni tanlang';
+  static const allDistricts = 'Tumanlarning hammasi';
+  static const avatarTooBig = "Fayl hajmi 5MB dan oshmasligi kerak";
+
+  /// `getRoleColor()` — avatar o'rnidagi tekis fon.
+  static Color roleColor(MarketRole role) => switch (role) {
+    MarketRole.user => const Color(0xFF10B981), // emerald-500
+    MarketRole.agent => const Color(0xFF3B82F6), // blue-500
+    MarketRole.designer => const Color(0xFF87885C), // olive
+    MarketRole.master => const Color(0xFF8B8B6B), // bronze
+    MarketRole.developer => const Color(0xFFF59E0B), // amber-500
+  };
+
+  /// `getRoleBadgeColor()` — nishoncha foni.
+  static Color roleBadgeBackground(MarketRole role) => switch (role) {
+    MarketRole.user => const Color(0xFFD1FAE5), // emerald-100
+    MarketRole.agent => const Color(0xFFDBEAFE), // blue-100
+    MarketRole.designer => const Color(0x1A87885C), // olive/10
+    MarketRole.master => const Color(0x1A8B8B6B), // bronze/10
+    MarketRole.developer => const Color(0xFFFEF3C7), // amber-100
+  };
+
+  static Color roleBadgeForeground(MarketRole role) => switch (role) {
+    MarketRole.user => const Color(0xFF047857), // emerald-700
+    MarketRole.agent => const Color(0xFF1D4ED8), // blue-700
+    MarketRole.designer => const Color(0xFF87885C),
+    MarketRole.master => const Color(0xFF8B8B6B),
+    MarketRole.developer => const Color(0xFFB45309), // amber-700
+  };
+
+  // ── sozlamalar ────────────────────────────────────────────────────────────
+  static const notifications = 'Bildirishnomalar';
+  static const notificationsDesc = "Yangi xabarlar va so'rovlar haqida bildirishnoma";
+  static const emailUpdates = 'Email yangiliklar';
+  static const emailUpdatesDesc = 'Haftalik dayjest va yangi takliflar';
+  static const changePassword = "Parolni o'zgartirish";
+  static const updatePassword = 'Yangilash';
+  static const currentPassword = 'Joriy parol';
+  static const newPassword = 'Yangi parol';
+  static const confirmNewPassword = 'Yangi parolni tasdiqlang';
+  static const passwordChanged = "Parol muvaffaqiyatli o'zgartirildi";
+  static const passwordError = "Parolni o'zgartirishda xato";
+
+  /// `auth.errorPasswordMin` / `auth.errorPasswordMatch` — parol formasi shularni ko'rsatadi.
+  static const errorPasswordMin = "Parol kamida 6 belgidan iborat bo'lishi kerak";
+  static const errorPasswordMatch = 'Parollar mos kelmaydi';
+  static const currentPasswordMissing = 'Joriy parol kiritilmagan';
+
+  /// Shablonda bu sarlavha tarjimasiz, to'g'ridan-to'g'ri yozilgan.
+  static const languageAndTheme = 'Til va Mavzu';
+  static const language = 'Til';
+  static const theme = 'Mavzu';
+  static const themeLight = "☀ Yorug'";
+  static const themeDark = "🌙 Qorong'u";
+  static const languageUz = "O'zbekcha";
+
+  static const dangerZone = 'Xavfli zona';
+  static const deleteAccount = "Hisobni o'chirish";
+  static const deleteAccountDesc = "Hisobingizni o'chirsangiz, qaytarib bo'lmaydi.";
+  static const deleteAccountConfirm = "Haqiqatan ham hisobingizni o'chirmoqchimisiz?";
+
   /// `cabinet.favBadge.*` + rasm ustidagi rangi.
   static (String, Color)? favoriteBadge(String source) => switch (source) {
     'viewer-apartment' => ('3D', Color(0x99000000)),

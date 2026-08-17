@@ -50,6 +50,10 @@ dependencies:
   shimmer: ^3.0.0
   # Saytning SVG viloyat chizmalarini Flutter Path'ga aylantirish uchun
   path_drawing: ^1.0.1
+  # Kabinetda profil rasmini almashtirish uchun (saytdagi `<input type="file">` o'rniga)
+  image_picker: ^1.1.2
+  # API javoblarini diskda saqlash uchun (kesh papkasi)
+  path_provider: ^2.1.5
 
 dev_dependencies:
   flutter_test:

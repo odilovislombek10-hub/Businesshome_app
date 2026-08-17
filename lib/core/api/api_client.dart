@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'response_cache.dart';
 
 /// Single entry point to the BusinessHome market API.
 ///
@@ -71,19 +75,114 @@ class ApiClient {
 
   Future<bool> get isLoggedIn async => (await _readToken())?.isNotEmpty ?? false;
 
-  Future<Response<T>> get<T>(String path, {Map<String, dynamic>? query}) =>
-      _dio.get<T>(path, queryParameters: query);
+  // ── kesh va so'rovlar oqimi ────────────────────────────────────────────────
+
+  /// Shu muddat ichidagi nusxa "yangi" hisoblanadi — tarmoqqa umuman chiqilmaydi.
+  static const _freshFor = Duration(minutes: 5);
+
+  /// Bundan eskisi ishlatilmaydi (faqat tarmoq yiqilsa zaxira sifatida).
+  static const _keepFor = Duration(days: 7);
+
+  /// Bir vaqtda ochiladigan ulanishlar soni. Bosh sahifa o'n oltita so'rovni birdan yuboradi;
+  /// hammasini bir zumda otish serverning rate-limit qoidasini qo'zg'atadi va IP bloklanadi.
+  static const _maxConcurrent = 5;
+
+  int _active = 0;
+  final _waiting = <Completer<void>>[];
+
+  /// Ayni damda fonda yangilanayotgan kalitlar — bir xil so'rov ikki marta ketmasligi uchun.
+  final _revalidating = <String>{};
+
+  Future<T> _gated<T>(Future<T> Function() send) async {
+    if (_active >= _maxConcurrent) {
+      final waiter = Completer<void>();
+      _waiting.add(waiter);
+      await waiter.future;
+    }
+    _active++;
+    try {
+      return await send();
+    } finally {
+      _active--;
+      if (_waiting.isNotEmpty) _waiting.removeAt(0).complete();
+    }
+  }
+
+  /// Faqat ochiq ma'lumot keshlanadi. Kabinet va auth javoblari foydalanuvchiga bog'liq va
+  /// o'zgarishi bilanoq ko'rinishi kerak (e'lon o'chirilgach ro'yxat eskirib qolmasin).
+  static bool _isCacheable(String path) =>
+      !path.startsWith('/market/cabinet') &&
+      !path.startsWith('/market/auth') &&
+      !path.startsWith('/market/ai');
+
+  Response<T> _cachedResponse<T>(String path, Map<String, dynamic>? query, CachedResponse hit) =>
+      Response<T>(
+        requestOptions: RequestOptions(path: path, queryParameters: query, baseUrl: baseUrl),
+        statusCode: 200,
+        data: hit.body as T,
+      );
+
+  /// [refresh] — keshni chetlab o'tish (masalan "tortib yangilash").
+  Future<Response<T>> get<T>(
+    String path, {
+    Map<String, dynamic>? query,
+    bool refresh = false,
+  }) async {
+    if (!_isCacheable(path)) {
+      return _gated(() => _dio.get<T>(path, queryParameters: query));
+    }
+
+    final key = ResponseCache.keyFor(path, query);
+    final cached = refresh ? null : await ResponseCache.instance.read(key);
+
+    if (cached != null && cached.age < _keepFor) {
+      // Eskirgan bo'lsa ham darrov ko'rsatiladi, yangisi fonda olinadi.
+      if (cached.age >= _freshFor) unawaited(_revalidate(path, query, key));
+      return _cachedResponse<T>(path, query, cached);
+    }
+
+    try {
+      final res = await _gated(() => _dio.get<T>(path, queryParameters: query));
+      if (res.statusCode == 200) {
+        unawaited(ResponseCache.instance.write(key, res.data, at: DateTime.now()));
+      }
+      return res;
+    } on DioException {
+      // Tarmoq yo'q yoki server javob bermayapti — eski nusxa bo'sh ekrandan yaxshiroq.
+      final fallback = cached ?? await ResponseCache.instance.read(key);
+      if (fallback != null) return _cachedResponse<T>(path, query, fallback);
+      rethrow;
+    }
+  }
+
+  Future<void> _revalidate(String path, Map<String, dynamic>? query, String key) async {
+    if (!_revalidating.add(key)) return;
+    try {
+      final res = await _gated(() => _dio.get<dynamic>(path, queryParameters: query));
+      if (res.statusCode == 200) {
+        await ResponseCache.instance.write(key, res.data, at: DateTime.now());
+      }
+    } catch (_) {
+      // Fon yangilanishi jimgina yiqiladi — ekranda eski ma'lumot qolaveradi.
+    } finally {
+      _revalidating.remove(key);
+    }
+  }
 
   /// [headers] carries the per-request extras the API expects, such as the AI assistant's
   /// `X-Anon-Key` for signed-out visitors.
-  Future<Response<T>> post<T>(String path, {Object? data, Map<String, String>? headers}) =>
-      _dio.post<T>(
-        path,
-        data: data,
-        options: Options(headers: headers),
-      );
+  Future<Response<T>> post<T>(String path, {Object? data, Map<String, String>? headers}) => _gated(
+    () => _dio.post<T>(
+      path,
+      data: data,
+      options: Options(headers: headers),
+    ),
+  );
 
-  Future<Response<T>> put<T>(String path, {Object? data}) => _dio.put<T>(path, data: data);
+  Future<Response<T>> put<T>(String path, {Object? data}) =>
+      _gated(() => _dio.put<T>(path, data: data));
 
-  Future<Response<T>> delete<T>(String path) => _dio.delete<T>(path);
+  /// [data] — ba'zi endpointlar o'chirish uchun tanada qiymat kutadi (portfolio rasmi).
+  Future<Response<T>> delete<T>(String path, {Object? data}) =>
+      _gated(() => _dio.delete<T>(path, data: data));
 }

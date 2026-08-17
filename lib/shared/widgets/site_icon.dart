@@ -91,6 +91,49 @@ abstract final class SiteIcons {
   static const chevronLeft = SiteIconData(['m15 18-6-6 6-6']);
   static const chevronDown = SiteIconData(['m6 9 6 6 6-6']);
   static const check = SiteIconData(['M20 6 9 17l-5-5']);
+  // ── login / register ──────────────────────────────────────────────────────
+  /// Logotip kvadrati ichidagi uycha — `login.component.ts` dagi aynan shu chizma.
+  static const logoHouse = SiteIconData([
+    'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z',
+    'M9 22V12h6v10',
+  ]);
+
+  static const eye = SiteIconData([
+    'M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z',
+    'M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0',
+  ]);
+
+  static const eyeOff = SiteIconData([
+    'M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94',
+    'M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19',
+    'M14.12 14.12a3 3 0 1 1-4.24-4.24',
+    'M1 1L23 23',
+  ]);
+
+  /// Xato satridagi nishoncha.
+  static const xCircle = SiteIconData([
+    'M12 12m-10 0a10 10 0 1 0 20 0a10 10 0 1 0 -20 0',
+    'M15 9L9 15',
+    'M9 9L15 15',
+  ]);
+
+  static const appleMark = SiteIconData([
+    'M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z',
+  ], filled: true);
+
+  static const facebookMark = SiteIconData([
+    'M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z',
+  ], filled: true);
+
+  /// Loyiha kartasidagi tahrirlash va o'chirish tugmalari.
+  static const edit = SiteIconData(['M12 20h9', 'M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z']);
+
+  static const trash = SiteIconData(['M3 6h18', 'M19 6l-2 14H7L5 6']);
+
+  static const camera = SiteIconData([
+    'M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z',
+    'M12 13m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0',
+  ]);
   static const user = SiteIconData([
     'M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2',
     'M12 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0',
