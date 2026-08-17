@@ -219,6 +219,11 @@ birinchi yuklashda (hali hech qanday ma'lumot yo'q).
 
 ## Tuzoqlar
 
+- **`Stack` ichidagi `SiteHeader` ni `Positioned` bilan qo'y.** Joylashtirilmagan `Stack` bolasi
+  bo'sh cheklov oladi va butun maydonni egallab, ostidagi tarkibni yopib qo'yadi — sahifa oppoq
+  chiqadi, logda hech qanday xato bo'lmaydi.
+- **Shablon `<app-footer />` bilan tugaydimi — tekshir.** Bu allaqachon olti sahifada tushib
+  qolgan; `SiteFooterSection` qo'shilsin.
 - **Sayt vaqti-vaqti bilan javob bermaydi** (`curl` `000`, 2-3 daqiqa). Rasm yuklanmasa avval
   shuni tekshir, kodni ayblama.
 - **Windows MAX_PATH** — arxivni uzun yo'lga ochma, `%TEMP%\atmp` ga och.

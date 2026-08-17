@@ -11,6 +11,7 @@ import '../features/masters/masters_screen.dart';
 import '../features/secondary/secondary_detail_screen.dart';
 import '../features/secondary/listings_config.dart';
 import '../features/secondary/secondary_screen.dart';
+import '../features/my_home/my_home_screen.dart';
 import '../features/new_projects/new_projects_screen.dart';
 import '../shared/widgets/placeholder_screen.dart';
 
@@ -79,10 +80,7 @@ final appRouter = GoRouter(
       path: '/property/:id',
       builder: (_, _) => const PlaceholderScreen(title: 'Mulk'),
     ),
-    GoRoute(
-      path: '/my-home',
-      builder: (_, _) => const PlaceholderScreen(title: 'Mening uyim'),
-    ),
+    GoRoute(path: '/my-home', builder: (_, _) => const MyHomeScreen()),
 
     // ── Reels ─────────────────────────────────────────────────────────────────
     // `/reels/create` before `/reels/:id`, otherwise "create" is read as an id.
