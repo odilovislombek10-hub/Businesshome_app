@@ -331,6 +331,8 @@ class MyHomeItem {
   const MyHomeItem({
     this.label,
     this.unitType,
+    this.devCode,
+    this.contractId,
     this.contract,
     this.property,
     this.finance,
@@ -343,6 +345,10 @@ class MyHomeItem {
 
   final String? label;
   final String? unitType;
+
+  /// `_meta` dan — to'lov chaqiruvida `dev_code` va `contract_id` bo'lib ketadi.
+  final String? devCode;
+  final int? contractId;
   final MyHomeContract? contract;
   final MyHomeProperty? property;
   final MyHomeFinance? finance;
@@ -366,9 +372,12 @@ class MyHomeItem {
     Map<String, dynamic>? section(String key) =>
         json[key] is Map<String, dynamic> ? json[key] as Map<String, dynamic> : null;
 
+    final meta = section('_meta');
     return MyHomeItem(
       label: _text(json['label']),
       unitType: _text(json['unit_type']),
+      devCode: meta == null ? null : _text(meta['dev_code']),
+      contractId: (meta?['contract_id'] as num?)?.toInt(),
       contract: section('contract') == null ? null : MyHomeContract.fromJson(section('contract')!),
       property: section('property') == null ? null : MyHomeProperty.fromJson(section('property')!),
       finance: section('finance') == null ? null : MyHomeFinance.fromJson(section('finance')!),

@@ -13,6 +13,8 @@ import '../../shared/widgets/site_footer_section.dart';
 import '../../shared/widgets/site_header.dart';
 import '../../shared/widgets/site_icon.dart';
 import '../../shared/widgets/skeleton.dart';
+import '../payments/payment_sheet.dart';
+import '../payments/saved_cards.dart';
 import 'my_home_models.dart';
 import 'my_home_repository.dart';
 import 'my_home_texts.dart';
@@ -327,6 +329,8 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
       const SizedBox(height: 4),
       Text(MyHomeTexts.listSubtitle(items.length), style: _mutedStyle()),
       const SizedBox(height: 24), // mb-6
+      const SavedCardsSection(),
+      const SizedBox(height: 24),
       for (final (index, item) in items.indexed) ...[
         _listCard(item, index),
         const SizedBox(height: 20), // gap-5
@@ -492,6 +496,8 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
         const SizedBox(height: 4),
         Text(MyHomeTexts.subtitle, style: _mutedStyle()),
         const SizedBox(height: 24), // mb-6
+        const SavedCardsSection(),
+        const SizedBox(height: 24),
         if (item.property case final property?) ...[
           _propertySummary(property, item.construction),
           const SizedBox(height: 24),
@@ -1017,7 +1023,25 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
                 ],
               ),
               const SizedBox(height: 12),
-              _softBox(MyHomeTexts.remainingSum, _money(finance.remainingAmount), big: true),
+              Row(
+                children: [
+                  Expanded(
+                    child: _softBox(
+                      MyHomeTexts.remainingSum,
+                      _money(finance.remainingAmount),
+                      big: true,
+                    ),
+                  ),
+                  // Saytda ham to'lash tugmasi faqat qoldiq bo'lganda chiqadi.
+                  if (finance.remainingAmount > 0) ...[
+                    const SizedBox(width: 12),
+                    _button(
+                      MyHomeTexts.pay,
+                      onTap: () => _openPay(item, finance.nextPaymentAmount),
+                    ),
+                  ],
+                ],
+              ),
             ],
           ],
         ),
@@ -1122,6 +1146,14 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
           ),
         ],
       ),
+      if (finance.remainingAmount > 0) ...[
+        const SizedBox(height: 12),
+        _button(
+          MyHomeTexts.pay,
+          onTap: () => _openPay(item, finance.nextPaymentAmount),
+          fullWidth: true,
+        ),
+      ],
       const SizedBox(height: 24),
       if (item.schedule.isNotEmpty) ...[
         Row(
@@ -1562,6 +1594,23 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
   }
 
   // ── umumiy qismlar ─────────────────────────────────────────────────────────
+
+  /// Saytdagi `openPay()` — taklif qilinadigan summa keyingi to'lov miqdori.
+  Future<void> _openPay(MyHomeItem item, num suggested) async {
+    final paid = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => PaymentSheet(
+        amount: suggested,
+        outstanding: item.finance?.remainingAmount ?? 0,
+        devCode: item.devCode,
+        contractId: item.contractId,
+      ),
+    );
+    // To'lov o'tgan bo'lsa shartnoma ma'lumoti yangilanadi.
+    if (paid == true && mounted) setState(() => _future = _repo.load());
+  }
 
   Future<void> _open(String url) async {
     if (url.isEmpty) return;
