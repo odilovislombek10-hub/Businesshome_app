@@ -222,6 +222,20 @@ birinchi yuklashda (hali hech qanday ma'lumot yo'q).
 - **`Stack` ichidagi `SiteHeader` ni `Positioned` bilan qo'y.** Joylashtirilmagan `Stack` bolasi
   bo'sh cheklov oladi va butun maydonni egallab, ostidagi tarkibni yopib qo'yadi — sahifa oppoq
   chiqadi, logda hech qanday xato bo'lmaydi.
+- **9-qadamni alohida o'tkaz, yozayotganda "tekshirdim" deb o'ylama.** Yozish paytida tekshirgandek
+  tuyuladi, lekin alohida o'tkazilganda har safar 4-6 ta chetlanish chiqadi.
+- **Matnlarni ko'z bilan emas, dastur bilan solishtir** — `uz.ts` dan regex bilan olib, `...Texts`
+  dagi qiymat bilan `==` qilib. Saytning o'z xatolari (masalan `Yangiliklarга` dagi kirilcha "га")
+  ham aynan ko'chirilishi kerak.
+- **Bosilish effektini o'zingdan qo'shma.** Saytda `active:scale` bo'lmasa, `Pressable(scale:)` ham
+  bo'lmaydi. Rasmda `group-hover:scale-105` bo'lsa — `Pressable.builder` + `ZoomOnPress`.
+- **Zaxira rasm, oy nomlari, format funksiyalari modelda bormi — avval qara.** `NewsItem` da
+  `fallbackImage` va `dateLabel` allaqachon bor edi.
+- **Saytning o'zida ham xato bor.** `/privacy`, `/terms` va `/news/:id` shablonlarida hech qanday
+  `pt-*` yo'q, header esa `fixed` (mobilda `h-14` = 56px) — sarlavha uning ostida qolib ketadi.
+  Bunday joyda 1:1 emas, to'g'ri qilib, izohda **nega** chetlanganingni yoz.
+- **`pt-32` = 128, `pt-20` = 80** — bu qiymat qat'iy header (56) ustiga qo'shilgan bo'shliqni ham
+  o'z ichiga oladi. Ilovada ustiga holat paneli (`MediaQuery.paddingOf(context).top`) qo'shiladi.
 - **Shablon `<app-footer />` bilan tugaydimi — tekshir.** Bu allaqachon olti sahifada tushib
   qolgan; `SiteFooterSection` qo'shilsin.
 - **`position: sticky` uchun ro'yxat o'rtasida `SliverPersistentHeader(pinned: true)` ishlatma.**
