@@ -22,6 +22,10 @@ class CurrencyService extends ChangeNotifier {
   String get display => _display;
   String get symbol => _display == 'usd' ? '\$' : "so'm";
 
+  /// Joriy kurs. `/my-home` sahifasidagi valyuta almashtirgichi shundan foydalanadi; kurs hali
+  /// kelmagan bo'lsa saytdagi standart qiymat (12 500) ishlatiladi.
+  double get rate => _rate > 0 ? _rate : 12500;
+
   Future<void> load() async {
     final prefs = await SharedPreferences.getInstance();
     final stored = prefs.getString(_currencyKey);

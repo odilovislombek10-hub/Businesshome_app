@@ -360,12 +360,15 @@ class MyHomeItem {
 
   bool get isShop => unitType == 'magazin' || property?.isShop == true;
 
-  /// Ro'yxatdagi sarlavha — saytdagi `propertyLabel()`.
+  /// Ro'yxatdagi sarlavha — saytdagi `propertyLabel()`: `Kvartira T4/2` yoki `Mulk 1`.
   String labelFor(int index) {
     if (label != null && label!.isNotEmpty) return label!;
-    final number = property?.apartmentNumber ?? '';
-    if (number.isNotEmpty) return '№$number';
-    return '${index + 1}-mulk';
+    final number = property?.apartmentNumber.isNotEmpty == true
+        ? property!.apartmentNumber
+        : (contract?.number ?? '');
+    final kind = isShop ? "Do'kon" : 'Kvartira';
+    final title = '$kind $number'.trim();
+    return title.isEmpty ? 'Mulk ${index + 1}' : title;
   }
 
   factory MyHomeItem.fromJson(Map<String, dynamic> json) {

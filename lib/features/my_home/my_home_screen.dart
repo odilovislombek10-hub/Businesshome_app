@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../app/theme.dart';
 import '../../core/services/auth_service.dart';
+import '../../core/services/currency_service.dart';
+import '../../core/utils/file_download.dart';
 import '../../core/utils/format.dart';
 import '../../shared/widgets/app_image.dart';
 import '../../shared/widgets/entrance.dart';
@@ -41,7 +42,40 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
   /// Ro'yxatdan tanlangan mulk; bitta bo'lsa darrov ochiladi.
   int? _selected;
   String _tab = 'overview';
+
+  /// Saytdagi sahifa ichidagi valyuta almashtirgichi (`setCurrency`).
+  String _currency = 'uzs';
   bool _linkMode = false;
+
+  /// Bo'limlar paneli saytda `position: sticky`. Flutter'da qadalgan `SliverPersistentHeader`
+  /// buni uddalay olmaydi: viewport sliverlarni teskari tartibda chizadi, shuning uchun
+  /// panelning tepasidagi tarkib (investitsiya kartalari) uning ustiga chizilib qolardi.
+  /// Endi panel ro'yxat ichida o'z joyini egallaydi, tepaga yetganda esa ustiga nusxasi
+  /// qo'yiladi — CSS'dagi `sticky` bilan bir xil natija.
+  final _scrollController = ScrollController();
+  final _tabBarKey = GlobalKey();
+  final _scrollKey = GlobalKey();
+
+  /// Panelning ro'yxat boshidan hisoblangan o'rni; panel ekrandan chiqib ketganda ham
+  /// oxirgi o'lchov saqlanib qoladi.
+  double? _tabBarOffset;
+  bool _tabBarStuck = false;
+
+  /// Har bir siljishda panelning o'rni qayta o'lchanadi — tepadagi rasm yuklanib
+  /// balandlik o'zgarsa ham qadalish nuqtasi to'g'ri qoladi.
+  void _measureTabBar() {
+    final scrollBox = _scrollKey.currentContext?.findRenderObject() as RenderBox?;
+    if (scrollBox == null || !_scrollController.hasClients) return;
+    final tabBox = _tabBarKey.currentContext?.findRenderObject() as RenderBox?;
+    if (tabBox != null && tabBox.hasSize) {
+      final dy = tabBox.localToGlobal(Offset.zero, ancestor: scrollBox).dy;
+      _tabBarOffset = _scrollController.offset + dy;
+    }
+    final offset = _tabBarOffset;
+    if (offset == null) return;
+    final stuck = _scrollController.offset >= offset;
+    if (stuck != _tabBarStuck) setState(() => _tabBarStuck = stuck);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -475,44 +509,182 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
 
   Widget _detail(List<MyHomeItem> items, int index) {
     final item = items[index];
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        if (items.length > 1) ...[
-          GestureDetector(
-            onTap: () => setState(() => _selected = null),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const SiteIcon(SiteIcons.chevronLeft, size: 16),
-                const SizedBox(width: 8),
-                Text(MyHomeTexts.backToList, style: _mutedStyle()),
+    // Saytda bo'limlar paneli `sticky top-[72px]` — pastga surilganda tepada qolib turadi,
+    // shuning uchun `CustomScrollView` + qadalgan sarlavha ishlatiladi.
+    final scroll = CustomScrollView(
+      key: _scrollKey,
+      controller: _scrollController,
+      slivers: [
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+          sliver: SliverList.list(
+            children: [
+              if (items.length > 1) ...[
+                GestureDetector(
+                  onTap: () => setState(() => _selected = null),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const SiteIcon(SiteIcons.chevronLeft, size: 16),
+                      const SizedBox(width: 8),
+                      Text(MyHomeTexts.backToList, style: _mutedStyle()),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16), // mb-4
               ],
+              Text(MyHomeTexts.title, style: _displayStyle(24)),
+              const SizedBox(height: 4),
+              Text(MyHomeTexts.subtitle, style: _mutedStyle()),
+              const SizedBox(height: 12),
+              _currencyToggle(),
+              const SizedBox(height: 24), // mb-6
+              const SavedCardsSection(),
+              const SizedBox(height: 24),
+              if (items.length > 1) ...[
+                _propertyChips(items, index),
+                const SizedBox(height: 24), // mb-6
+              ],
+              if (item.property case final property?) ...[
+                _propertySummary(property, item.construction),
+                const SizedBox(height: 24),
+              ],
+              if (item.finance case final finance?) ...[
+                _contractStatusCard(item, finance),
+                const SizedBox(height: 24),
+                _investmentCards(finance),
+                const SizedBox(height: 24),
+              ],
+            ],
+          ),
+        ),
+        SliverToBoxAdapter(
+          child: KeyedSubtree(key: _tabBarKey, child: _tabBarBar()),
+        ),
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+          sliver: SliverList.list(children: _tabContent(item)),
+        ),
+        const SliverToBoxAdapter(child: SizedBox(height: 64)), // pb-16
+        const SliverToBoxAdapter(child: SiteFooterSection()),
+      ],
+    );
+
+    return NotificationListener<ScrollNotification>(
+      onNotification: (_) {
+        _measureTabBar();
+        return false;
+      },
+      child: Stack(
+        children: [
+          Positioned.fill(child: scroll),
+          if (_tabBarStuck) Positioned(top: 0, left: 0, right: 0, child: _tabBarBar()),
+        ],
+      ),
+    );
+  }
+
+  /// Panel va uning atrofidagi bo'shliq — ro'yxatdagi nusxa ham, tepadagisi ham shu.
+  Widget _tabBarBar() => ColoredBox(
+    // Ostidagi tarkib panel orqasidan ko'rinmasligi uchun fon to'ldiriladi.
+    color: AppColors.surfaceAltLight,
+    child: Padding(padding: const EdgeInsets.fromLTRB(16, 8, 16, 8), child: _tabBar()),
+  );
+
+  /// Valyuta almashtirgich — saytdagi sarlavha o'ngidagi tugmachalar.
+  Widget _currencyToggle() {
+    final theme = Theme.of(context);
+    Widget option(String value, String label) {
+      final active = _currency == value;
+      return Pressable(
+        onTap: () => setState(() => _currency = value),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), // px-3 py-1.5
+          decoration: BoxDecoration(
+            color: active ? AppColors.olive : Colors.transparent,
+            borderRadius: BorderRadius.circular(AppRadius.sm),
+          ),
+          child: Text(
+            label,
+            style: theme.textTheme.labelSmall?.copyWith(
+              fontSize: 12, // text-xs
+              fontWeight: FontWeight.w700,
+              color: active ? Colors.white : AppColors.dark.withValues(alpha: 0.6),
             ),
           ),
-          const SizedBox(height: 16), // mb-4
-        ],
-        Text(MyHomeTexts.title, style: _displayStyle(24)),
-        const SizedBox(height: 4),
-        Text(MyHomeTexts.subtitle, style: _mutedStyle()),
-        const SizedBox(height: 24), // mb-6
-        const SavedCardsSection(),
-        const SizedBox(height: 24),
-        if (item.property case final property?) ...[
-          _propertySummary(property, item.construction),
-          const SizedBox(height: 24),
-        ],
-        if (item.finance case final finance?) ...[
-          _contractStatusCard(item, finance),
-          const SizedBox(height: 24),
-          _investmentCards(finance),
-          const SizedBox(height: 24),
-        ],
-        _tabBar(),
-        const SizedBox(height: 24),
-        ..._tabContent(item),
-        const SizedBox(height: 64), // pb-16
-        const SiteFooterSection(),
+        ),
+      );
+    }
+
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Container(
+        padding: const EdgeInsets.all(2), // p-0.5
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(AppRadius.md),
+          border: Border.all(color: AppColors.borderLight),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [option('uzs', MyHomeTexts.soum), option('usd', r'$')],
+        ),
+      ),
+    );
+  }
+
+  /// Bir nechta mulk bo'lsa tez almashtirish chiplari — saytdagi `selectProperty`.
+  Widget _propertyChips(List<MyHomeItem> items, int selected) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          MyHomeTexts.myProperties(items.length).toUpperCase(),
+          style: theme.textTheme.labelSmall?.copyWith(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.3,
+            color: AppColors.dark.withValues(alpha: 0.5),
+          ),
+        ),
+        const SizedBox(height: 8), // mb-2
+        Wrap(
+          spacing: 8, // gap-2
+          runSpacing: 8,
+          children: [
+            for (final (index, item) in items.indexed)
+              Pressable(
+                onTap: () => setState(() => _selected = index),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: index == selected ? AppColors.olive : Colors.white,
+                    borderRadius: BorderRadius.circular(AppRadius.md),
+                    border: Border.all(
+                      color: index == selected ? AppColors.olive : AppColors.borderLight,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(item.isShop ? '\u{1F3EA}' : '\u{1F3E0}'),
+                      const SizedBox(width: 8), // gap-2
+                      Text(
+                        item.labelFor(index),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w500,
+                          color: index == selected
+                              ? Colors.white
+                              : AppColors.dark.withValues(alpha: 0.7),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          ],
+        ),
       ],
     );
   }
@@ -835,16 +1007,41 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
     );
   }
 
-  Widget _statCard(String label, String value, String hint, {_Tone tone = _Tone.neutral}) {
+  /// Saytda uch joyda uchraydi va o'lchamlari har xil: umumiy ko'rinishda `p-5 text-xl` va fon
+  /// yarim shaffof (`bg-emerald-50/50`), to'lovlarda `p-4 text-lg` va fon to'liq, bozor
+  /// tahlilida esa kartalar bitta ustunda (`grid-cols-1`). Shuning uchun farqlar parametr.
+  Widget _statCard(
+    String label,
+    String value,
+    String hint, {
+    _Tone tone = _Tone.neutral,
+    double padding = 20, // p-5
+    double valueSize = 20, // text-xl
+    double hintSize = 12, // text-xs
+    bool solid = false,
+    bool fullWidth = false,
+    Widget? trailing,
+  }) {
     final theme = Theme.of(context);
     final (background, border, text) = switch (tone) {
-      _Tone.positive => (const Color(0x80ECFDF5), const Color(0xFFD1FAE5), const Color(0xFF047857)),
+      _Tone.positive => (
+        solid ? const Color(0xFFECFDF5) : const Color(0x80ECFDF5),
+        const Color(0xFFD1FAE5),
+        const Color(0xFF047857),
+      ),
       _Tone.negative => (const Color(0x80FFF1F2), const Color(0xFFFECDD3), const Color(0xFFBE123C)),
+      _Tone.warning => (
+        const Color(0xFFFFFBEB), // bg-amber-50
+        const Color(0xFFFEF3C7), // border-amber-100
+        const Color(0xFFB45309), // text-amber-700
+      ),
       _Tone.neutral => (Colors.white, AppColors.borderLight, AppColors.dark),
     };
     return Container(
-      width: (MediaQuery.sizeOf(context).width - 32 - 12) / 2, // grid-cols-2 gap-3
-      padding: const EdgeInsets.all(20), // p-5
+      width: fullWidth
+          ? double.infinity
+          : (MediaQuery.sizeOf(context).width - 32 - 12) / 2, // grid-cols-2 gap-3
+      padding: EdgeInsets.all(padding),
       decoration: BoxDecoration(
         color: background,
         borderRadius: BorderRadius.circular(AppRadius.lg),
@@ -862,26 +1059,29 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
             ),
           ),
           if (value.isNotEmpty) ...[
-            const SizedBox(height: 8), // mt-2
+            const SizedBox(height: 4), // mt-1
             Text(
               value,
               style: theme.textTheme.titleLarge?.copyWith(
-                fontSize: 20, // text-xl
+                fontSize: valueSize,
                 fontWeight: FontWeight.w700,
                 color: text,
               ),
             ),
           ],
-          const SizedBox(height: 4), // mt-1
-          Text(
-            hint,
-            style: theme.textTheme.labelSmall?.copyWith(
-              fontSize: 12,
-              color: tone == _Tone.neutral
-                  ? AppColors.dark.withValues(alpha: 0.4)
-                  : text.withValues(alpha: 0.7),
+          if (hint.isNotEmpty) ...[
+            const SizedBox(height: 2), // mt-0.5
+            Text(
+              hint,
+              style: theme.textTheme.labelSmall?.copyWith(
+                fontSize: hintSize,
+                color: tone == _Tone.neutral
+                    ? AppColors.dark.withValues(alpha: 0.4)
+                    : text.withValues(alpha: 0.7),
+              ),
             ),
-          ),
+          ],
+          if (trailing != null) ...[const SizedBox(height: 8), trailing], // mt-2
         ],
       ),
     );
@@ -1108,15 +1308,79 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
               _row(MyHomeTexts.lateTerms, contract.latePaymentTerms),
             if (contract.additionalNotes.isNotEmpty)
               _row(MyHomeTexts.notes, contract.additionalNotes),
-            if (contract.pdfUrl case final pdf? when pdf.isNotEmpty) ...[
-              const SizedBox(height: 16),
-              _button(MyHomeTexts.openPdf, onTap: () => _open(pdf), fullWidth: true),
-            ],
           ],
         ),
       ),
+      if (contract.pdfUrl case final pdf? when pdf.isNotEmpty) ...[
+        const SizedBox(height: 16),
+        _contractPdfCard(pdf),
+      ],
     ];
   }
+
+  /// Saytdagi "Shartnoma PDF" kartasi — qizil hujjat belgisi va ikki tugma.
+  Widget _contractPdfCard(String pdf) {
+    return _card(
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 48, // w-12 h-12
+                height: 48,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFEF2F2), // bg-red-50
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                ),
+                child: const Center(
+                  child: SiteIcon(SiteIcons.document, size: 24, color: Color(0xFFDC2626)),
+                ),
+              ),
+              const SizedBox(width: 12), // gap-3
+              Text(MyHomeTexts.contractPdf, style: _titleStyle(14)),
+            ],
+          ),
+          const SizedBox(height: 16), // mb-4
+          _button(
+            MyHomeTexts.view,
+            onTap: () => _download(pdf, 'Shartnoma.pdf'),
+            fullWidth: true,
+            dark: true,
+            compact: true,
+          ),
+          const SizedBox(height: 8), // space-y-2
+          _button(
+            MyHomeTexts.download,
+            onTap: () => _download(pdf, 'Shartnoma.pdf', save: true),
+            fullWidth: true,
+            outlined: true,
+            compact: true,
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Grafik qatoridagi kichik "To'lash" tugmasi (`px-3 py-1.5 text-xs font-semibold`).
+  Widget _payChip({VoidCallback? onTap}) => Pressable(
+    onTap: onTap,
+    child: Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: AppColors.olive,
+        borderRadius: BorderRadius.circular(AppRadius.sm),
+      ),
+      child: Text(
+        MyHomeTexts.pay,
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: Colors.white,
+        ),
+      ),
+    ),
+  );
 
   // ── 3. To'lov grafigi ──────────────────────────────────────────────────────
 
@@ -1131,30 +1395,48 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
         spacing: 12,
         runSpacing: 12,
         children: [
-          _statCard(MyHomeTexts.totalLabel, _money(finance.totalPrice), ''),
+          _statCard(
+            MyHomeTexts.totalLabel,
+            _money(finance.totalPrice),
+            '',
+            padding: 16,
+            valueSize: 18,
+          ),
           _statCard(
             MyHomeTexts.paidWithPercent(finance.paidPercent),
             _money(finance.paidAmount),
             '',
             tone: _Tone.positive,
+            solid: true,
+            padding: 16,
+            valueSize: 18,
           ),
-          _statCard(MyHomeTexts.remainingLabel, _money(finance.remainingAmount), ''),
+          _statCard(
+            MyHomeTexts.remainingLabel,
+            _money(finance.remainingAmount),
+            '',
+            padding: 16,
+            valueSize: 18,
+          ),
+          // Saytda "To'lash" tugmasi aynan shu kartaning ichida turadi, alohida emas.
           _statCard(
             MyHomeTexts.nextLabel,
             _money(finance.nextPaymentAmount),
             MyHomeTexts.date(finance.nextPaymentDate),
+            tone: _Tone.warning,
+            padding: 16,
+            valueSize: 18,
+            hintSize: 10, // text-[10px]
+            trailing: finance.remainingAmount > 0
+                ? SizedBox(
+                    width: double.infinity,
+                    child: _payChip(onTap: () => _openPay(item, finance.nextPaymentAmount)),
+                  )
+                : null,
           ),
         ],
       ),
-      if (finance.remainingAmount > 0) ...[
-        const SizedBox(height: 12),
-        _button(
-          MyHomeTexts.pay,
-          onTap: () => _openPay(item, finance.nextPaymentAmount),
-          fullWidth: true,
-        ),
-      ],
-      const SizedBox(height: 24),
+      const SizedBox(height: 16), // space-y-4
       if (item.schedule.isNotEmpty) ...[
         Row(
           children: [
@@ -1194,14 +1476,37 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
                     Text(
                       row.paidAmount > 0 ? _money(row.paidAmount) : '—',
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: row.status == 'paid'
-                            ? const Color(0xFF047857)
-                            : AppColors.dark.withValues(alpha: 0.5),
+                        fontSize: 14, // text-sm
+                        fontWeight: FontWeight.w700, // font-bold
+                        color: switch (row.status) {
+                          'paid' => const Color(0xFF059669), // text-emerald-600
+                          'partial' => AppColors.olive, // text-primary
+                          _ => AppColors.dark.withValues(alpha: 0.3), // text-dark/30
+                        },
                       ),
                     ),
-                    if (row.status == 'paid')
-                      const Text('✓', style: TextStyle(color: Color(0xFF10B981))),
+                    // Saytdagi mobil kartada to'lanmagan qatorda "To'lash", to'langanida esa
+                    // chek havolasi turadi — ikkalasi bir vaqtda ko'rinmaydi.
+                    if (row.status != 'paid')
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4), // mt-1
+                        child: _payChip(onTap: () => _openPay(item, row.amount - row.paidAmount)),
+                      )
+                    else if (row.receiptUrl case final receipt? when receipt.isNotEmpty)
+                      GestureDetector(
+                        onTap: () => _download(receipt, 'Kvitansiya-${row.date}.pdf', save: true),
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 4), // mt-1
+                          child: Text(
+                            MyHomeTexts.downloadReceipt,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.olive,
+                            ),
+                          ),
+                        ),
+                      ),
                   ],
                 ),
               ],
@@ -1235,27 +1540,48 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
                     ],
                   ),
                 ),
-                Builder(
-                  builder: (context) {
-                    final (label, foreground, background) = MyHomeTexts.paymentStatus(
-                      payment.status,
-                    );
-                    return Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: background,
-                        borderRadius: BorderRadius.circular(AppRadius.pill),
-                      ),
-                      child: Text(
-                        label,
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: foreground,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Builder(
+                      builder: (context) {
+                        final (label, foreground, background) = MyHomeTexts.paymentStatus(
+                          payment.status,
+                        );
+                        return Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: background,
+                            borderRadius: BorderRadius.circular(AppRadius.pill),
+                          ),
+                          child: Text(
+                            label,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: foreground,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    if (payment.receiptUrl case final receipt? when receipt.isNotEmpty)
+                      GestureDetector(
+                        onTap: () =>
+                            _download(receipt, 'Kvitansiya-${payment.date}.pdf', save: true),
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 4), // mt-1
+                          child: Text(
+                            MyHomeTexts.receipt,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.olive,
+                            ),
+                          ),
                         ),
                       ),
-                    );
-                  },
+                  ],
                 ),
               ],
             ),
@@ -1418,13 +1744,21 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
         spacing: 12,
         runSpacing: 12,
         children: [
-          _statCard(MyHomeTexts.yourPrice, _money(finance.totalPrice), ''),
-          _statCard(MyHomeTexts.currentPrice, _money(finance.currentMarketPrice), ''),
+          // Saytda bu bo'lim mobilda `grid-cols-1` — kartalar to'liq kenglikda, ustma-ust.
+          _statCard(MyHomeTexts.yourPrice, _money(finance.totalPrice), '', fullWidth: true),
+          _statCard(
+            MyHomeTexts.currentPrice,
+            _money(finance.currentMarketPrice),
+            '',
+            fullWidth: true,
+          ),
           _statCard(
             MyHomeTexts.potentialProfit,
             '+${_money(finance.growth)}',
             MyHomeTexts.percent(finance.growthPercent),
             tone: _Tone.positive,
+            solid: true,
+            fullWidth: true,
           ),
         ],
       ),
@@ -1571,7 +1905,7 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
                         ),
                       ),
                       GestureDetector(
-                        onTap: () => _open(doc.url),
+                        onTap: () => _download(doc.url, doc.name),
                         child: Text(
                           MyHomeTexts.download,
                           style: theme.textTheme.labelSmall?.copyWith(
@@ -1612,16 +1946,32 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
     if (paid == true && mounted) setState(() => _future = _repo.load());
   }
 
-  Future<void> _open(String url) async {
+  /// Chek, shartnoma va hujjatlar `Authorization` talab qiladi — shuning uchun oddiy havola
+  /// bilan ochilmaydi, `downloadAndOpen` orqali yuklab olinadi.
+  Future<void> _download(String url, String fileName, {bool save = false}) async {
     if (url.isEmpty) return;
-    await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.showSnackBar(const SnackBar(content: Text(MyHomeTexts.downloading)));
+    final ok = await downloadAndOpen(url, fileName, saveToDownloads: save);
+    if (!ok) {
+      messenger.showSnackBar(const SnackBar(content: Text(MyHomeTexts.downloadFailed)));
+    }
   }
 
-  String _money(num? value) => value == null ? '—' : formatNumber(value);
+  /// Saytdagi `fmtMoney` — so'mda `495 600 000 so'm`, dollarda `\$39,648`.
+  String _money(num? value) {
+    if (value == null) return '—';
+    if (_currency == 'usd') {
+      final usd = (value / CurrencyService.instance.rate).round();
+      return '\$${formatNumber(usd).replaceAll(' ', ',')}';
+    }
+    return '${formatNumber(value)} ${MyHomeTexts.soum}';
+  }
 
+  /// Saytda karta sarlavhalari `font-semibold` (600); `font-bold` faqat sahifa sarlavhasida.
   TextStyle? _titleStyle(double size) => Theme.of(context).textTheme.titleMedium?.copyWith(
     fontSize: size,
-    fontWeight: FontWeight.w700,
+    fontWeight: FontWeight.w600,
     color: AppColors.dark,
   );
 
@@ -1841,23 +2191,29 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
     VoidCallback? onTap,
     bool fullWidth = false,
     bool outlined = false,
+    bool dark = false,
+    // Shartnoma PDF kartasidagi tugmalar kichikroq: `px-3 py-2 rounded-lg font-medium`.
+    bool compact = false,
   }) {
     final theme = Theme.of(context);
     return Pressable(
       onTap: onTap,
       child: Container(
         width: fullWidth ? double.infinity : null,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        padding: compact
+            ? const EdgeInsets.symmetric(horizontal: 12, vertical: 8)
+            : const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: outlined ? Colors.white : AppColors.olive,
-          borderRadius: BorderRadius.circular(AppRadius.md),
+          color: outlined ? Colors.white : (dark ? AppColors.dark : AppColors.olive),
+          borderRadius: BorderRadius.circular(compact ? AppRadius.sm : AppRadius.md),
           border: outlined ? Border.all(color: AppColors.borderLight) : null,
         ),
         child: Text(
           label,
           style: theme.textTheme.bodyMedium?.copyWith(
-            fontWeight: FontWeight.w600,
+            fontSize: 14,
+            fontWeight: compact ? FontWeight.w500 : FontWeight.w600,
             color: outlined ? AppColors.dark : Colors.white,
           ),
         ),
@@ -1925,11 +2281,12 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
     _series.dispose();
     _number.dispose();
     _phone.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 }
 
-enum _Tone { neutral, positive, negative }
+enum _Tone { neutral, positive, negative, warning }
 
 /// Narx dinamikasi — oddiy chiziq va maydon.
 class _PricePainter extends CustomPainter {
@@ -1989,3 +2346,5 @@ class _PricePainter extends CustomPainter {
   @override
   bool shouldRepaint(_PricePainter old) => old.points != points;
 }
+
+/// Bo'limlar panelini tepada ushlab turadi — saytdagi `sticky top-[72px]`.

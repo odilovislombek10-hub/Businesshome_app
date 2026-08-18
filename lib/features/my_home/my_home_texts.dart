@@ -95,7 +95,10 @@ abstract final class MyHomeTexts {
   static String warrantyMonths(int months) => '$months oy';
   static const lateTerms = "Kechikish shartlari";
   static const notes = "Qo'shimcha";
-  static const openPdf = 'Shartnomani ochish';
+  static const contractPdf = 'Shartnoma PDF';
+  static const view = "Ko'rish";
+  static const downloading = 'Yuklanmoqda...';
+  static const downloadFailed = "Faylni yuklab bo'lmadi";
 
   // To'lov grafigi
   static const totalLabel = 'Umumiy';
@@ -107,6 +110,7 @@ abstract final class MyHomeTexts {
   static const noPayments = "To'lov ma'lumotlari yo'q";
   static const paymentHistory = "To'lov tarixi";
   static const receipt = 'Chek';
+  static const downloadReceipt = 'Chekni yuklash';
 
   /// `paymentStatusLabel` va rangi.
   static (String, Color, Color) paymentStatus(String status) => switch (status) {

@@ -224,6 +224,16 @@ birinchi yuklashda (hali hech qanday ma'lumot yo'q).
   chiqadi, logda hech qanday xato bo'lmaydi.
 - **Shablon `<app-footer />` bilan tugaydimi — tekshir.** Bu allaqachon olti sahifada tushib
   qolgan; `SiteFooterSection` qo'shilsin.
+- **`position: sticky` uchun ro'yxat o'rtasida `SliverPersistentHeader(pinned: true)` ishlatma.**
+  Viewport sliverlarni **teskari tartibda** chizadi — birinchi sliver eng ustida bo'ladi. Shuning
+  uchun qadalgan sarlavhaning **tepasidagi** tarkib uning ustiga chizilib, panel yarim ko'rinib
+  qoladi (`SliverAppBar` ishlaydi, chunki u birinchi sliver). Yechim: panelni ro'yxat ichida
+  oddiy `SliverToBoxAdapter` qilib qo'y, `ScrollController` bilan o'rnini o'lchab, tepaga
+  yetganda `Stack` ustiga nusxasini chiqar — CSS `sticky` bilan aynan bir xil.
+- **Fayl yuklab olish `launchUrl` bilan ishlamaydi**, agar sayt uni `responseType: 'blob'` orqali
+  olsa: bunday havolalar `Authorization` sarlavhasini talab qiladi. `ApiClient.downloadBytes` +
+  `downloadAndOpen` ishlat. Backend `/api/...` ko'rinishidagi nisbiy yo'l qaytaradi —
+  `ApiClient.resolveUrl` bilan to'liq URL yasa, aks holda `/api/api/...` chiqadi.
 - **Sayt vaqti-vaqti bilan javob bermaydi** (`curl` `000`, 2-3 daqiqa). Rasm yuklanmasa avval
   shuni tekshir, kodni ayblama.
 - **Windows MAX_PATH** — arxivni uzun yo'lga ochma, `%TEMP%\atmp` ga och.

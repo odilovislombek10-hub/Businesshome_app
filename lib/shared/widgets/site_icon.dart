@@ -22,6 +22,12 @@ abstract final class SiteIcons {
     'M12 22.08V12',
   ]);
 
+  /// PDF/hujjat fayli — "Shartnoma PDF" kartasida.
+  static const document = SiteIconData([
+    'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z',
+    'M14 2v6h6',
+  ]);
+
   static const star = SiteIconData([
     'M12 2l2.39 7.36H22l-6.18 4.49L18.21 21 12 16.51 5.79 21l2.39-7.15L2 9.36h7.61z',
   ], filled: true);

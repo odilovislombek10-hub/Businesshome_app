@@ -43,10 +43,83 @@ class ApiClient {
               }
               handler.next(options);
             },
+            onResponse: (response, handler) async {
+              // `validateStatus` 4xx ni xato deb hisoblamaydi, shuning uchun 401 shu yerda
+              // ushlanadi — saytdagi `authInterceptor` ham aynan shunday qiladi.
+              final retried = await _retryAfterRefresh(response.requestOptions, response);
+              if (retried != null) return handler.resolve(retried);
+              handler.next(response);
+            },
           ),
         );
 
   String? _cachedToken;
+
+  // ── token yangilash ────────────────────────────────────────────────────────
+
+  /// Access token bor-yo'g'i 15 daqiqa yashaydi (`MARKET_ACCESS_TOKEN_EXPIRE_MINUTES`), refresh
+  /// token esa 30 kun. Saytda 401 kelganda interceptor refresh orqali yangi token olib so'rovni
+  /// qayta yuboradi; usiz foydalanuvchi har 15 daqiqada tizimdan chiqib qolardi.
+  Future<Response<T>?> _retryAfterRefresh<T>(RequestOptions options, Response<T> failed) async {
+    if (failed.statusCode != 401) return null;
+    final path = options.path;
+    if (path.contains('/auth/refresh') ||
+        path.contains('/auth/login') ||
+        path.contains('/auth/register')) {
+      return null;
+    }
+    if (options.extra['bh_retried'] == true) return null;
+
+    final token = await _refreshAccessToken();
+    if (token == null) return null;
+
+    options.extra = {...options.extra, 'bh_retried': true};
+    options.headers['Authorization'] = 'Bearer $token';
+    try {
+      return await _dio.fetch<T>(options);
+    } on DioException {
+      return null;
+    }
+  }
+
+  /// Bir vaqtda bir nechta so'rov 401 olsa ham refresh faqat bir marta yuboriladi.
+  Future<String>? _refreshing;
+
+  Future<String?> _refreshAccessToken() async {
+    final inFlight = _refreshing;
+    if (inFlight != null) {
+      try {
+        return await inFlight;
+      } catch (_) {
+        return null;
+      }
+    }
+    final refresh = await readRefreshToken();
+    if (refresh == null || refresh.isEmpty) return null;
+
+    final future = _refreshing = () async {
+      final res = await _dio.post<dynamic>(
+        '/market/auth/refresh',
+        data: {'refresh_token': refresh},
+        options: Options(headers: {'Authorization': null}),
+      );
+      final data = res.data;
+      if (res.statusCode != 200 || data is! Map || data['token'] is! String) {
+        throw StateError('refresh failed');
+      }
+      final token = data['token'] as String;
+      await saveToken(token);
+      return token;
+    }();
+
+    try {
+      return await future;
+    } catch (_) {
+      return null;
+    } finally {
+      if (identical(_refreshing, future)) _refreshing = null;
+    }
+  }
 
   Future<String?> _readToken() async {
     if (_cachedToken != null) return _cachedToken;
@@ -181,6 +254,31 @@ class ApiClient {
 
   Future<Response<T>> put<T>(String path, {Object? data}) =>
       _gated(() => _dio.put<T>(path, data: data));
+
+  /// Backend fayl havolalarini `/api/...` ko'rinishida qaytaradi (`receipt_url`, `pdf_url`).
+  /// Dio bunday yo'lni [baseUrl] ga ulab yuborsa `/api/api/...` chiqadi — shuning uchun saytdagi
+  /// `resolveUrl` kabi domen qismini o'zimiz yasaymiz.
+  static String resolveUrl(String url) {
+    if (url.isEmpty || url.startsWith('http')) return url;
+    final origin = baseUrl.substring(0, baseUrl.length - '/api'.length);
+    return url.startsWith('/') ? '$origin$url' : '$origin/$url';
+  }
+
+  /// Himoyalangan faylni baytlar ko'rinishida oladi (chek, shartnoma PDF, hujjatlar).
+  ///
+  /// Bu fayllar `Authorization` sarlavhasini talab qiladi — shuning uchun ularni brauzerga
+  /// oddiy havola bilan berib bo'lmaydi, avval shu yerdan yuklab olinadi.
+  Future<List<int>> downloadBytes(String url) async {
+    final res = await _gated(
+      () =>
+          _dio.get<List<int>>(resolveUrl(url), options: Options(responseType: ResponseType.bytes)),
+    );
+    final data = res.data;
+    if (res.statusCode != 200 || data == null) {
+      throw DioException(requestOptions: res.requestOptions, response: res);
+    }
+    return data;
+  }
 
   /// [data] — ba'zi endpointlar o'chirish uchun tanada qiymat kutadi (portfolio rasmi).
   Future<Response<T>> delete<T>(String path, {Object? data}) =>
