@@ -35,10 +35,6 @@ class _NewsScreenState extends State<NewsScreen> {
   static const _heroImage =
       'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=1920&q=80';
 
-  /// Rasmi yo'q yangilik uchun zaxira — saytdagi bilan bir xil.
-  static const _fallbackImage =
-      'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80';
-
   @override
   void initState() {
     super.initState();
@@ -122,8 +118,8 @@ class _NewsScreenState extends State<NewsScreen> {
           ),
         ),
         Padding(
-          // `pt-32` — qat'iy header ostidan; `py-8` mobilda.
-          padding: EdgeInsets.fromLTRB(16, 96 + MediaQuery.paddingOf(context).top, 16, 32),
+          // `pt-32` = 128; ustiga holat paneli qo'shiladi, saytda u yo'q. `py-8` mobilda.
+          padding: EdgeInsets.fromLTRB(16, 128 + MediaQuery.paddingOf(context).top, 16, 32),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -295,16 +291,15 @@ class _NewsScreenState extends State<NewsScreen> {
 
   String _imageOf(NewsItem item) {
     final url = absoluteMediaUrl(item.image);
-    return (url == null || url.isEmpty) ? _fallbackImage : url;
+    return (url == null || url.isEmpty) ? NewsItem.fallbackImage : url;
   }
 
   /// Birinchi yangilik. Mobilda `grid-cols-1` — rasm tepada (`aspect-[16/10]`), matn ostida.
   Widget _featuredCard(NewsItem item) {
     final theme = Theme.of(context);
-    return Pressable(
-      scale: 0.99,
+    return Pressable.builder(
       onTap: () => context.go('/news/${item.id}'),
-      child: Container(
+      builder: (context, pressed) => Container(
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           color: Colors.white,
@@ -318,7 +313,11 @@ class _NewsScreenState extends State<NewsScreen> {
               children: [
                 AspectRatio(
                   aspectRatio: 16 / 10,
-                  child: AppImage(imageUrl: _imageOf(item), fit: BoxFit.cover),
+                  // `group-hover:scale-105`
+                  child: ZoomOnPress(
+                    pressed: pressed,
+                    child: AppImage(imageUrl: _imageOf(item), fit: BoxFit.cover),
+                  ),
                 ),
                 if (item.dateLabel.isNotEmpty)
                   Positioned(top: 16, left: 16, child: _dateBadge(item.dateLabel, size: 14)),
@@ -399,10 +398,9 @@ class _NewsScreenState extends State<NewsScreen> {
 
   Widget _card(NewsItem item) {
     final theme = Theme.of(context);
-    return Pressable(
-      scale: 0.99,
+    return Pressable.builder(
       onTap: () => context.go('/news/${item.id}'),
-      child: Container(
+      builder: (context, pressed) => Container(
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           color: Colors.white,
@@ -416,7 +414,11 @@ class _NewsScreenState extends State<NewsScreen> {
               children: [
                 AspectRatio(
                   aspectRatio: 4 / 3,
-                  child: AppImage(imageUrl: _imageOf(item), fit: BoxFit.cover),
+                  // `group-hover:scale-105`
+                  child: ZoomOnPress(
+                    pressed: pressed,
+                    child: AppImage(imageUrl: _imageOf(item), fit: BoxFit.cover),
+                  ),
                 ),
                 if (item.dateLabel.isNotEmpty)
                   Positioned(top: 12, left: 12, child: _dateBadge(item.dateLabel, size: 12)),

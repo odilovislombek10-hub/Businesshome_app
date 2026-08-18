@@ -268,6 +268,13 @@ abstract final class SiteIcons {
 
   static const arrowLeft = SiteIconData(['M19 12H5', 'm12 19-7-7 7-7']);
 
+  /// "Topilmadi" holatidagi undov belgisi (heroicons `exclamation-circle`).
+  static const alertCircle = SiteIconData([
+    'M12 9v3.75',
+    'M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z',
+    'M12 15.75h.008v.008H12v-.008Z',
+  ]);
+
   static const logout = SiteIconData([
     'M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4',
     'm16 17 5-5-5-5',

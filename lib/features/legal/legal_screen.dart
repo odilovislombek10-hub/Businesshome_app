@@ -76,8 +76,10 @@ class _LegalScreenState extends State<LegalScreen> {
                       ),
                       padding: EdgeInsets.fromLTRB(
                         16,
-                        // `container-custom py-12` + qat'iy header.
-                        96 + MediaQuery.paddingOf(context).top,
+                        // Saytda `py-12` (48) va boshqa hech nima — sarlavha qat'iy header
+                        // (56px) ostida qolib ketadi. Bu saytdagi kamchilik, shuning uchun
+                        // header balandligi qo'shildi.
+                        56 + 48 + MediaQuery.paddingOf(context).top,
                         16,
                         48,
                       ),

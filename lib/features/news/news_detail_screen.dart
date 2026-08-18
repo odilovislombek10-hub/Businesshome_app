@@ -118,11 +118,12 @@ class _NewsDetailScreenState extends State<NewsDetailScreen> {
               color: Color(0xFFF3F4F6), // bg-gray-100
               shape: BoxShape.circle,
             ),
-            child: Center(
+            child: const Center(
+              // `w-8 h-8 text-gray-400 stroke-width-1.5`
               child: SiteIcon(
-                SiteIcons.newspaper,
-                size: 40,
-                color: AppColors.dark.withValues(alpha: 0.2),
+                SiteIcons.alertCircle,
+                size: 32,
+                color: Color(0xFF9CA3AF),
                 strokeWidth: 1.5,
               ),
             ),
@@ -290,10 +291,9 @@ class _NewsDetailScreenState extends State<NewsDetailScreen> {
     final theme = Theme.of(context);
     final cover = absoluteMediaUrl(project.coverImage);
     final logo = absoluteMediaUrl(project.developerLogo);
-    return Pressable(
-      scale: 0.99,
+    return Pressable.builder(
       onTap: () => context.go('/${project.developerCode}/${project.slug}'),
-      child: Container(
+      builder: (context, pressed) => Container(
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           color: Colors.white,
@@ -306,7 +306,11 @@ class _NewsDetailScreenState extends State<NewsDetailScreen> {
               height: 160, // h-[160px]
               width: double.infinity,
               child: cover != null && cover.isNotEmpty
-                  ? AppImage(imageUrl: cover, fit: BoxFit.cover)
+                  // `group-hover:scale-105`
+                  ? ZoomOnPress(
+                      pressed: pressed,
+                      child: AppImage(imageUrl: cover, fit: BoxFit.cover),
+                    )
                   : ColoredBox(
                       color: const Color(0xFFF3F4F6), // bg-gray-100
                       child: Center(
