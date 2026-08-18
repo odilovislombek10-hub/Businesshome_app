@@ -11,7 +11,10 @@ import '../features/masters/masters_screen.dart';
 import '../features/secondary/secondary_detail_screen.dart';
 import '../features/secondary/listings_config.dart';
 import '../features/secondary/secondary_screen.dart';
+import '../features/legal/legal_screen.dart';
 import '../features/my_home/my_home_screen.dart';
+import '../features/news/news_detail_screen.dart';
+import '../features/news/news_screen.dart';
 import '../features/new_projects/new_projects_screen.dart';
 import '../shared/widgets/placeholder_screen.dart';
 
@@ -118,10 +121,8 @@ final appRouter = GoRouter(
     ),
 
     // ── Listings & specialists ────────────────────────────────────────────────
-    GoRoute(
-      path: '/ads',
-      builder: (_, _) => const PlaceholderScreen(title: "E'lonlar"),
-    ),
+    // Saytda `/ads` `redirectTo: 'secondary'` — alohida sahifasi yo'q.
+    GoRoute(path: '/ads', redirect: (_, _) => '/secondary'),
     GoRoute(
       path: '/ads/create',
       builder: (_, _) => const PlaceholderScreen(title: "E'lon yaratish"),
@@ -151,21 +152,20 @@ final appRouter = GoRouter(
     GoRoute(path: '/birja', builder: (_, _) => const BirjaScreen()),
 
     // ── Content ───────────────────────────────────────────────────────────────
-    GoRoute(
-      path: '/news',
-      builder: (_, _) => const PlaceholderScreen(title: 'Yangiliklar'),
-    ),
+    GoRoute(path: '/news', builder: (_, _) => const NewsScreen()),
     GoRoute(
       path: '/news/:id',
-      builder: (_, _) => const PlaceholderScreen(title: 'Yangilik'),
+      builder: (_, state) =>
+          NewsDetailScreen(id: int.tryParse(state.pathParameters['id'] ?? '') ?? 0),
     ),
+    // Ikkalasi ham bitta sahifa; farqi `slug` da.
     GoRoute(
       path: '/privacy',
-      builder: (_, _) => const PlaceholderScreen(title: 'Maxfiylik siyosati'),
+      builder: (_, _) => const LegalScreen(slug: 'privacy'),
     ),
     GoRoute(
       path: '/terms',
-      builder: (_, _) => const PlaceholderScreen(title: 'Foydalanish shartlari'),
+      builder: (_, _) => const LegalScreen(slug: 'terms'),
     ),
 
     // Vanity project URL — businesshome.uz/<quruvchi>/<loyiha>.

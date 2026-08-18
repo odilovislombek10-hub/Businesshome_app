@@ -75,6 +75,17 @@ abstract final class SiteIcons {
 
   static const arrowRight = SiteIconData(['M5 12h14', 'm12 5 7 7-7 7']);
 
+  /// Yangiliklar bo'sh holatidagi gazeta belgisi (heroicons `newspaper`).
+  static const newspaper = SiteIconData([
+    'M12 7.5h1.5',
+    'M12 10.5h1.5',
+    'M4.5 13.5h7.5',
+    'M4.5 16.5h7.5',
+    'M15 7.5h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25',
+    'M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25',
+    'M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5',
+  ]);
+
   // ── header / navigation ───────────────────────────────────────────────────
   static const search = SiteIconData([
     'M11 11m-8 0a8 8 0 1 0 16 0a8 8 0 1 0 -16 0',
