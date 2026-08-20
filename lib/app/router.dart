@@ -17,6 +17,7 @@ import '../features/map_search/map_search_screen.dart';
 import '../features/my_home/my_home_screen.dart';
 import '../features/news/news_detail_screen.dart';
 import '../features/news/news_screen.dart';
+import '../features/rent/rent_detail_screen.dart';
 import '../features/new_projects/new_projects_screen.dart';
 import '../shared/widgets/placeholder_screen.dart';
 
@@ -59,7 +60,8 @@ final appRouter = GoRouter(
     ),
     GoRoute(
       path: '/property/rent/:id',
-      builder: (_, _) => const PlaceholderScreen(title: 'Ijara mulk'),
+      builder: (_, state) =>
+          RentDetailScreen(id: int.tryParse(state.pathParameters['id'] ?? '') ?? 0),
     ),
     GoRoute(
       path: '/secondary',

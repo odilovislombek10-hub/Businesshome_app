@@ -243,6 +243,17 @@ abstract final class SiteIcons {
     'm21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21',
   ]);
 
+  /// Ijara shartlaridagi "Minimal muddat" belgisi (lucide `calendar`).
+  static const calendar = SiteIconData([
+    'M8 2v4',
+    'M16 2v4',
+    'M3 10h18',
+    'M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z',
+  ]);
+
+  /// "Kommunal to'lovlar" belgisi (lucide `zap`).
+  static const zap = SiteIconData(['M4 14h7l-1 8 10-12h-7l1-8z']);
+
   static const wallet = SiteIconData([
     'M21 12V7H5a2 2 0 0 1 0-4h14v4',
     'M3 5v14a2 2 0 0 0 2 2h16v-5',
