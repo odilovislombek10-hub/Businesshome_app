@@ -17,6 +17,7 @@ import '../features/map_search/map_search_screen.dart';
 import '../features/my_home/my_home_screen.dart';
 import '../features/news/news_detail_screen.dart';
 import '../features/news/news_screen.dart';
+import '../features/project_detail/project_detail_screen.dart';
 import '../features/rent/rent_detail_screen.dart';
 import '../features/new_projects/new_projects_screen.dart';
 import '../shared/widgets/placeholder_screen.dart';
@@ -79,7 +80,8 @@ final appRouter = GoRouter(
     GoRoute(path: '/new-projects', builder: (_, _) => const NewProjectsScreen()),
     GoRoute(
       path: '/property/:id',
-      builder: (_, _) => const PlaceholderScreen(title: 'Mulk'),
+      builder: (_, state) =>
+          ProjectDetailScreen(id: int.tryParse(state.pathParameters['id'] ?? '')),
     ),
     GoRoute(path: '/my-home', builder: (_, _) => const MyHomeScreen()),
 
@@ -169,9 +171,9 @@ final appRouter = GoRouter(
     // Vanity project URL — businesshome.uz/<quruvchi>/<loyiha>.
     GoRoute(
       path: '/:developerCode/:projectCode',
-      builder: (_, state) => PlaceholderScreen(
-        title: state.pathParameters['projectCode'] ?? 'Loyiha',
-        note: 'Quruvchi: ${state.pathParameters['developerCode']}',
+      builder: (_, state) => ProjectDetailScreen(
+        developerCode: state.pathParameters['developerCode'],
+        projectCode: state.pathParameters['projectCode'],
       ),
     ),
   ],
