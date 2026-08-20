@@ -15,6 +15,7 @@ import '../../shared/widgets/entrance.dart';
 import '../../shared/widgets/site_footer_section.dart';
 import '../../shared/widgets/site_header.dart';
 import '../../shared/widgets/site_icon.dart';
+import '../../shared/widgets/yandex_map.dart';
 import 'create_listing_data.dart';
 import 'create_listing_draft.dart';
 import 'create_listing_form.dart';
@@ -1165,10 +1166,80 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
         onChanged: (value) => _form.address = value,
       ),
       const SizedBox(height: 20),
-      // Xarita hozircha yo'q — saytdagi izoh matni qoldirildi.
-      _label(CreateListingTexts.mapLocation),
-      const SizedBox(height: 2),
-      _hint(CreateListingTexts.mapLocationHint),
+      Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _label(CreateListingTexts.mapLocation),
+                const SizedBox(height: 2), // mt-0.5
+                _hint(CreateListingTexts.mapLocationHint),
+              ],
+            ),
+          ),
+          if (_form.locationLat != null && _form.locationLng != null)
+            GestureDetector(
+              onTap: () => setState(() {
+                _form.locationLat = null;
+                _form.locationLng = null;
+              }),
+              child: Text(
+                CreateListingTexts.clearLocation,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: const Color(0xFFEF4444), // text-red-500
+                ),
+              ),
+            ),
+        ],
+      ),
+      const SizedBox(height: 12), // mb-3
+      ClipRRect(
+        borderRadius: BorderRadius.circular(AppRadius.lg), // rounded-2xl
+        child: Container(
+          height: 360, // h-[360px]
+          decoration: BoxDecoration(border: Border.all(color: AppColors.borderLight)),
+          child: YandexMapView(
+            pickMode: true,
+            pickedLat: _form.locationLat,
+            pickedLng: _form.locationLng,
+            onPicked: (lat, lng) => setState(() {
+              _form.locationLat = lat;
+              _form.locationLng = lng;
+            }),
+          ),
+        ),
+      ),
+      const SizedBox(height: 8), // mt-2
+      if (_form.locationLat case final lat? when _form.locationLng != null)
+        Row(
+          children: [
+            const SiteIcon(SiteIcons.check, size: 14, color: Color(0xFF059669)),
+            const SizedBox(width: 8), // gap-2
+            Text(
+              CreateListingTexts.locationSelected,
+              style: theme.textTheme.labelSmall?.copyWith(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: const Color(0xFF059669), // text-emerald-600
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              // Saytda `toFixed(5)`.
+              '${lat.toStringAsFixed(5)}, ${_form.locationLng!.toStringAsFixed(5)}',
+              style: theme.textTheme.labelSmall?.copyWith(
+                fontSize: 12,
+                color: AppColors.dark.withValues(alpha: 0.5),
+              ),
+            ),
+          ],
+        )
+      else
+        _hint(CreateListingTexts.clickMapToSelect),
     ];
   }
 
