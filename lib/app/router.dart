@@ -13,6 +13,7 @@ import '../features/secondary/listings_config.dart';
 import '../features/secondary/secondary_screen.dart';
 import '../features/create_listing/create_listing_screen.dart';
 import '../features/legal/legal_screen.dart';
+import '../features/map_search/map_search_screen.dart';
 import '../features/my_home/my_home_screen.dart';
 import '../features/news/news_detail_screen.dart';
 import '../features/news/news_screen.dart';
@@ -47,13 +48,7 @@ final appRouter = GoRouter(
     ),
 
     // ── Property catalogue ────────────────────────────────────────────────────
-    GoRoute(
-      path: '/map',
-      builder: (_, _) => const PlaceholderScreen(
-        title: 'Xaritada qidirish',
-        note: 'Saytdagi Leaflet xaritasi — mulklarni xarita ustidan qidirish.',
-      ),
-    ),
+    GoRoute(path: '/map', builder: (_, _) => const MapSearchScreen()),
     GoRoute(
       path: '/rent',
       builder: (_, state) => SecondaryScreen(
