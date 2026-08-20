@@ -19,6 +19,7 @@ import '../features/news/news_detail_screen.dart';
 import '../features/news/news_screen.dart';
 import '../features/project_detail/project_detail_screen.dart';
 import '../features/rent/rent_detail_screen.dart';
+import '../features/specialist_detail/specialist_detail_screen.dart';
 import '../features/new_projects/new_projects_screen.dart';
 import '../shared/widgets/placeholder_screen.dart';
 
@@ -138,12 +139,18 @@ final appRouter = GoRouter(
     GoRoute(path: '/designers', builder: (_, _) => const DesignersScreen()),
     GoRoute(
       path: '/designers/:id',
-      builder: (_, _) => const PlaceholderScreen(title: 'Dizayner'),
+      builder: (_, state) => SpecialistDetailScreen(
+        id: int.tryParse(state.pathParameters['id'] ?? '') ?? 0,
+        kind: SpecialistKind.designer,
+      ),
     ),
     GoRoute(path: '/masters', builder: (_, _) => const MastersScreen()),
     GoRoute(
       path: '/masters/:id',
-      builder: (_, _) => const PlaceholderScreen(title: 'Usta'),
+      builder: (_, state) => SpecialistDetailScreen(
+        id: int.tryParse(state.pathParameters['id'] ?? '') ?? 0,
+        kind: SpecialistKind.master,
+      ),
     ),
     GoRoute(
       path: '/specialists/create',
