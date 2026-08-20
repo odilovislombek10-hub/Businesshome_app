@@ -34,6 +34,9 @@ abstract final class CreateListingTexts {
   /// `createListing.areaSection.total`
   static const areaSectionTotal = 'Umumiy maydon';
 
+  /// `createListing.bathLayout.label`
+  static const bathLayoutLabel = 'Sanuzel';
+
   /// `createListing.bathroomCount`
   static const bathroomCount = 'Sanuzellar soni';
 
@@ -51,6 +54,9 @@ abstract final class CreateListingTexts {
 
   /// `createListing.cancel`
   static const cancel = 'Bekor qilish';
+
+  /// `createListing.ceiling.label`
+  static const ceilingLabel = 'Shipi';
 
   /// `createListing.city`
   static const city = 'Shahar';
@@ -79,6 +85,9 @@ abstract final class CreateListingTexts {
   /// `createListing.descriptionPlaceholder`
   static const descriptionPlaceholder = "Mulk haqida batafsil ma'lumot yozing";
 
+  /// `createListing.designStyle.label`
+  static const designStyleLabel = 'Dizayn uslubi';
+
   /// `createListing.district`
   static const district = 'Tuman';
 
@@ -102,6 +111,9 @@ abstract final class CreateListingTexts {
 
   /// `createListing.floor`
   static const floor = 'Qavat';
+
+  /// `createListing.floorMat.label`
+  static const floorMatLabel = 'Pol qoplamasi';
 
   /// `createListing.floorPlaceholder`
   static const floorPlaceholder = 'Qavatni kiriting';
@@ -142,6 +154,9 @@ abstract final class CreateListingTexts {
   /// `createListing.hasVremenkaHint`
   static const hasVremenkaHint = "Hovlida qo'shimcha kichik bino (vremenka) bormi";
 
+  /// `createListing.heating.label`
+  static const heatingLabel = 'Isitish';
+
   /// `createListing.houseFloors`
   static const houseFloors = 'Uy qavatlari soni';
 
@@ -150,6 +165,9 @@ abstract final class CreateListingTexts {
 
   /// `createListing.houseFloorsPlaceholder`
   static const houseFloorsPlaceholder = 'Masalan: 2';
+
+  /// `createListing.kitchen.label`
+  static const kitchenLabel = 'Oshxona';
 
   /// `createListing.landArea`
   static const landArea = 'Yer maydoni';
@@ -329,6 +347,12 @@ abstract final class CreateListingTexts {
 
   /// `createListing.vremenkaRooms`
   static const vremenkaRooms = 'Vremenkada xonalar soni';
+
+  /// `createListing.wallFin.label`
+  static const wallFinLabel = 'Devor bezagi';
+
+  /// `createListing.window.label`
+  static const windowLabel = 'Deraza';
 
   /// `createListing.yourLocation`
   static const yourLocation = 'Sizning lokatsiyangiz';

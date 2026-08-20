@@ -107,6 +107,8 @@ abstract final class SiteIcons {
   static const chevronRight = SiteIconData(['m9 18 6-6-6-6']);
   static const chevronLeft = SiteIconData(['m15 18-6-6 6-6']);
   static const chevronDown = SiteIconData(['m6 9 6 6 6-6']);
+
+  static const chevronUp = SiteIconData(['m18 15-6-6-6 6']);
   static const check = SiteIconData(['M20 6 9 17l-5-5']);
   // ── login / register ──────────────────────────────────────────────────────
   /// Logotip kvadrati ichidagi uycha — `login.component.ts` dagi aynan shu chizma.

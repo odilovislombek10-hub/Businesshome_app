@@ -172,6 +172,114 @@ class ListingForm {
     return buffer.toString();
   }
 
+  // ── qoralama ──────────────────────────────────────────────────────────────
+
+  /// Avtomatik saqlash uchun — maydon nomlari saytdagi `ListingForm` bilan bir xil, shuning
+  /// uchun saytda saqlangan qoralama ham o'qiladi.
+  Map<String, dynamic> toJson() => {
+    'dealType': dealType,
+    'propertyType': propertyType,
+    'title': title,
+    'description': description,
+    'rooms': rooms,
+    'roomsEnabled': roomsEnabled,
+    'bathrooms': bathrooms,
+    'bathroomShared': bathroomShared,
+    'bathroomEnabled': bathroomEnabled,
+    ...extraRooms,
+    'hasBalcony': hasBalcony,
+    'hasLoggia': hasLoggia,
+    'hasVremenka': hasVremenka,
+    'vremenkaArea': vremenkaArea,
+    'hasRepair': hasRepair,
+    'repairType': repairType,
+    'designStyle': designStyle,
+    'floorMaterial': floorMaterial,
+    'wallFinish': wallFinish,
+    'ceilingType': ceilingType,
+    'windowType': windowType,
+    'kitchenType': kitchenType,
+    'bathroomLayout': bathroomLayout,
+    'heatingType': heatingType,
+    'livingArea': livingArea,
+    'balconyArea': balconyArea,
+    'area': area,
+    'landArea': landArea,
+    'floor': floor,
+    'totalFloors': totalFloors,
+    'segment': segment,
+    'price': price,
+    'pricePerM2': pricePerM2,
+    'currency': currency,
+    'paymentOptions': paymentOptions,
+    'city': city,
+    'district': district,
+    'address': address,
+    'locationLat': locationLat,
+    'locationLng': locationLng,
+    'amenities': amenities,
+    'urgent': urgent,
+  };
+
+  void applyJson(Map<String, dynamic> json) {
+    String str(String key, String fallback) => json[key] is String ? json[key] as String : fallback;
+    double? dbl(String key) => (json[key] as num?)?.toDouble();
+    int? integer(String key) => (json[key] as num?)?.toInt();
+    bool flag(String key, [bool fallback = false]) =>
+        json[key] is bool ? json[key] as bool : fallback;
+    List<String> strings(String key) =>
+        json[key] is List ? [for (final v in json[key] as List) v.toString()] : const <String>[];
+
+    dealType = str('dealType', dealType);
+    propertyType = str('propertyType', propertyType);
+    title = str('title', title);
+    description = str('description', description);
+    rooms = integer('rooms') ?? rooms;
+    roomsEnabled = flag('roomsEnabled', roomsEnabled);
+    bathrooms = integer('bathrooms') ?? bathrooms;
+    bathroomShared = json['bathroomShared'] is bool ? json['bathroomShared'] as bool : null;
+    bathroomEnabled = flag('bathroomEnabled', bathroomEnabled);
+    for (final key in extraRooms.keys) {
+      extraRooms[key] = integer(key) ?? 0;
+    }
+    hasBalcony = flag('hasBalcony');
+    hasLoggia = flag('hasLoggia');
+    hasVremenka = flag('hasVremenka');
+    vremenkaArea = dbl('vremenkaArea');
+    hasRepair = flag('hasRepair');
+    repairType = json['repairType'] as String?;
+    designStyle = json['designStyle'] as String?;
+    floorMaterial = json['floorMaterial'] as String?;
+    wallFinish = json['wallFinish'] as String?;
+    ceilingType = json['ceilingType'] as String?;
+    windowType = json['windowType'] as String?;
+    kitchenType = json['kitchenType'] as String?;
+    bathroomLayout = json['bathroomLayout'] as String?;
+    heatingType = json['heatingType'] as String?;
+    livingArea = dbl('livingArea');
+    balconyArea = dbl('balconyArea');
+    area = dbl('area');
+    landArea = dbl('landArea');
+    floor = integer('floor');
+    totalFloors = integer('totalFloors');
+    segment = json['segment'] as String?;
+    price = dbl('price');
+    pricePerM2 = dbl('pricePerM2');
+    currency = str('currency', currency);
+    paymentOptions
+      ..clear()
+      ..addAll(strings('paymentOptions'));
+    city = str('city', city);
+    district = str('district', district);
+    address = str('address', address);
+    locationLat = dbl('locationLat');
+    locationLng = dbl('locationLng');
+    amenities
+      ..clear()
+      ..addAll(strings('amenities'));
+    urgent = flag('urgent');
+  }
+
   // ── jo'natish ─────────────────────────────────────────────────────────────
 
   /// Saytdagi `payload` bilan aynan bir xil — maydon nomlari ham snake_case.

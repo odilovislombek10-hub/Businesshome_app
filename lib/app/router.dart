@@ -11,6 +11,7 @@ import '../features/masters/masters_screen.dart';
 import '../features/secondary/secondary_detail_screen.dart';
 import '../features/secondary/listings_config.dart';
 import '../features/secondary/secondary_screen.dart';
+import '../features/create_listing/create_listing_screen.dart';
 import '../features/legal/legal_screen.dart';
 import '../features/my_home/my_home_screen.dart';
 import '../features/news/news_detail_screen.dart';
@@ -123,13 +124,13 @@ final appRouter = GoRouter(
     // ── Listings & specialists ────────────────────────────────────────────────
     // Saytda `/ads` `redirectTo: 'secondary'` — alohida sahifasi yo'q.
     GoRoute(path: '/ads', redirect: (_, _) => '/secondary'),
-    GoRoute(
-      path: '/ads/create',
-      builder: (_, _) => const PlaceholderScreen(title: "E'lon yaratish"),
-    ),
+    GoRoute(path: '/ads/create', builder: (_, _) => const CreateListingScreen()),
     GoRoute(
       path: '/ads/:id/edit',
-      builder: (_, _) => const PlaceholderScreen(title: "E'lonni tahrirlash"),
+      builder: (_, state) => CreateListingScreen(
+        editId: int.tryParse(state.pathParameters['id'] ?? ''),
+        editKind: state.uri.queryParameters['kind'],
+      ),
     ),
     GoRoute(
       path: '/agent/:id',
