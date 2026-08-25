@@ -1,17 +1,24 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../app/theme.dart';
+import '../../core/api/api_client.dart';
 import '../../core/api/media_url.dart';
 import '../../core/models/property_listing.dart';
 import '../../core/services/currency_service.dart';
 import '../../shared/widgets/app_image.dart';
+import '../../shared/widgets/amenities_grid.dart';
 import '../../shared/widgets/entrance.dart';
+import '../../shared/widgets/property_contact_card.dart';
+import '../../shared/widgets/property_location_map.dart';
+import '../../shared/widgets/property_tours_card.dart';
+import '../../shared/widgets/site_toast.dart';
 import '../../shared/widgets/site_footer_section.dart';
 import '../../shared/widgets/site_header.dart';
 import '../../shared/widgets/site_icon.dart';
-import '../../shared/widgets/yandex_map.dart';
 import '../secondary/secondary_repository.dart';
 import 'rent_detail_texts.dart';
 
@@ -35,7 +42,14 @@ class _RentDetailScreenState extends State<RentDetailScreen> {
   static const _repo = SecondaryRepository(endpoint: '/market/rent');
   final _scroll = ScrollController();
 
-  late final Future<PropertyListing?> _future = _repo.byId(widget.id);
+  late final Future<PropertyListing?> _future = _load();
+
+  Future<PropertyListing?> _load() async {
+    final property = await _repo.byId(widget.id);
+    if (property != null) unawaited(_recordView(property.id));
+    return property;
+  }
+
   late final Future<List<PropertyListing>> _similar = _loadSimilar();
   bool _scrolled = false;
   bool _favorite = false;
@@ -179,24 +193,35 @@ class _RentDetailScreenState extends State<RentDetailScreen> {
         ],
         if (p.amenities.isNotEmpty) ...[
           const SizedBox(height: 16),
-          _card(RentDetailTexts.amenities, _amenities(p)),
+          AmenitiesGrid(amenities: p.amenities, propertyType: p.type),
+        ],
+        if (PropertyToursCard(
+              propertyId: p.id,
+              propertyTitle: p.title,
+              videoUrl: p.videoUrl,
+              videoThumbnail: p.videoThumbnail,
+              has360Tour: p.hasVirtualTour,
+            )
+            case final tours when tours.hasAnyTour) ...[
+          const SizedBox(height: 16),
+          tours,
         ],
         if (p.lat != null && p.lng != null) ...[
           const SizedBox(height: 16),
-          _card(
-            RentDetailTexts.location,
-            ClipRRect(
-              borderRadius: BorderRadius.circular(AppRadius.md),
-              child: SizedBox(
-                height: 240,
-                child: YandexMapView(
-                  center: (p.lat!, p.lng!),
-                  zoom: 15,
-                  pickedLat: p.lat,
-                  pickedLng: p.lng,
-                ),
-              ),
-            ),
+          PropertyLocationMap(
+            lat: p.lat!,
+            lng: p.lng!,
+            address: [p.district, p.address].where((s) => s?.isNotEmpty ?? false).join(', '),
+            title: p.title,
+          ),
+        ],
+        if (p.owner case final owner?) ...[
+          const SizedBox(height: 16),
+          PropertyContactCard(
+            owner: owner,
+            propertyTitle: p.title,
+            propertyType: 'rent',
+            propertyId: p.id,
           ),
         ],
         FutureBuilder<List<PropertyListing>>(
@@ -311,6 +336,26 @@ class _RentDetailScreenState extends State<RentDetailScreen> {
   /// Saytda mebel alohida maydon emas — qulayliklardan aniqlanadi.
   bool _isFurnished(PropertyListing p) => p.amenities.contains('mebel');
 
+  /// Saytda `navigator.share`, u bo'lmasa havola nusxalanadi va
+  /// "Link nusxalandi" chiqadi.
+  Future<void> _share(PropertyListing p) async {
+    await Clipboard.setData(ClipboardData(text: 'https://businesshome.uz/property/rent/${p.id}'));
+    if (!mounted) return;
+    showSiteToast(context, 'Link nusxalandi');
+  }
+
+  /// Saytda kirgan foydalanuvchi uchun ko'rish qayd etiladi — kabinetdagi
+  /// "Yaqinda ko'rilgan" ro'yxati shundan to'ladi.
+  Future<void> _recordView(int id) async {
+    if (!await ApiClient.instance.isLoggedIn) return;
+    try {
+      await ApiClient.instance.post<dynamic>(
+        '/market/cabinet/views',
+        data: {'property_id': id, 'property_type': 'rent'},
+      );
+    } catch (_) {}
+  }
+
   Widget _actions(PropertyListing p) {
     Widget button(SiteIconData icon, Color color, VoidCallback onTap, {Color? background}) =>
         Pressable(
@@ -336,14 +381,7 @@ class _RentDetailScreenState extends State<RentDetailScreen> {
           () => setState(() => _favorite = !_favorite),
           background: _favorite ? const Color(0xFFFEF2F2) : null,
         ),
-        button(
-          SiteIcons.arrowRight,
-          AppColors.dark.withValues(alpha: 0.6),
-          () => launchUrl(
-            Uri.parse('https://businesshome.uz/property/rent/${p.id}'),
-            mode: LaunchMode.externalApplication,
-          ),
-        ),
+        button(SiteIcons.share, AppColors.dark.withValues(alpha: 0.6), () => _share(p)),
       ],
     );
   }
@@ -624,31 +662,6 @@ class _RentDetailScreenState extends State<RentDetailScreen> {
           child,
         ],
       ),
-    );
-  }
-
-  Widget _amenities(PropertyListing p) {
-    final theme = Theme.of(context);
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: [
-        for (final amenity in p.amenities)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: AppColors.surfaceAltLight,
-              borderRadius: BorderRadius.circular(AppRadius.sm),
-            ),
-            child: Text(
-              amenity,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontSize: 13,
-                color: AppColors.dark.withValues(alpha: 0.7),
-              ),
-            ),
-          ),
-      ],
     );
   }
 

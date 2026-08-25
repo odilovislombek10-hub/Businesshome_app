@@ -27,6 +27,7 @@ class PropertyListing {
     this.description,
     this.amenities = const [],
     this.status,
+    this.hasBalcony = false,
     this.hasVirtualTour = false,
     this.videoUrl,
     this.videoThumbnail,
@@ -54,6 +55,7 @@ class PropertyListing {
   final String? description;
   final List<String> amenities;
   final String? status;
+  final bool hasBalcony;
   final bool hasVirtualTour;
   final String? videoUrl;
   final String? videoThumbnail;
@@ -93,6 +95,7 @@ class PropertyListing {
     description: json['description']?.toString(),
     amenities: (json['amenities'] as List?)?.whereType<String>().toList() ?? const [],
     status: json['status']?.toString(),
+    hasBalcony: json['hasBalcony'] == true,
     hasVirtualTour: json['hasVirtualTour'] == true,
     videoUrl: json['videoUrl']?.toString(),
     videoThumbnail: json['videoThumbnail']?.toString(),

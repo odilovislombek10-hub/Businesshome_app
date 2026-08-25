@@ -162,6 +162,22 @@ class SecondaryRepository {
     return Paginated.fromJson(data, PropertyListing.fromJson);
   }
 
+  /// `detail.similarProperties` — saytda bir xil tur va shahardan beshta olinadi,
+  /// keyin joriy e'lon chiqarib tashlanadi.
+  Future<List<PropertyListing>> similar({String? type, String? city}) async {
+    final res = await _api.get<dynamic>(
+      endpoint,
+      query: {
+        if (type != null && type.isNotEmpty) 'type': type,
+        if (city != null && city.isNotEmpty) 'city': city,
+        'per_page': 5,
+      },
+    );
+    final data = res.data;
+    if (data is! Map<String, dynamic>) return const [];
+    return Paginated.fromJson(data, PropertyListing.fromJson).items;
+  }
+
   Future<PropertyListing?> byId(int id) async {
     final res = await _api.get<dynamic>('$endpoint/$id');
     final data = res.data;

@@ -1,6 +1,6 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../shared/widgets/app_image.dart';
@@ -8,9 +8,17 @@ import '../../app/theme.dart';
 import '../../core/api/media_url.dart';
 import '../../core/models/property_listing.dart';
 import '../../core/services/currency_service.dart';
+import '../../shared/utils/breakpoints.dart';
+import '../../shared/widgets/amenities_grid.dart';
 import '../../shared/widgets/entrance.dart';
+import '../../shared/widgets/property_contact_card.dart';
+import '../../shared/widgets/property_location_map.dart';
+import '../../shared/widgets/property_tours_card.dart';
+import '../../shared/widgets/report_modal.dart';
+import '../../shared/widgets/site_toast.dart';
 import '../../shared/widgets/site_header.dart';
 import '../../shared/widgets/site_icon.dart';
+import '../../core/api/api_client.dart';
 import 'secondary_repository.dart';
 
 /// `/property/secondary/:id` — the site's `secondary-detail` page.
@@ -31,9 +39,43 @@ class _SecondaryDetailScreenState extends State<SecondaryDetailScreen> {
   final _repo = SecondaryRepository();
   final _scroll = ScrollController();
 
-  late final Future<PropertyListing?> _future = _repo.byId(widget.id);
+  late final Future<PropertyListing?> _future = _load();
   bool _scrolled = false;
   bool _favorite = false;
+  List<PropertyListing> _similar = const [];
+
+  /// Saytda e'lon ochilgach ikkita qo'shimcha ish bo'ladi: o'xshash e'lonlar
+  /// yuklanadi va (kirgan foydalanuvchi uchun) ko'rish qayd etiladi.
+  Future<PropertyListing?> _load() async {
+    final property = await _repo.byId(widget.id);
+    if (property != null) {
+      unawaited(_loadSimilar(property));
+      unawaited(_recordView(property.id));
+    }
+    return property;
+  }
+
+  Future<void> _loadSimilar(PropertyListing p) async {
+    try {
+      final items = await _repo.similar(type: p.type, city: p.city);
+      if (!mounted) return;
+      setState(() {
+        _similar = items.where((x) => x.id != p.id).take(4).toList();
+      });
+    } catch (_) {
+      // Saytda ham xatolik jim yutiladi — bo'lim shunchaki chizilmaydi.
+    }
+  }
+
+  Future<void> _recordView(int id) async {
+    if (!await ApiClient.instance.isLoggedIn) return;
+    try {
+      await ApiClient.instance.post<dynamic>(
+        '/market/cabinet/views',
+        data: {'property_id': id, 'property_type': 'secondary'},
+      );
+    } catch (_) {}
+  }
 
   @override
   void initState() {
@@ -180,9 +222,38 @@ class _SecondaryDetailScreenState extends State<SecondaryDetailScreen> {
         ],
         if (p.amenities.isNotEmpty) ...[
           const SizedBox(height: 16),
-          _card(context, 'Qulayliklar', _amenities(context, p)),
+          AmenitiesGrid(amenities: p.amenities, propertyType: p.type),
         ],
-        if (p.owner != null) ...[const SizedBox(height: 16), _contactCard(context, p)],
+        if (PropertyToursCard(
+              propertyId: p.id,
+              propertyTitle: p.title,
+              videoUrl: p.videoUrl,
+              videoThumbnail: p.videoThumbnail,
+              has360Tour: p.hasVirtualTour,
+            )
+            case final tours when tours.hasAnyTour) ...[
+          const SizedBox(height: 16),
+          tours,
+        ],
+        if (p.lat != null && p.lng != null) ...[
+          const SizedBox(height: 16),
+          PropertyLocationMap(
+            lat: p.lat!,
+            lng: p.lng!,
+            address: [p.district, p.address].where((s) => s?.isNotEmpty ?? false).join(', '),
+            title: p.title,
+          ),
+        ],
+        if (p.owner case final owner?) ...[
+          const SizedBox(height: 16),
+          PropertyContactCard(
+            owner: owner,
+            propertyTitle: p.title,
+            propertyType: 'secondary',
+            propertyId: p.id,
+          ),
+        ],
+        if (_similar.isNotEmpty) ...[const SizedBox(height: 16), _similarBlock(context)],
       ],
     );
   }
@@ -291,10 +362,11 @@ class _SecondaryDetailScreenState extends State<SecondaryDetailScreen> {
           () => setState(() => _favorite = !_favorite),
           background: _favorite ? const Color(0xFFFEF2F2) : null,
         ),
+        button(SiteIcons.share, AppColors.dark.withValues(alpha: 0.6), () => _share(p)),
         button(
-          SiteIcons.arrowRight,
+          SiteIcons.xCircle,
           AppColors.dark.withValues(alpha: 0.6),
-          () => _open('https://businesshome.uz/property/secondary/${p.id}'),
+          () => ReportSheet.show(context, propertyId: p.id, propertyType: 'secondary'),
         ),
       ],
     );
@@ -400,127 +472,192 @@ class _SecondaryDetailScreenState extends State<SecondaryDetailScreen> {
 
   Widget _keyFacts(BuildContext context, PropertyListing p) {
     final theme = Theme.of(context);
+    final currency = CurrencyService.instance;
     final facts = <(String, String)>[
       if (p.type case final type?) ('Turi', _typeLabel(type)),
       if (p.rooms != null) ('Xonalar', '${p.rooms}'),
       if (p.bathrooms != null) ('Sanuzellar', '${p.bathrooms}'),
       if (p.area != null) ('Maydon', '${p.area!.round()} m²'),
-      if (p.floor != null)
-        ('Qavat', '${p.floor}${p.totalFloors == null ? '' : '/${p.totalFloors}'}'),
+      if (p.floor != null) ('Qavat', '${p.floor} / ${p.totalFloors ?? ''}'),
+      ('Balkon', p.hasBalcony ? 'Ha' : "Yo'q"),
       if (p.status case final status?) ('Holat', _statusLabel(status)),
+      if (p.price != null && (p.area ?? 0) > 0)
+        ('1 m² narxi', currency.formatWithSymbol(p.price! / p.area!, from: p.currency ?? 'uzs')),
     ];
 
-    return Column(
-      children: [
-        for (final (label, value) in facts)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Text(
-                    label.toUpperCase(),
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      fontSize: 12,
-                      color: AppColors.dark.withValues(alpha: 0.4),
-                    ),
-                  ),
-                ),
-                Text(
-                  value,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: AppColors.dark,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-      ],
-    );
-  }
-
-  Widget _amenities(BuildContext context, PropertyListing p) {
-    final theme = Theme.of(context);
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: [
-        for (final amenity in p.amenities)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: AppColors.surfaceAltLight,
-              borderRadius: BorderRadius.circular(AppRadius.pill),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const SiteIcon(SiteIcons.check, size: 12, color: AppColors.olive),
-                const SizedBox(width: 6),
-                Text(amenity, style: theme.textTheme.bodyMedium),
-              ],
-            ),
-          ),
-      ],
-    );
-  }
-
-  Widget _contactCard(BuildContext context, PropertyListing p) {
-    final theme = Theme.of(context);
-    final owner = p.owner!;
-    final avatar = absoluteMediaUrl(owner.avatar);
-    return _card(
-      context,
-      "Bog'lanish",
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+    // Saytda `grid-cols-2 md:grid-cols-4` — yorliq tepada, qiymat pastda.
+    final columns = Bp.pick(context, base: 2, md: 4);
+    final rows = <Widget>[];
+    for (var i = 0; i < facts.length; i += columns) {
+      final slice = facts.sublist(i, (i + columns).clamp(0, facts.length));
+      rows.add(
+        Padding(
+          padding: EdgeInsets.only(top: i == 0 ? 0 : 16), // gap-4
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CircleAvatar(
-                radius: 22,
-                backgroundColor: AppColors.olive.withValues(alpha: 0.1),
-                backgroundImage: avatar == null ? null : CachedNetworkImageProvider(avatar),
-                child: avatar != null
-                    ? null
-                    : const SiteIcon(SiteIcons.user, size: 20, color: AppColors.olive),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      owner.name?.isNotEmpty == true ? owner.name! : 'Egasi',
-                      style: theme.textTheme.titleMedium?.copyWith(color: AppColors.dark),
-                    ),
-                    if (owner.type case final type?)
-                      Text(
-                        type == 'agent' ? 'Reltor' : 'Uy egasi',
-                        style: theme.textTheme.bodySmall,
-                      ),
-                  ],
+              for (var c = 0; c < columns; c++) ...[
+                if (c > 0) const SizedBox(width: 16),
+                Expanded(
+                  child: c < slice.length
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              slice[c].$1.toUpperCase(),
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                fontSize: 12,
+                                color: AppColors.dark.withValues(alpha: 0.4),
+                              ),
+                            ),
+                            const SizedBox(height: 4), // mb-1
+                            Text(
+                              slice[c].$2,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: slice[c].$1 == 'Holat'
+                                    ? (p.status == 'available'
+                                          ? const Color(0xFF059669)
+                                          : const Color(0xFFD97706))
+                                    : AppColors.dark,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        )
+                      : const SizedBox.shrink(),
                 ),
-              ),
+              ],
             ],
           ),
-          if (owner.phone?.isNotEmpty ?? false) ...[
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton(
-                style: FilledButton.styleFrom(backgroundColor: AppColors.olive),
-                onPressed: () => _open('tel:${owner.phone}'),
-                child: Text(owner.phone!),
-              ),
-            ),
+        ),
+      );
+    }
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: rows);
+  }
+
+  /// Saytda ulashish tugmasi `navigator.share` ni sinaydi, bo'lmasa havolani
+  /// nusxalab "Link nusxalandi" deydi. Ilovada nusxalash qismi qoladi.
+  Future<void> _share(PropertyListing p) async {
+    await Clipboard.setData(
+      ClipboardData(text: 'https://businesshome.uz/property/secondary/${p.id}'),
+    );
+    if (!mounted) return;
+    showSiteToast(context, 'Link nusxalandi');
+  }
+
+  /// `detail.similarProperties` — bir xil tur va shahardagi to'rtta e'lon.
+  Widget _similarBlock(BuildContext context) {
+    final theme = Theme.of(context);
+    return _card(
+      context,
+      "O'xshash e'lonlar",
+      Column(
+        children: [
+          for (var i = 0; i < _similar.length; i++) ...[
+            if (i > 0) const SizedBox(height: 16), // gap-4
+            _similarRow(context, theme, _similar[i]),
           ],
         ],
       ),
     );
   }
+
+  Widget _similarRow(BuildContext context, ThemeData theme, PropertyListing p) {
+    final currency = CurrencyService.instance;
+    final image = p.images.isEmpty ? null : absoluteMediaUrl(p.images.first);
+    return Pressable(
+      scale: 0.99,
+      onTap: () => context.push('/property/secondary/${p.id}'),
+      child: Container(
+        padding: const EdgeInsets.all(12), // p-3
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(AppRadius.md)),
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(AppRadius.sm),
+              child: SizedBox(
+                width: 96, // w-24
+                height: 80, // h-20
+                child: image == null || image.isEmpty
+                    ? const ColoredBox(color: AppColors.surfaceMutedLight)
+                    : AppImage(imageUrl: image, fit: BoxFit.cover),
+              ),
+            ),
+            const SizedBox(width: 12), // gap-3
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    p.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.dark,
+                    ),
+                  ),
+                  const SizedBox(height: 4), // mt-1
+                  Text(
+                    p.price == null
+                        ? '—'
+                        : currency.formatWithSymbol(p.price!, from: p.currency ?? 'uzs'),
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.olive,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Text(
+                        '${p.rooms ?? ''} x',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          fontSize: 11,
+                          color: AppColors.dark.withValues(alpha: 0.5),
+                        ),
+                      ),
+                      _dot(),
+                      Text(
+                        '${p.area?.round() ?? ''} m²',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          fontSize: 11,
+                          color: AppColors.dark.withValues(alpha: 0.5),
+                        ),
+                      ),
+                      if (p.district case final district?) ...[
+                        _dot(),
+                        Flexible(
+                          child: Text(
+                            district,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              fontSize: 11,
+                              color: AppColors.dark.withValues(alpha: 0.5),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _dot() => Container(
+    width: 2,
+    height: 2,
+    margin: const EdgeInsets.symmetric(horizontal: 8),
+    decoration: BoxDecoration(color: AppColors.dark.withValues(alpha: 0.2), shape: BoxShape.circle),
+  );
 
   static String _typeLabel(String type) => switch (type) {
     'apartment' => 'Kvartira',
