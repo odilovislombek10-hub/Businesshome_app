@@ -14,6 +14,7 @@ import '../features/secondary/secondary_screen.dart';
 import '../features/agent_public/agent_public_screen.dart';
 import '../features/chat/chat_thread_screen.dart';
 import '../features/create_listing/create_listing_screen.dart';
+import '../features/create_reel/create_reel_screen.dart';
 import '../features/create_specialist/create_specialist_screen.dart';
 import '../features/legal/legal_screen.dart';
 import '../features/map_search/map_search_screen.dart';
@@ -94,10 +95,7 @@ final appRouter = GoRouter(
     // ── Reels ─────────────────────────────────────────────────────────────────
     // `/reels/create` before `/reels/:id`, otherwise "create" is read as an id.
     GoRoute(path: '/reels', builder: (_, _) => const ReelsScreen()),
-    GoRoute(
-      path: '/reels/create',
-      builder: (_, _) => const PlaceholderScreen(title: 'Reel yaratish'),
-    ),
+    GoRoute(path: '/reels/create', builder: (_, _) => const CreateReelScreen()),
     GoRoute(
       path: '/reels/:id',
       builder: (_, state) => ReelsScreen(startId: state.pathParameters['id']),
