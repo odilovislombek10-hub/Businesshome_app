@@ -13,6 +13,13 @@ import 'site_icon.dart';
 class AiAssistant extends StatefulWidget {
   const AiAssistant({super.key});
 
+  /// Noldan katta bo'lsa tugma chizilmaydi.
+  ///
+  /// Saytda Aziza `z-[9998]`, 3D ko'ruvchi esa `z-[9999]` — ya'ni 3D to'liq
+  /// ekranda tugma ko'rinmaydi. Ilovada suzuvchi tugma `Navigator` ustida
+  /// turgani uchun buni qo'lda aytish kerak.
+  static final ValueNotifier<int> hidden = ValueNotifier<int>(0);
+
   @override
   State<AiAssistant> createState() => _AiAssistantState();
 }
@@ -41,6 +48,13 @@ class _AiAssistantState extends State<AiAssistant> {
 
   @override
   Widget build(BuildContext context) {
+    return ValueListenableBuilder<int>(
+      valueListenable: AiAssistant.hidden,
+      builder: (context, hidden, _) => hidden > 0 ? const SizedBox.shrink() : _button(context),
+    );
+  }
+
+  Widget _button(BuildContext context) {
     final theme = Theme.of(context);
     return Positioned(
       right: 24, // right-6

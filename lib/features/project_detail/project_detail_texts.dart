@@ -24,6 +24,13 @@ abstract final class ProjectDetailTexts {
   static const notFound = 'Loyiha topilmadi';
   static const backHome = 'Bosh sahifaga qaytish';
 
+  // `present.*` — prezentatsiya rejimi (`?present=1`)
+  static const presentLabel = 'Prezentatsiya';
+  static const presentPause = 'Pauza';
+  static const presentResume = 'Davom';
+  static const presentView3d = "3D ko'rinish";
+  static const presentExit = 'Chiqish';
+
   /// Hero'dagi belgilar — saytda ham shu qo'shimchalar bilan yoziladi.
   static const blocks = 'blok';
   static const apartments = 'xonadon';

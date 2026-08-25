@@ -87,8 +87,10 @@ final appRouter = GoRouter(
     GoRoute(path: '/new-projects', builder: (_, _) => const NewProjectsScreen()),
     GoRoute(
       path: '/property/:id',
-      builder: (_, state) =>
-          ProjectDetailScreen(id: int.tryParse(state.pathParameters['id'] ?? '')),
+      builder: (_, state) => ProjectDetailScreen(
+        id: int.tryParse(state.pathParameters['id'] ?? ''),
+        presenting: state.uri.queryParameters['present'] == '1',
+      ),
     ),
     GoRoute(path: '/my-home', builder: (_, _) => const MyHomeScreen()),
 
@@ -181,6 +183,7 @@ final appRouter = GoRouter(
       builder: (_, state) => ProjectDetailScreen(
         developerCode: state.pathParameters['developerCode'],
         projectCode: state.pathParameters['projectCode'],
+        presenting: state.uri.queryParameters['present'] == '1',
       ),
     ),
   ],

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -6,13 +7,16 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:webview_flutter_android/webview_flutter_android.dart';
 
 import '../../app/theme.dart';
 import '../../core/api/api_client.dart';
 import '../../core/api/media_url.dart';
 import '../../core/services/auth_service.dart';
+import '../../shared/widgets/ai_assistant.dart';
 import '../../shared/widgets/app_image.dart';
 import '../../shared/widgets/entrance.dart';
+import '../../shared/widgets/presentation_mode.dart';
 import '../../shared/widgets/site_footer_section.dart';
 import '../../shared/utils/breakpoints.dart';
 import '../../shared/widgets/site_icon.dart';
@@ -27,11 +31,20 @@ import 'project_detail_texts.dart';
 /// hammasi `@if (…length > 0)` bilan o'ralgan. Prodda hozircha bironta loyihada
 /// `architecture`, `highlights`, `gallery_sections`, `smart_home`, `documents` to'ldirilmagan.
 class ProjectDetailScreen extends StatefulWidget {
-  const ProjectDetailScreen({super.key, this.id, this.developerCode, this.projectCode});
+  const ProjectDetailScreen({
+    super.key,
+    this.id,
+    this.developerCode,
+    this.projectCode,
+    this.presenting = false,
+  });
 
   final int? id;
   final String? developerCode;
   final String? projectCode;
+
+  /// `?present=1` — sahifa sekin o'zi suriladi, oxirida 3D ochiladi.
+  final bool presenting;
 
   @override
   State<ProjectDetailScreen> createState() => _ProjectDetailScreenState();
@@ -45,6 +58,16 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
   /// Saytda bu `FavoritesService` orqali serverda saqlanadi; ilovada hozircha faqat
   /// shu ekran ichida turadi.
   bool _favorite = false;
+
+  final _scroll = ScrollController();
+  final _viewer3dKey = GlobalKey<_Viewer3dSectionState>();
+  late bool _presenting = widget.presenting;
+
+  @override
+  void dispose() {
+    _scroll.dispose();
+    super.dispose();
+  }
 
   Future<ProjectDetail?> _load() {
     final dev = widget.developerCode;
@@ -69,6 +92,12 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
             children: [
               Positioned.fill(child: _body(project)),
               Positioned(top: 0, left: 0, right: 0, child: _header(project)),
+              if (_presenting)
+                PresentationMode(
+                  scroll: _scroll,
+                  onReveal: () => _viewer3dKey.currentState?.open(),
+                  onExit: () => setState(() => _presenting = false),
+                ),
             ],
           );
         },
@@ -103,6 +132,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
   Widget _body(ProjectDetail project) {
     final settings = project.settings;
     return ListView(
+      controller: _scroll,
       padding: EdgeInsets.zero,
       children: [
         _hero(project),
@@ -110,6 +140,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
         if (settings.architectureTabs.isNotEmpty)
           _ArchitectureShowcase(architect: settings.architect, tabs: settings.architectureTabs),
         _Viewer3dSection(
+          key: _viewer3dKey,
           url: _viewerUrl(project),
           poster: absoluteMediaUrl(settings.heroPosterUrl ?? project.coverImage),
         ),
@@ -688,6 +719,29 @@ class _HeroMediaState extends State<_HeroMedia> {
         else
           const ColoredBox(color: AppColors.dark),
         if (ready)
+          // `absolute top-4 right-4 w-10 h-10 bg-olive rounded-xl` — videoni
+          // to'liq ekranda ochadi.
+          Positioned(
+            top: Bp.pick(context, base: 16.0, sm: 24.0),
+            right: Bp.pick(context, base: 16.0, sm: 24.0),
+            child: Pressable(
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(builder: (_) => _VideoFullscreen(controller: controller)),
+              ),
+              child: Container(
+                width: Bp.pick(context, base: 40.0, sm: 48.0),
+                height: Bp.pick(context, base: 40.0, sm: 48.0),
+                decoration: BoxDecoration(
+                  color: AppColors.olive,
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                ),
+                child: const Center(
+                  child: SiteIcon(SiteIcons.fullscreen, size: 20, color: AppColors.cream),
+                ),
+              ),
+            ),
+          ),
+        if (ready)
           // `right-4 bottom-4 sm:right-auto sm:left-8 sm:bottom-8`
           Positioned(
             right: Bp.isSm(context) ? null : 16,
@@ -718,6 +772,50 @@ class _HeroMediaState extends State<_HeroMedia> {
           border: Border.all(color: AppColors.cream.withValues(alpha: 0.2)),
         ),
         child: Center(child: SiteIcon(icon, size: 16, color: AppColors.cream)),
+      ),
+    );
+  }
+}
+
+/// Hero videosi to'liq ekranda — saytda bu `h-screen` holati, ustidagi
+/// qatlam va matn yashiriladi, tugma esa X ga aylanadi.
+class _VideoFullscreen extends StatelessWidget {
+  const _VideoFullscreen({required this.controller});
+
+  final VideoPlayerController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Center(
+            child: AspectRatio(
+              aspectRatio: controller.value.aspectRatio,
+              child: VideoPlayer(controller),
+            ),
+          ),
+          Positioned(
+            top: MediaQuery.paddingOf(context).top + 16,
+            right: 16,
+            child: Pressable(
+              onTap: () => Navigator.of(context).pop(),
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppColors.olive,
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                ),
+                child: const Center(
+                  child: SiteIcon(SiteIcons.close, size: 20, color: AppColors.cream),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -963,7 +1061,7 @@ class _TabSwitcher extends StatelessWidget {
 /// "3D'ni ko'rish" tugmasi turadi; yuklanib bo'lgach "Ko'rish uchun bosing" yoziladi.
 /// Ilovada ham xuddi shunday: WebView darrov yuklanadi, lekin ko'rinmaydi.
 class _Viewer3dSection extends StatefulWidget {
-  const _Viewer3dSection({required this.url, required this.poster});
+  const _Viewer3dSection({super.key, required this.url, required this.poster});
 
   final String url;
   final String? poster;
@@ -986,16 +1084,71 @@ class _Viewer3dSectionState extends State<_Viewer3dSection> {
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(AppColors.dark)
+      // 3D ichidagi o'tish videolari brauzerdagi kabi o'zi o'ynashi kerak.
+      // Busiz WebView ularni to'xtatib turadi va ekranda "play" belgisi chiqadi.
+      ..addJavaScriptChannel('BHViewer', onMessageReceived: _onViewerMessage)
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageFinished: (_) {
             if (mounted) setState(() => _ready = true);
+            _installBridge();
             _sendAuth();
           },
         ),
       )
       ..loadRequest(Uri.parse(widget.url));
+
+    if (_controller.platform case final AndroidWebViewController android) {
+      android.setMediaPlaybackRequiresUserGesture(false);
+    }
   }
+
+  /// Saytda 3D ko'ruvchi ota oynaga `postMessage` yuboradi. WebView ichida
+  /// `window.parent` — o'zi, shuning uchun xabarni shu yerda tutib Dart tomonga
+  /// uzatamiz (`viewer3d.component.ts` dagi `onChildMessage` ning o'rni).
+  Future<void> _installBridge() async {
+    try {
+      await _controller.runJavaScript('''
+        if (!window.__bhBridge) {
+          window.__bhBridge = true;
+          window.addEventListener('message', function (e) {
+            var d = e && e.data;
+            if (!d || typeof d !== 'object' || !d.type) return;
+            try { BHViewer.postMessage(JSON.stringify(d)); } catch (err) {}
+          });
+        }
+      ''');
+    } catch (_) {}
+  }
+
+  void _onViewerMessage(JavaScriptMessage message) {
+    Map<String, dynamic> data;
+    try {
+      final decoded = jsonDecode(message.message);
+      if (decoded is! Map) return;
+      data = decoded.cast<String, dynamic>();
+    } catch (_) {
+      return;
+    }
+    switch (data['type']) {
+      case 'bh.exit3d':
+        // Ko'ruvchi menyusidagi "3D dan chiqish".
+        if (_movedToFullscreen && mounted) Navigator.of(context).pop();
+      case 'bh:auth-request':
+        // Saytdagi kabi 2 soniyada bir marta (halqa bo'lib qolmasligi uchun).
+        final now = DateTime.now();
+        if (_lastAuthRequest != null &&
+            now.difference(_lastAuthRequest!) < const Duration(seconds: 2)) {
+          return;
+        }
+        _lastAuthRequest = now;
+        _sendAuth();
+      case 'bh:request-login':
+        if (mounted) context.push('/login');
+    }
+  }
+
+  DateTime? _lastAuthRequest;
 
   /// Saytda token iframe'ga `postMessage({type:'bh:auth', …})` orqali beriladi — 3D ichidagi
   /// "Sevimlilar" tugmasi shuning hisobiga ishlaydi.
@@ -1017,6 +1170,9 @@ class _Viewer3dSectionState extends State<_Viewer3dSection> {
       // 3D sahifasi hali tayyor bo'lmasa — jim o'tamiz, saytda ham xatolik chiqmaydi.
     }
   }
+
+  /// Prezentatsiya rejimi oxirida tashqaridan chaqiriladi (`reveal`).
+  void open() => unawaited(_open());
 
   Future<void> _open() async {
     setState(() => _movedToFullscreen = true);
@@ -1138,35 +1294,39 @@ class _Viewer3dSectionState extends State<_Viewer3dSection> {
 }
 
 /// Oldindan yuklangan ko'ruvchi to'liq ekranda — saytdagi `fixed inset-0 z-[9999]`.
-class _Viewer3dPage extends StatelessWidget {
+///
+/// Saytda bu holatda ekranga **hech narsa qo'shilmaydi**: yopish tugmasi ham,
+/// "Aziza" tugmasi ham ko'rinmaydi (3D `z-[9999]`, Aziza `z-[9998]`). Chiqish
+/// ko'ruvchining o'z menyusidagi "3D dan chiqish" orqali bo'ladi — u ota
+/// oynaga `bh.exit3d` yuboradi.
+class _Viewer3dPage extends StatefulWidget {
   const _Viewer3dPage({required this.controller});
 
   final WebViewController controller;
 
   @override
+  State<_Viewer3dPage> createState() => _Viewer3dPageState();
+}
+
+class _Viewer3dPageState extends State<_Viewer3dPage> {
+  @override
+  void initState() {
+    super.initState();
+    // Qurilish paytida o'zgartirilsa `ValueListenableBuilder` qayta chizilmaydi,
+    // shuning uchun kadr tugagach aytamiz.
+    WidgetsBinding.instance.addPostFrameCallback((_) => AiAssistant.hidden.value++);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.addPostFrameCallback((_) => AiAssistant.hidden.value--);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: AppColors.dark,
-    body: Stack(
-      children: [
-        Positioned.fill(child: WebViewWidget(controller: controller)),
-        Positioned(
-          top: MediaQuery.paddingOf(context).top + 12,
-          right: 16,
-          child: Pressable(
-            onTap: () => Navigator.of(context).pop(),
-            child: Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.5),
-                shape: BoxShape.circle,
-              ),
-              child: const Center(child: SiteIcon(SiteIcons.close, size: 20, color: Colors.white)),
-            ),
-          ),
-        ),
-      ],
-    ),
+    body: WebViewWidget(controller: widget.controller),
   );
 }
 
