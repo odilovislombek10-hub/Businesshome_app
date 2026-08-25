@@ -281,6 +281,43 @@ abstract final class SiteIcons {
 
   static const arrowLeft = SiteIconData(['M19 12H5', 'm12 19-7-7 7-7']);
 
+  /// Reels — bo'sh holатdagi video belgisi (lucide `video`).
+  static const video = SiteIconData([
+    'M23 7l-7 5 7 5V7z',
+    'M1 7a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2z',
+  ]);
+
+  /// Tovush yoqilgan (lucide `volume-2`).
+  static const volumeOn = SiteIconData([
+    'M11 5 6 9H2v6h4l5 4V5z',
+    'M15.54 8.46a5 5 0 0 1 0 7.07',
+    'M19.07 4.93a10 10 0 0 1 0 14.14',
+  ]);
+
+  /// Tovush o'chirilgan (lucide `volume-x`).
+  static const volumeOff = SiteIconData(['M11 5 6 9H2v6h4l5 4V5z', 'M22 9l-6 6', 'M16 9l6 6']);
+
+  /// Ulashish (lucide `share-2`).
+  static const share = SiteIconData([
+    'M18 5m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0',
+    'M6 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0',
+    'M18 19m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0',
+    'M8.59 13.51l6.83 3.98',
+    'M15.41 6.51l-6.82 3.98',
+  ]);
+
+  /// Suhbat (lucide `message-circle`).
+  static const chat = SiteIconData([
+    'M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z',
+  ]);
+
+  /// Ma'lumot (lucide `info`).
+  static const info = SiteIconData([
+    'M12 12m-10 0a10 10 0 1 0 20 0a10 10 0 1 0 -20 0',
+    'M12 16v-4',
+    'M12 8h.01',
+  ]);
+
   /// "Topilmadi" holatidagi undov belgisi (heroicons `exclamation-circle`).
   static const alertCircle = SiteIconData([
     'M12 9v3.75',

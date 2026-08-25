@@ -9,6 +9,9 @@ class Reel {
     this.badge,
     this.price,
     this.location,
+    this.videoUrl,
+    this.kind,
+    this.entityId,
   });
 
   final int id;
@@ -21,6 +24,14 @@ class Reel {
   final String? badge;
   final String? price;
   final String? location;
+
+  /// To'liq ekranli `/reels` sahifasi uchun — bosh sahifadagi kartada ishlatilmaydi.
+  final String? videoUrl;
+
+  /// `secondary` | `rent` | `new-project` | `designer` | `master` — "Batafsil" qayerga
+  /// olib borishini shu belgilaydi.
+  final String? kind;
+  final int? entityId;
 
   /// The card shows only the first word of the author's name.
   String get authorFirstName => (author ?? '').split(' ').first;
@@ -37,5 +48,10 @@ class Reel {
     badge: (json['badge'] ?? json['category'])?.toString(),
     price: json['price']?.toString(),
     location: (json['location'] ?? json['city'])?.toString(),
+    videoUrl: (json['videoUrl'] ?? json['video_url'])?.toString(),
+    kind: json['kind']?.toString(),
+    entityId: (json['entityId'] ?? json['entity_id']) is num
+        ? ((json['entityId'] ?? json['entity_id']) as num).toInt()
+        : null,
   );
 }

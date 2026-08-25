@@ -11,6 +11,8 @@ import '../features/masters/masters_screen.dart';
 import '../features/secondary/secondary_detail_screen.dart';
 import '../features/secondary/listings_config.dart';
 import '../features/secondary/secondary_screen.dart';
+import '../features/agent_public/agent_public_screen.dart';
+import '../features/chat/chat_thread_screen.dart';
 import '../features/create_listing/create_listing_screen.dart';
 import '../features/create_specialist/create_specialist_screen.dart';
 import '../features/legal/legal_screen.dart';
@@ -18,7 +20,9 @@ import '../features/map_search/map_search_screen.dart';
 import '../features/my_home/my_home_screen.dart';
 import '../features/news/news_detail_screen.dart';
 import '../features/news/news_screen.dart';
+import '../features/order_detail/order_detail_screen.dart';
 import '../features/project_detail/project_detail_screen.dart';
+import '../features/reels/reels_screen.dart';
 import '../features/rent/rent_detail_screen.dart';
 import '../features/specialist_detail/specialist_detail_screen.dart';
 import '../features/new_projects/new_projects_screen.dart';
@@ -89,23 +93,21 @@ final appRouter = GoRouter(
 
     // ── Reels ─────────────────────────────────────────────────────────────────
     // `/reels/create` before `/reels/:id`, otherwise "create" is read as an id.
-    GoRoute(
-      path: '/reels',
-      builder: (_, _) => const PlaceholderScreen(title: 'Reels'),
-    ),
+    GoRoute(path: '/reels', builder: (_, _) => const ReelsScreen()),
     GoRoute(
       path: '/reels/create',
       builder: (_, _) => const PlaceholderScreen(title: 'Reel yaratish'),
     ),
     GoRoute(
       path: '/reels/:id',
-      builder: (_, _) => const PlaceholderScreen(title: 'Reels'),
+      builder: (_, state) => ReelsScreen(startId: state.pathParameters['id']),
     ),
 
     // ── Cabinet ───────────────────────────────────────────────────────────────
     GoRoute(
       path: '/cabinet/orders/:id',
-      builder: (_, _) => const PlaceholderScreen(title: 'Buyurtma'),
+      builder: (_, state) =>
+          OrderDetailScreen(id: int.tryParse(state.pathParameters['id'] ?? '') ?? 0),
     ),
     // The site redirects the bare `/cabinet` to its dashboard tab.
     GoRoute(path: '/cabinet', redirect: (_, _) => '/cabinet/dashboard'),
@@ -119,7 +121,8 @@ final appRouter = GoRouter(
     ),
     GoRoute(
       path: '/chat/:id',
-      builder: (_, _) => const PlaceholderScreen(title: 'Suhbat'),
+      builder: (_, state) =>
+          ChatThreadScreen(id: int.tryParse(state.pathParameters['id'] ?? '') ?? 0),
     ),
 
     // ── Listings & specialists ────────────────────────────────────────────────
@@ -135,7 +138,8 @@ final appRouter = GoRouter(
     ),
     GoRoute(
       path: '/agent/:id',
-      builder: (_, _) => const PlaceholderScreen(title: 'Agent'),
+      builder: (_, state) =>
+          AgentPublicScreen(id: int.tryParse(state.pathParameters['id'] ?? '') ?? 0),
     ),
     GoRoute(path: '/designers', builder: (_, _) => const DesignersScreen()),
     GoRoute(
