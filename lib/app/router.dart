@@ -12,6 +12,7 @@ import '../features/secondary/secondary_detail_screen.dart';
 import '../features/secondary/listings_config.dart';
 import '../features/secondary/secondary_screen.dart';
 import '../features/create_listing/create_listing_screen.dart';
+import '../features/create_specialist/create_specialist_screen.dart';
 import '../features/legal/legal_screen.dart';
 import '../features/map_search/map_search_screen.dart';
 import '../features/my_home/my_home_screen.dart';
@@ -152,10 +153,7 @@ final appRouter = GoRouter(
         kind: SpecialistKind.master,
       ),
     ),
-    GoRoute(
-      path: '/specialists/create',
-      builder: (_, _) => const PlaceholderScreen(title: 'Mutaxassis yaratish'),
-    ),
+    GoRoute(path: '/specialists/create', builder: (_, _) => const CreateSpecialistScreen()),
     GoRoute(path: '/birja', builder: (_, _) => const BirjaScreen()),
 
     // ── Content ───────────────────────────────────────────────────────────────
