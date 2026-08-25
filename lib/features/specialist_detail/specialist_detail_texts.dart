@@ -59,6 +59,27 @@ abstract final class SpecialistDetailTexts {
   static const availableToday = 'Bugun mavjud';
   static const callNow = "Hozir qo'ng'iroq qilish";
 
+  // `masterDetail.unit.*`
+  static const unitPerService = '1 xizmat';
+  static const unitPerProject = '1 loyiha';
+  static const unitPerM = '1 metr';
+  static const unitPerM2 = '1 m\u00b2';
+  static const unitPerPiece = '1 dona';
+  static const unitPerRoom = '1 xona';
+
+  /// Saytda ham qattiq yozilgan — har bir usta uchun bir xil ro'yxat
+  /// (`master-detail.component.ts` dagi `serviceAreas`).
+  static const serviceAreas = [
+    'Yunusobod',
+    "Mirzo Ulug'bek",
+    'Chilonzor',
+    'Yakkasaroy',
+    'Shayxontohur',
+    'Sergeli',
+    'Mirobod',
+    'Olmazor',
+  ];
+
   /// `designers.spec.*` — dizayner mutaxassisligi.
   static String designerSpec(String code) => switch (code) {
     'interior' => 'Interer dizayn',

@@ -14,7 +14,12 @@ class ProjectDetail {
     this.description,
     this.coverImage,
     this.status,
+    this.developerLogo,
     this.totalApartments = 0,
+    this.totalBlocks = 0,
+    this.totalArea,
+    this.startDate,
+    this.endDate,
     this.minPrice,
     this.lat,
     this.lng,
@@ -30,7 +35,12 @@ class ProjectDetail {
   final String? description;
   final String? coverImage;
   final String? status;
+  final String? developerLogo;
   final int totalApartments;
+  final int totalBlocks;
+  final num? totalArea;
+  final String? startDate;
+  final String? endDate;
   final num? minPrice;
   final double? lat;
   final double? lng;
@@ -53,7 +63,12 @@ class ProjectDetail {
       description: _text(json['description']),
       coverImage: _text(json['cover_image']),
       status: _text(json['status']),
+      developerLogo: developer is Map ? _text(developer['logo']) : null,
       totalApartments: (json['total_apartments'] as num?)?.toInt() ?? 0,
+      totalBlocks: (json['total_blocks'] as num?)?.toInt() ?? 0,
+      totalArea: json['total_area'] is num ? json['total_area'] as num : null,
+      startDate: _text(json['start_date']),
+      endDate: _text(json['end_date']),
       minPrice: json['min_price'] is num ? json['min_price'] as num : null,
       lat: (json['latitude'] as num?)?.toDouble(),
       lng: (json['longitude'] as num?)?.toDouble(),
@@ -73,6 +88,7 @@ class ProjectMarketSettings {
     this.pageDescription,
     this.galleryImages = const [],
     this.features = const [],
+    this.architect,
     this.architectureTabs = const [],
     this.highlightCategories = const [],
     this.gallerySections = const [],
@@ -88,10 +104,11 @@ class ProjectMarketSettings {
   final String? pageDescription;
   final List<String> galleryImages;
   final List<ProjectFeature> features;
+  final ProjectArchitect? architect;
   final List<ProjectTab> architectureTabs;
   final List<HighlightCategory> highlightCategories;
   final List<GallerySection> gallerySections;
-  final List<ProjectTab> smartHomeTabs;
+  final List<SmartHomeTab> smartHomeTabs;
   final List<DocumentCategory> documentCategories;
 
   static String? _text(Object? value) {
@@ -135,6 +152,9 @@ class ProjectMarketSettings {
         for (final row in (json['features'] as List? ?? const []))
           if (row is Map) ProjectFeature.fromJson(row),
       ],
+      architect: (architecture is Map && architecture['architect'] is Map)
+          ? ProjectArchitect.fromJson(architecture['architect'] as Map)
+          : null,
       architectureTabs: [
         for (final row
             in ((architecture is Map ? architecture['tabs'] : null) as List? ?? const []))
@@ -151,7 +171,7 @@ class ProjectMarketSettings {
       ],
       smartHomeTabs: [
         for (final row in (json['smart_home'] as List? ?? const []))
-          if (row is Map) ProjectTab.fromJson(row),
+          if (row is Map) SmartHomeTab.fromJson(row),
       ],
       documentCategories: [
         for (final row in (json['documents'] as List? ?? const []))
@@ -175,7 +195,7 @@ class ProjectFeature {
   );
 }
 
-/// Arxitektura va "Smart Home" bo'limlari bir xil shaklda: yorliq + slaydlar.
+/// Arxitektura bo'limining yorlig'i va uning slaydlari.
 class ProjectTab {
   const ProjectTab({required this.label, required this.slides});
 
@@ -224,11 +244,110 @@ class GallerySection {
   const GallerySection({required this.label, required this.images});
 
   final String label;
-  final List<String> images;
+  final List<GalleryImage> images;
 
   factory GallerySection.fromJson(Map row) => GallerySection(
     label: ProjectMarketSettings.localized(row, 'label'),
-    images: ProjectMarketSettings._urls(row['images']),
+    images: [
+      for (final image in (row['images'] as List? ?? const []))
+        if (image is Map && image['url'] != null)
+          GalleryImage.fromJson(image)
+        else if (image is String && image.trim().isNotEmpty)
+          GalleryImage(url: image, hotspots: const []),
+    ],
+  );
+}
+
+/// Galereya rasmi va uning ustidagi nuqtalari.
+class GalleryImage {
+  const GalleryImage({required this.url, required this.hotspots});
+
+  final String url;
+  final List<GalleryHotspot> hotspots;
+
+  factory GalleryImage.fromJson(Map row) => GalleryImage(
+    url: row['url'].toString(),
+    hotspots: [
+      for (final spot in (row['hotspots'] as List? ?? const []))
+        if (spot is Map) GalleryHotspot.fromJson(spot),
+    ],
+  );
+}
+
+/// Rasm ustidagi nuqta — foizda joylashadi, bosilganda izohi chiqadi.
+class GalleryHotspot {
+  const GalleryHotspot({
+    required this.x,
+    required this.y,
+    required this.label,
+    required this.description,
+  });
+
+  final double x;
+  final double y;
+  final String label;
+  final String description;
+
+  factory GalleryHotspot.fromJson(Map row) => GalleryHotspot(
+    x: (row['x'] as num?)?.toDouble() ?? 0,
+    y: (row['y'] as num?)?.toDouble() ?? 0,
+    label: ProjectMarketSettings.localized(row, 'label'),
+    description: ProjectMarketSettings.localized(row, 'description'),
+  );
+}
+
+/// Arxitektura bo'limidagi loyiha muallifi.
+class ProjectArchitect {
+  const ProjectArchitect({
+    required this.name,
+    required this.role,
+    required this.description,
+    this.avatar,
+  });
+
+  final String name;
+  final String role;
+  final String description;
+  final String? avatar;
+
+  factory ProjectArchitect.fromJson(Map row) => ProjectArchitect(
+    name: row['name']?.toString() ?? '',
+    role: ProjectMarketSettings.localized(row, 'role'),
+    description: ProjectMarketSettings.localized(row, 'description'),
+    avatar: ProjectMarketSettings._text(row['avatar']),
+  );
+}
+
+/// "Aqlli uy" bo'limining bir yorlig'i: fon rasmi, matni va mahsulotlari.
+class SmartHomeTab {
+  const SmartHomeTab({
+    required this.icon,
+    required this.title,
+    required this.description,
+    required this.image,
+    required this.products,
+  });
+
+  /// `zap` | `droplets` | `thermometer` | `wifi` — saytda shu to'rttasi chiziladi.
+  final String icon;
+  final String title;
+  final String description;
+  final String image;
+  final List<({String name, String image})> products;
+
+  factory SmartHomeTab.fromJson(Map row) => SmartHomeTab(
+    icon: row['icon']?.toString() ?? '',
+    title: ProjectMarketSettings.localized(row, 'title'),
+    description: ProjectMarketSettings.localized(row, 'description'),
+    image: row['image']?.toString() ?? '',
+    products: [
+      for (final product in (row['products'] as List? ?? const []))
+        if (product is Map)
+          (
+            name: ProjectMarketSettings.localized(product, 'name'),
+            image: product['image']?.toString() ?? '',
+          ),
+    ],
   );
 }
 
@@ -239,11 +358,11 @@ class DocumentCategory {
   final List<({String name, String url})> documents;
 
   factory DocumentCategory.fromJson(Map row) => DocumentCategory(
-    label: ProjectMarketSettings.localized(row, 'label'),
+    label: ProjectMarketSettings.localized(row, 'title'),
     documents: [
       for (final doc in (row['documents'] as List? ?? const []))
-        if (doc is Map && doc['url'] != null)
-          (name: ProjectMarketSettings.localized(doc, 'name'), url: doc['url'].toString()),
+        if (doc is Map && doc['file_url'] != null)
+          (name: doc['filename']?.toString() ?? '', url: doc['file_url'].toString()),
     ],
   );
 }

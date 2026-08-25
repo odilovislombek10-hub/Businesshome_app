@@ -10,6 +10,7 @@ import '../../shared/widgets/entrance.dart';
 import '../../shared/widgets/site_footer_section.dart';
 import '../../shared/widgets/site_header.dart';
 import '../../shared/widgets/site_icon.dart';
+import 'master_services.dart';
 import 'specialist_detail_models.dart';
 import 'specialist_detail_repository.dart';
 import 'specialist_detail_texts.dart';
@@ -154,6 +155,7 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
         const SizedBox(height: 16),
         if (widget.kind.isDesigner) _packages(s) else _priceList(s),
         const SizedBox(height: 16),
+        if (!widget.kind.isDesigner) ...[_serviceAreas(), const SizedBox(height: 16)],
         _sidebar(s),
         const SizedBox(height: 16),
         _reviewsBlock(s),
@@ -728,11 +730,21 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
   /// ko'rinishda — xizmat nomi, narxi va birligi qatorma-qator.
   Widget _priceList(SpecialistDetail s) {
     final theme = Theme.of(context);
+    final rows = masterServiceRows(s);
     return _card(
-      SpecialistDetailTexts.priceList,
+      null,
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Text(
+            SpecialistDetailTexts.priceList,
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: AppColors.dark,
+            ),
+          ),
+          const SizedBox(height: 4), // mb-1
           Text(
             SpecialistDetailTexts.priceListHint,
             style: theme.textTheme.bodyMedium?.copyWith(
@@ -740,96 +752,130 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
               color: AppColors.dark.withValues(alpha: 0.5),
             ),
           ),
-          const SizedBox(height: 16),
-          if (s.servicePackages.isEmpty)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 32),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: AppColors.surfaceAltLight,
-                borderRadius: BorderRadius.circular(AppRadius.md),
-              ),
-              child: Text(
-                SpecialistDetailTexts.noPackages,
-                textAlign: TextAlign.center,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  fontSize: 14,
-                  color: AppColors.dark.withValues(alpha: 0.5),
-                ),
-              ),
-            )
-          else
-            for (final package in s.servicePackages) ...[
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceAltLight,
-                  borderRadius: BorderRadius.circular(AppRadius.md),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            package.title,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.dark,
-                            ),
-                          ),
-                          if (package.features.isNotEmpty)
-                            Text(
-                              package.features.first,
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                fontSize: 12,
-                                color: AppColors.dark.withValues(alpha: 0.5),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                    Text(
-                      formatNumber(package.price),
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.olive,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 8),
-            ],
-          if (s.city case final city?) ...[
-            const SizedBox(height: 12),
-            Text(
-              SpecialistDetailTexts.serviceArea,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: AppColors.dark,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Row(
+          // Saytda bo'sh holat yo'q: jadval bo'sh bo'lsa hech narsa chizilmaydi.
+          if (rows.isNotEmpty) const SizedBox(height: 20), // mb-5
+          for (var i = 0; i < rows.length; i++) ...[
+            if (i > 0) const SizedBox(height: 12), // space-y-3
+            _serviceRow(rows[i]),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _serviceRow(ServiceRow service) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.all(16), // p-4
+      decoration: BoxDecoration(
+        color: AppColors.surfaceAltLight,
+        borderRadius: BorderRadius.circular(AppRadius.md), // rounded-xl
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start, // items-start
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SiteIcon(SiteIcons.mapPin, size: 14, color: AppColors.dark.withValues(alpha: 0.5)),
-                const SizedBox(width: 6),
                 Text(
-                  CityLabels.label(city),
+                  service.name,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontSize: 14,
-                    color: AppColors.dark.withValues(alpha: 0.6),
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.dark,
                   ),
+                ),
+                if (service.description.isNotEmpty) ...[
+                  const SizedBox(height: 2), // mt-0.5
+                  Text(
+                    service.description,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      fontSize: 12,
+                      color: AppColors.dark.withValues(alpha: 0.5),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          const SizedBox(width: 16), // gap-4
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                formatNumber(service.price),
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.bronze,
+                ),
+              ),
+              Text(
+                service.unit,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  fontSize: 11,
+                  color: AppColors.dark.withValues(alpha: 0.4),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Xizmat ko'rsatadigan hududlar — saytda ham har bir usta uchun bir xil
+  /// ro'yxat, mobil ko'rinishda ikki ustun (`grid-cols-2`).
+  Widget _serviceAreas() {
+    final theme = Theme.of(context);
+    const areas = SpecialistDetailTexts.serviceAreas;
+    return _card(
+      SpecialistDetailTexts.serviceArea,
+      Column(
+        children: [
+          for (var i = 0; i < areas.length; i += 2) ...[
+            if (i > 0) const SizedBox(height: 12), // gap-3
+            Row(
+              children: [
+                Expanded(child: _areaChip(areas[i], theme)),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: i + 1 < areas.length
+                      ? _areaChip(areas[i + 1], theme)
+                      : const SizedBox.shrink(),
                 ),
               ],
             ),
           ],
+        ],
+      ),
+    );
+  }
+
+  Widget _areaChip(String area, ThemeData theme) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10), // px-3 py-2.5
+      decoration: BoxDecoration(
+        color: AppColors.bronze.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(AppRadius.md),
+      ),
+      child: Row(
+        children: [
+          SiteIcon(SiteIcons.check, size: 16, color: AppColors.bronze),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              area,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: AppColors.dark.withValues(alpha: 0.8),
+              ),
+            ),
+          ),
         ],
       ),
     );

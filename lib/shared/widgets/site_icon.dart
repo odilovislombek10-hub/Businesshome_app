@@ -237,6 +237,46 @@ abstract final class SiteIcons {
     'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z',
   ]);
 
+  /// Yuklab olish (lucide `download`).
+  static const download = SiteIconData([
+    'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4',
+    'M7 10l5 5 5-5',
+    'M12 15V3',
+  ]);
+
+  /// Qo'shish (lucide `plus`).
+  static const plus = SiteIconData(['M5 12h14', 'M12 5v14']);
+
+  /// To'xtatish (lucide `pause`).
+  static const pause = SiteIconData([
+    'M14 4m0 1a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1z',
+    'M6 4m0 1a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1z',
+  ]);
+
+  /// To'liq ekran (`maximize`).
+  static const fullscreen = SiteIconData([
+    'M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3',
+  ]);
+
+  /// Aqlli uy — suv (lucide `droplets`).
+  static const droplets = SiteIconData([
+    'M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z',
+    'M12.56 6.6A10.97 10.97 0 0 0 14 3.02c.5 2.5 2 4.9 4 6.5s3 3.5 3 5.5a6.98 6.98 0 0 1-11.91 4.97',
+  ]);
+
+  /// Aqlli uy — harorat (lucide `thermometer`).
+  static const thermometer = SiteIconData([
+    'M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z',
+  ]);
+
+  /// Aqlli uy — internet (lucide `wifi`).
+  static const wifi = SiteIconData([
+    'M12 20h.01',
+    'M2 8.82a15 15 0 0 1 20 0',
+    'M5 12.859a10 10 0 0 1 14 0',
+    'M8.5 16.429a5 5 0 0 1 7 0',
+  ]);
+
   static const image = SiteIconData([
     'M3 3m0 2a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z',
     'M9 9m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0',

@@ -134,6 +134,9 @@ class ApiClient {
     if (refreshToken != null) await prefs.setString(_refreshKey, refreshToken);
   }
 
+  /// Saqlangan access token — 3D ko'ruvchiga `postMessage` bilan uzatish uchun kerak.
+  Future<String?> accessToken() => _readToken();
+
   Future<String?> readRefreshToken() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(_refreshKey);

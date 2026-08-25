@@ -189,3 +189,22 @@ class SpecialistReview {
     createdAt: DateTime.tryParse(row['createdAt']?.toString() ?? ''),
   );
 }
+
+/// Usta sahifasidagi narx jadvali qatori.
+///
+/// Usta kabinetdan o'z paketlarini kiritgan bo'lsa — shulardan yig'iladi.
+/// Kiritmagan bo'lsa sayt mutaxassisligiga qarab standart taklifni ko'rsatadi:
+/// narxlar `priceFrom` ga ko'paytma qo'llab hisoblanadi.
+class ServiceRow {
+  const ServiceRow({
+    required this.name,
+    required this.price,
+    required this.unit,
+    required this.description,
+  });
+
+  final String name;
+  final num price;
+  final String unit;
+  final String description;
+}
