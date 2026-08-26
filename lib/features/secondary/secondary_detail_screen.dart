@@ -7,6 +7,7 @@ import '../../shared/widgets/app_image.dart';
 import '../../app/theme.dart';
 import '../../core/api/media_url.dart';
 import '../../core/models/property_listing.dart';
+import '../../core/services/favorites_service.dart';
 import '../../core/services/currency_service.dart';
 import '../../shared/utils/breakpoints.dart';
 import '../../shared/widgets/amenities_grid.dart';
@@ -41,7 +42,7 @@ class _SecondaryDetailScreenState extends State<SecondaryDetailScreen> {
 
   late final Future<PropertyListing?> _future = _load();
   bool _scrolled = false;
-  bool _favorite = false;
+  late bool _favorite = FavoritesService.instance.isFavorite(widget.id, 'secondary');
   List<PropertyListing> _similar = const [];
 
   /// Saytda e'lon ochilgach ikkita qo'shimcha ish bo'ladi: o'xshash e'lonlar
@@ -90,6 +91,22 @@ class _SecondaryDetailScreenState extends State<SecondaryDetailScreen> {
   void dispose() {
     _scroll.dispose();
     super.dispose();
+  }
+
+  /// Saytda sevimlilar serverda saqlanadi (`FavoritesService`).
+  Future<void> _toggleFavorite(int id) async {
+    final result = await FavoritesService.instance.toggle(id, 'secondary');
+    if (!mounted) return;
+    if (result == null) {
+      context.push('/login');
+      return;
+    }
+    setState(() => _favorite = result);
+    showSiteToast(
+      context,
+      result ? "❤ Sevimlilarga qo'shildi" : 'Sevimlilardan olib tashlandi',
+      kind: result ? ToastKind.success : ToastKind.info,
+    );
   }
 
   @override
@@ -359,7 +376,7 @@ class _SecondaryDetailScreenState extends State<SecondaryDetailScreen> {
         button(
           SiteIcons.heart,
           _favorite ? const Color(0xFFEF4444) : AppColors.dark.withValues(alpha: 0.6),
-          () => setState(() => _favorite = !_favorite),
+          () => _toggleFavorite(p.id),
           background: _favorite ? const Color(0xFFFEF2F2) : null,
         ),
         button(SiteIcons.share, AppColors.dark.withValues(alpha: 0.6), () => _share(p)),

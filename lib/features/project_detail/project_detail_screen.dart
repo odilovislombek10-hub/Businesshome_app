@@ -13,6 +13,7 @@ import '../../app/theme.dart';
 import '../../core/api/api_client.dart';
 import '../../core/api/media_url.dart';
 import '../../core/services/auth_service.dart';
+import '../../core/services/favorites_service.dart';
 import '../../shared/widgets/ai_assistant.dart';
 import '../../shared/widgets/app_image.dart';
 import '../../shared/widgets/entrance.dart';
@@ -20,6 +21,7 @@ import '../../shared/widgets/presentation_mode.dart';
 import '../../shared/widgets/site_footer_section.dart';
 import '../../shared/utils/breakpoints.dart';
 import '../../shared/widgets/site_icon.dart';
+import '../../shared/widgets/site_toast.dart';
 import 'project_detail_models.dart';
 import 'project_detail_repository.dart';
 import 'project_detail_texts.dart';
@@ -55,9 +57,28 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
 
   late final Future<ProjectDetail?> _future = _load();
 
-  /// Saytda bu `FavoritesService` orqali serverda saqlanadi; ilovada hozircha faqat
-  /// shu ekran ichida turadi.
   bool _favorite = false;
+
+  /// Loyihalarda bir xil `id` turli quruvchilarda uchraydi, shuning uchun
+  /// saytda kalitga quruvchi kodi ham qo'shiladi.
+  Future<void> _toggleFavorite(ProjectDetail project) async {
+    final result = await FavoritesService.instance.toggle(
+      project.id,
+      'new-project',
+      developerCode: project.developerCode,
+    );
+    if (!mounted) return;
+    if (result == null) {
+      context.push('/login');
+      return;
+    }
+    setState(() => _favorite = result);
+    showSiteToast(
+      context,
+      result ? "❤ Sevimlilarga qo'shildi" : 'Sevimlilardan olib tashlandi',
+      kind: result ? ToastKind.success : ToastKind.info,
+    );
+  }
 
   final _scroll = ScrollController();
   final _viewer3dKey = GlobalKey<_Viewer3dSectionState>();
@@ -221,7 +242,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
               _headerButton(
                 SiteIcons.heart,
                 filled: _favorite,
-                onTap: () => setState(() => _favorite = !_favorite),
+                onTap: () => _toggleFavorite(project),
               ),
               const SizedBox(width: 8),
               _headerButton(SiteIcons.share, onTap: () {}),

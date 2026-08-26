@@ -284,6 +284,6 @@ class ApiClient {
   }
 
   /// [data] — ba'zi endpointlar o'chirish uchun tanada qiymat kutadi (portfolio rasmi).
-  Future<Response<T>> delete<T>(String path, {Object? data}) =>
-      _gated(() => _dio.delete<T>(path, data: data));
+  Future<Response<T>> delete<T>(String path, {Object? data, Map<String, dynamic>? query}) =>
+      _gated(() => _dio.delete<T>(path, data: data, queryParameters: query));
 }

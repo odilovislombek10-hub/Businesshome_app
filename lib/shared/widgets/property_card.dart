@@ -3,9 +3,11 @@ import 'package:go_router/go_router.dart';
 
 import 'app_image.dart';
 import '../../app/theme.dart';
+import '../../core/services/favorites_service.dart';
 import '../../core/services/currency_service.dart';
 import '../models/property_view.dart';
 import 'site_icon.dart';
+import 'site_toast.dart';
 
 /// Port of the site's `app-property-card`.
 ///
@@ -40,7 +42,43 @@ class PropertyCard extends StatefulWidget {
 }
 
 class _PropertyCardState extends State<PropertyCard> {
+  @override
+  void initState() {
+    super.initState();
+    // Sevimlilar ro'yxati o'zgarsa yurakcha rangi yangilanadi.
+    FavoritesService.instance.addListener(_onFavoritesChanged);
+  }
+
+  @override
+  void dispose() {
+    FavoritesService.instance.removeListener(_onFavoritesChanged);
+    super.dispose();
+  }
+
+  void _onFavoritesChanged() {
+    if (mounted) setState(() {});
+  }
+
   int _active = 0;
+
+  /// Saytdagi `FavoritesService.toggle` — kirmagan bo'lsa login sahifasi.
+  Future<void> _toggleFavorite(BuildContext context) async {
+    final result = await FavoritesService.instance.toggle(
+      widget.property.id,
+      widget.property.propertyType,
+      developerCode: widget.property.developerCode,
+    );
+    if (!context.mounted) return;
+    if (result == null) {
+      context.push('/login');
+      return;
+    }
+    showSiteToast(
+      context,
+      result ? "❤ Sevimlilarga qo'shildi" : 'Sevimlilardan olib tashlandi',
+      kind: result ? ToastKind.success : ToastKind.info,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -114,8 +152,14 @@ class _PropertyCardState extends State<PropertyCard> {
                 top: widget.compact ? 10 : 16,
                 right: widget.compact ? 10 : 16,
                 child: _FavoriteButton(
-                  isFavorite: widget.isFavorite,
-                  onPressed: widget.onFavorite,
+                  isFavorite:
+                      widget.isFavorite ||
+                      FavoritesService.instance.isFavorite(
+                        widget.property.id,
+                        widget.property.propertyType,
+                        widget.property.developerCode,
+                      ),
+                  onPressed: widget.onFavorite ?? () => _toggleFavorite(context),
                   compact: widget.compact,
                 ),
               ),

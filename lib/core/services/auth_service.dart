@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../api/api_client.dart';
 import '../api/response_cache.dart';
 import '../models/market_user.dart';
+import 'favorites_service.dart';
 
 /// Raised when the API answers a 4xx with a message meant for the user.
 ///
@@ -55,6 +56,7 @@ class AuthService extends ChangeNotifier {
 
     // 2) Fonda tekshirish. Faqat 401/403 da chiqariladi — tarmoq xatosi sessiyani buzmaydi.
     unawaited(_verifySession(hadStoredUser: stored != null));
+    unawaited(FavoritesService.instance.load());
   }
 
   Future<void> _verifySession({required bool hadStoredUser}) async {
@@ -96,6 +98,8 @@ class AuthService extends ChangeNotifier {
 
   Future<void> _acceptUser(MarketUser user) async {
     _user = user;
+    // Saytda kirilgach sevimlilar bir marta yuklanadi.
+    unawaited(FavoritesService.instance.load());
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_userKey, jsonEncode(user.toJson()));
@@ -211,6 +215,8 @@ class AuthService extends ChangeNotifier {
     await prefs.remove(_userKey);
     // Keshda ochiq ma'lumot yotadi, lekin boshqa hisob bilan kirilganda eskisi ko'rinmasin.
     await ResponseCache.instance.clear();
+    // Saytda chiqishda sevimlilar ro'yxati ham tozalanadi.
+    FavoritesService.instance.clear();
     _user = null;
     notifyListeners();
   }

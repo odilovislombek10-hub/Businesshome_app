@@ -8,6 +8,7 @@ import '../../app/theme.dart';
 import '../../core/api/api_client.dart';
 import '../../core/api/media_url.dart';
 import '../../core/models/property_listing.dart';
+import '../../core/services/favorites_service.dart';
 import '../../core/services/currency_service.dart';
 import '../../shared/widgets/app_image.dart';
 import '../../shared/widgets/amenities_grid.dart';
@@ -52,7 +53,7 @@ class _RentDetailScreenState extends State<RentDetailScreen> {
 
   late final Future<List<PropertyListing>> _similar = _loadSimilar();
   bool _scrolled = false;
-  bool _favorite = false;
+  late bool _favorite = FavoritesService.instance.isFavorite(widget.id, 'rent');
 
   Future<List<PropertyListing>> _loadSimilar() async {
     try {
@@ -76,6 +77,22 @@ class _RentDetailScreenState extends State<RentDetailScreen> {
   void dispose() {
     _scroll.dispose();
     super.dispose();
+  }
+
+  /// Saytda sevimlilar serverda saqlanadi (`FavoritesService`).
+  Future<void> _toggleFavorite(int id) async {
+    final result = await FavoritesService.instance.toggle(id, 'rent');
+    if (!mounted) return;
+    if (result == null) {
+      context.push('/login');
+      return;
+    }
+    setState(() => _favorite = result);
+    showSiteToast(
+      context,
+      result ? "❤ Sevimlilarga qo'shildi" : 'Sevimlilardan olib tashlandi',
+      kind: result ? ToastKind.success : ToastKind.info,
+    );
   }
 
   @override
@@ -378,7 +395,7 @@ class _RentDetailScreenState extends State<RentDetailScreen> {
         button(
           SiteIcons.heart,
           _favorite ? const Color(0xFFEF4444) : AppColors.dark.withValues(alpha: 0.6),
-          () => setState(() => _favorite = !_favorite),
+          () => _toggleFavorite(p.id),
           background: _favorite ? const Color(0xFFFEF2F2) : null,
         ),
         button(SiteIcons.share, AppColors.dark.withValues(alpha: 0.6), () => _share(p)),
