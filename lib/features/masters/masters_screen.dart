@@ -575,23 +575,29 @@ class _MastersScreenState extends State<MastersScreen> {
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
           child: Column(
             children: [
-              // Bir ekranda to'rtta karta ko'rinishi uchun ikki ustun.
-              GridView.builder(
-                // Ichma-ich GridView atrofdagi paddingni meros qiladi — aniq nol qo'yiladi.
-                padding: EdgeInsets.zero,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 18, // gap-[18px]
-                  crossAxisSpacing: 18,
-                  mainAxisExtent: _MasterCard.extent,
-                ),
-                itemCount: items.length,
-                itemBuilder: (context, i) => Entrance.fadeIn(
-                  delay: Duration(milliseconds: i * 100),
-                  child: _MasterCard(master: items[i]),
-                ),
+              // Saytda `repeat(auto-fill, minmax(280px, 1fr))` — kenglikka nechta
+              // 280px to'liq sig'sa, shuncha ustun. Telefonda bitta.
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final columns = ((constraints.maxWidth + 18) / (280 + 18)).floor().clamp(1, 6);
+                  return GridView.builder(
+                    // Ichma-ich GridView atrofdagi paddingni meros qiladi.
+                    padding: EdgeInsets.zero,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: columns,
+                      mainAxisSpacing: 18, // gap-[18px]
+                      crossAxisSpacing: 18,
+                      mainAxisExtent: _MasterCard.extent,
+                    ),
+                    itemCount: items.length,
+                    itemBuilder: (context, i) => Entrance.fadeIn(
+                      delay: Duration(milliseconds: i * 100),
+                      child: _MasterCard(master: items[i]),
+                    ),
+                  );
+                },
               ),
               if (page.pages > 1) ...[
                 const SizedBox(height: 32), // mt-8
@@ -624,10 +630,10 @@ class _MastersScreenState extends State<MastersScreen> {
         padding: EdgeInsets.zero,
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        crossAxisCount: 2,
+        crossAxisCount: 1,
         mainAxisSpacing: 18,
         crossAxisSpacing: 18,
-        childAspectRatio: 172 / _MasterCard.extent,
+        mainAxisExtent: _MasterCard.extent,
         children: [
           for (var i = 0; i < 6; i++)
             Pulse(

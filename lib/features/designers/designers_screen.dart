@@ -2,11 +2,13 @@ import '../../shared/widgets/app_image.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../app/theme.dart';
 import '../../core/services/favorites_service.dart';
+import '../../shared/utils/breakpoints.dart';
 import '../../core/constants/city_labels.dart';
 import '../../core/models/designer.dart';
 import '../../core/models/property_listing.dart';
@@ -609,31 +611,18 @@ class _DesignersScreenState extends State<DesignersScreen> {
           padding: const EdgeInsets.fromLTRB(16, 20, 16, 0), // gap-8 → telefonda ixchamroq
           child: Column(
             children: [
-              // Bir ekranda to'rtta karta ko'rinishi uchun ikki ustun.
-              GridView.builder(
-                // Ichma-ich GridView atrofdagi paddingni meros qiladi — aniq nol qo'yiladi.
-                padding: EdgeInsets.zero,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 16,
-                  crossAxisSpacing: 16,
-                  mainAxisExtent: _DesignerCard.extent,
+              // Saytda kartalar ustma-ust turadi (`space-y-5`), to'r emas.
+              for (var i = 0; i < page.items.length; i++) ...[
+                if (i > 0) const SizedBox(height: 20), // space-y-5
+                Entrance.fadeIn(
+                  delay: Duration(milliseconds: i * 100),
+                  child: _DesignerCard(
+                    designer: page.items[i],
+                    isFavorite: FavoritesService.instance.isFavorite(page.items[i].id, 'designer'),
+                    onFavorite: () => _toggleFavorite(page.items[i].id),
+                  ),
                 ),
-                itemCount: page.items.length,
-                itemBuilder: (context, i) {
-                  final designer = page.items[i];
-                  return Entrance.fadeIn(
-                    delay: Duration(milliseconds: i * 100),
-                    child: _DesignerCard(
-                      designer: designer,
-                      isFavorite: FavoritesService.instance.isFavorite(designer.id, 'designer'),
-                      onFavorite: () => _toggleFavorite(designer.id),
-                    ),
-                  );
-                },
-              ),
+              ],
               if (page.pages > 1) ...[
                 const SizedBox(height: 48), // mt-12
                 _pagination(context, page),
@@ -653,10 +642,10 @@ class _DesignersScreenState extends State<DesignersScreen> {
         padding: EdgeInsets.zero,
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        crossAxisCount: 2,
-        mainAxisSpacing: 16,
-        crossAxisSpacing: 16,
-        childAspectRatio: 172 / _DesignerCard.extent,
+        crossAxisCount: 1,
+        mainAxisSpacing: 20,
+        crossAxisSpacing: 20,
+        mainAxisExtent: 420,
         children: [
           for (var i = 0; i < 4; i++)
             const Pulse(
@@ -793,21 +782,13 @@ class _DesignersScreenState extends State<DesignersScreen> {
   }
 }
 
-/// Bitta dizayner kartasi — kompozitsiyasi usta kartasi bilan bir xil.
+/// Saytdagi dizayner kartasi — keng, ikki qismli (`flex-col md:flex-row`).
 ///
-/// Foydalanuvchi so'rovi bo'yicha shablondagi keng, yozuvli kartadan voz kechildi: bir ekranda
-/// to'rttasi ko'rinishi uchun karta usta kartasi shaklida (muqova + chiqib turgan avatar +
-/// reyting tabletkasi + ma'lumot qatorlari) va ikki ustunda chiziladi.
-///
-/// Shablondagi barcha ma'lumot saqlangan — ism, mutaxassislik, reyting va sharhlar soni, shahar,
-/// teglar, uchta ko'rsatkich (loyiha / tajriba / narx), portfolio va uchala amal tugmasi.
-/// Faqat tavsif matni chiqarib tashlandi: yarim kenglikda u kartani bir necha barobar
-/// cho'zib yuborar edi.
+/// Chapda: 96px avatar (yashil tasdiq belgisi bilan, video bo'lsa qizil "play"),
+/// ism, mutaxassislik, yulduzlar va shahar. O'ngda: tavsif, uchta raqam
+/// (loyiha / yil / narx), portfolio lentasi, teglar va tugmalar.
 class _DesignerCard extends StatelessWidget {
   const _DesignerCard({required this.designer, required this.isFavorite, required this.onFavorite});
-
-  /// Ikki ustunli to'rda bitta katakning balandligi.
-  static const extent = 322.0;
 
   final Designer designer;
   final bool isFavorite;
@@ -816,118 +797,197 @@ class _DesignerCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Pressable(
-      scale: 0.99,
+      scale: 0.995,
       onTap: () => context.push('/designers/${designer.id}'),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(AppRadius.lg), // rounded-2xl
-          border: Border.all(color: AppColors.borderLight),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 2,
-              offset: const Offset(0, 1),
-            ),
+          border: Border.all(color: AppColors.surfaceMutedLight),
+          boxShadow: const [
+            BoxShadow(color: Color(0x0D000000), blurRadius: 2, offset: Offset(0, 1)),
           ],
         ),
         clipBehavior: Clip.antiAlias,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _cover(context),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+        // Saytda `md` dan boshlab ikki ustun; telefonda ustma-ust.
+        child: Bp.isMd(context)
+            ? IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    _avatarRow(context),
-                    const SizedBox(height: 8),
-                    _nameAndCity(context),
-                    const SizedBox(height: 8),
-                    _specAndTags(context),
-                    const SizedBox(height: 8),
-                    _stats(context),
-                    if (designer.portfolio.isNotEmpty) ...[
-                      const SizedBox(height: 8),
-                      _portfolio(context),
-                    ],
-                    const Spacer(),
-                    const SizedBox(height: 8),
-                    _actions(context),
+                    SizedBox(width: 256, child: _left(context)), // md:w-64
+                    Expanded(child: _right(context)),
                   ],
                 ),
+              )
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [_left(context), _right(context)],
               ),
-            ),
-          ],
-        ),
       ),
     );
   }
 
-  /// Muqova — hero'ning olive→bronza gradienti, nuqtali naqsh va palitra suv belgisi bilan.
-  Widget _cover(BuildContext context) {
-    return SizedBox(
-      height: 52,
-      child: Stack(
+  /// `p-6 bg-gray-50/30`, `md:border-r`.
+  Widget _left(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.all(24), // p-6
+      decoration: BoxDecoration(
+        color: AppColors.surfaceAltLight.withValues(alpha: 0.3),
+        border: Bp.isMd(context)
+            ? Border(right: BorderSide(color: AppColors.surfaceMutedLight))
+            : null,
+      ),
+      child: Column(
         children: [
-          Positioned.fill(
-            child: DecoratedBox(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment(-0.87, -0.5),
-                  end: Alignment(0.87, 0.5),
-                  colors: [Color(0xFF8C8D60), Color(0xFF9A6E4F)],
+          _avatar(context),
+          const SizedBox(height: 16), // mt-4
+          Text(
+            designer.fullName,
+            textAlign: TextAlign.center,
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontSize: 18, // text-lg
+              fontWeight: FontWeight.w700,
+              color: AppColors.dark,
+            ),
+          ),
+          const SizedBox(height: 4), // mt-1
+          Text(
+            DesignersTexts.specLabel(designer.specialization),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: AppColors.olive,
+            ),
+          ),
+          const SizedBox(height: 12), // mt-3
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              for (var i = 1; i <= 5; i++)
+                Padding(
+                  padding: const EdgeInsets.only(right: 4), // gap-1
+                  child: SiteIcon(
+                    i <= designer.rating.round()
+                        ? SiteIcons.ratingStar
+                        : SiteIcons.ratingStarOutline,
+                    size: 14,
+                    color: const Color(0xFFFBBF24),
+                  ),
+                ),
+              const SizedBox(width: 4), // ml-1
+              Text(
+                '${designer.rating}',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.dark,
                 ),
               ),
-            ),
+              const SizedBox(width: 4),
+              Text(
+                '(${designer.reviewsCount})',
+                style: theme.textTheme.labelSmall?.copyWith(
+                  fontSize: 12,
+                  color: AppColors.dark.withValues(alpha: 0.4),
+                ),
+              ),
+            ],
           ),
-          const Positioned.fill(
-            child: CustomPaint(painter: DotPatternPainter(step: 14, alpha: 0.072)),
+          const SizedBox(height: 8), // mt-2
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SiteIcon(SiteIcons.mapPin, size: 14, color: AppColors.dark.withValues(alpha: 0.5)),
+              const SizedBox(width: 6), // gap-1.5
+              Flexible(
+                child: Text(
+                  CityLabels.label(designer.city),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontSize: 14,
+                    color: AppColors.dark.withValues(alpha: 0.5),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 96px avatar, pastda yashil belgi, video bo'lsa tepada qizil "play".
+  Widget _avatar(BuildContext context) {
+    final theme = Theme.of(context);
+    return SizedBox(
+      width: 96, // w-24
+      height: 96,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            width: 96,
+            height: 96,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.olive.withValues(alpha: 0.15),
+              border: Border.all(color: Colors.white, width: 4), // ring-4 ring-white
+              boxShadow: const [
+                BoxShadow(color: Color(0x1A000000), blurRadius: 10, offset: Offset(0, 4)),
+              ],
+              image: designer.avatar.isEmpty
+                  ? null
+                  : DecorationImage(
+                      image: CachedNetworkImageProvider(designer.avatar),
+                      fit: BoxFit.cover,
+                    ),
+            ),
+            child: designer.avatar.isNotEmpty
+                ? null
+                : Center(
+                    child: Text(
+                      _initials(designer.fullName),
+                      style: theme.textTheme.displaySmall?.copyWith(
+                        fontSize: 30, // text-3xl
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.olive,
+                      ),
+                    ),
+                  ),
           ),
           Positioned(
-            right: 8,
-            bottom: -6,
-            child: SizedBox.square(
-              dimension: 52,
-              child: Stack(
-                children: [
-                  SiteIcon(
-                    SiteIcons.paletteOutline,
-                    size: 52,
-                    strokeWidth: 1.3,
-                    color: Colors.white.withValues(alpha: 0.16),
-                  ),
-                  SiteIcon(
-                    SiteIcons.paletteDots,
-                    size: 52,
-                    color: Colors.white.withValues(alpha: 0.16),
-                  ),
-                ],
+            right: -4,
+            bottom: -4,
+            child: Container(
+              width: 24, // w-6
+              height: 24,
+              decoration: BoxDecoration(
+                color: const Color(0xFF10B981), // emerald-500
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 2),
               ),
+              child: const Center(child: SiteIcon(SiteIcons.check, size: 12, color: Colors.white)),
             ),
           ),
-          // Video bo'lsa — reels nishonchasi, shablondagidek `/reels/designer-<id>` ga.
-          if (designer.videoUrl != null)
+          if (designer.videoUrl?.isNotEmpty ?? false)
             Positioned(
-              top: 8,
-              left: 8,
+              right: -4,
+              top: -4,
               child: Pressable(
                 onTap: () => context.push('/reels/designer-${designer.id}'),
                 child: Container(
-                  width: 24,
-                  height: 24,
+                  width: 28, // w-7
+                  height: 28,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFDC2626), // bg-red-600
+                    color: const Color(0xFFDC2626), // red-600
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.white, width: 2),
                   ),
                   child: const Center(
-                    child: Padding(
-                      padding: EdgeInsets.only(left: 2), // ml-0.5
-                      child: SiteIcon(SiteIcons.play, size: 9, color: Colors.white),
-                    ),
+                    child: SiteIcon(SiteIcons.play, size: 12, color: Colors.white),
                   ),
                 ),
               ),
@@ -937,303 +997,169 @@ class _DesignerCard extends StatelessWidget {
     );
   }
 
-  /// Avatar muqovaga yarim chiqib turadi; o'ng tomonda reyting tabletkasi.
-  Widget _avatarRow(BuildContext context) {
+  /// `flex-1 p-6` — tavsif, raqamlar, portfolio, teglar va tugmalar.
+  Widget _right(BuildContext context) {
     final theme = Theme.of(context);
-    return SizedBox(
-      height: 22,
-      child: OverflowBox(
-        alignment: Alignment.bottomCenter,
-        maxHeight: 44,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            _avatar(context),
-            const Spacer(),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 2),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceAltLight,
-                  borderRadius: BorderRadius.circular(AppRadius.pill),
-                  border: Border.all(color: AppColors.borderLight),
+    return Padding(
+      padding: const EdgeInsets.all(24), // p-6
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (designer.description.isNotEmpty) ...[
+            Text(
+              designer.description,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontSize: 14,
+                height: 1.6, // leading-relaxed
+                color: AppColors.dark.withValues(alpha: 0.7),
+              ),
+            ),
+            const SizedBox(height: 16), // mb-4
+          ],
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 12), // py-3
+            decoration: BoxDecoration(
+              color: AppColors.surfaceAltLight,
+              borderRadius: BorderRadius.circular(AppRadius.md),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: _stat(theme, '${designer.completedProjects}', DesignersTexts.projects),
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const SiteIcon(SiteIcons.ratingStar, size: 10, color: Color(0xFFFBBF24)),
-                    const SizedBox(width: 3),
-                    Text(
-                      '${designer.rating}',
+                _statDivider(),
+                Expanded(child: _stat(theme, '${designer.experience}', DesignersTexts.years)),
+                _statDivider(),
+                Expanded(
+                  child: _stat(
+                    theme,
+                    formatNumber(designer.priceFrom),
+                    DesignersTexts.priceFromLabel,
+                    olive: true,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (designer.portfolio.isNotEmpty) ...[
+            const SizedBox(height: 16), // mb-4
+            Text(
+              DesignersTexts.portfolio,
+              style: theme.textTheme.labelSmall?.copyWith(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.5, // tracking-wide
+                color: AppColors.dark.withValues(alpha: 0.5),
+              ),
+            ),
+            const SizedBox(height: 8), // mb-2
+            Row(
+              children: [
+                for (var i = 0; i < designer.portfolio.length && i < 4; i++) ...[
+                  if (i > 0) const SizedBox(width: 8), // gap-2
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
+                      child: AspectRatio(
+                        aspectRatio: 4 / 3,
+                        child: AppImage(imageUrl: designer.portfolio[i], fit: BoxFit.cover),
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ],
+          if (designer.tags.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            Wrap(
+              spacing: 6, // gap-1.5
+              runSpacing: 6,
+              children: [
+                for (final tag in designer.tags)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceAltLight,
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
+                    ),
+                    child: Text(
+                      tag,
                       style: theme.textTheme.labelSmall?.copyWith(
                         fontSize: 11,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.dark,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.dark.withValues(alpha: 0.5),
                       ),
                     ),
-                    const SizedBox(width: 2),
-                    Text(
-                      '(${designer.reviewsCount})',
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        fontSize: 9.5,
-                        color: AppColors.dark.withValues(alpha: 0.4),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _avatar(BuildContext context) {
-    final theme = Theme.of(context);
-    Widget ring(Widget child) => Container(
-      width: 44,
-      height: 44,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(color: Colors.white, width: 3),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.12),
-            blurRadius: 6,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: ClipOval(child: child),
-    );
-
-    final avatar = designer.avatar.isNotEmpty
-        ? ring(AppImage(imageUrl: designer.avatar, fit: BoxFit.cover))
-        : ring(
-            DecoratedBox(
-              decoration: BoxDecoration(gradient: avatarGradient(designer.fullName)),
-              child: Center(
-                child: Text(
-                  initialsOf(designer.fullName),
-                  style: theme.textTheme.displaySmall?.copyWith(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
                   ),
-                ),
-              ),
+              ],
             ),
-          );
-
-    // Shablondagi yashil tasdiq nishonchasi — avatarning o'ng pastida.
-    return SizedBox(
-      width: 48,
-      height: 44,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          avatar,
-          Positioned(
-            right: 0,
-            bottom: 0,
-            child: Container(
-              width: 15,
-              height: 15,
-              decoration: BoxDecoration(
-                color: const Color(0xFF10B981), // bg-emerald-500
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 2),
-              ),
-              child: const Center(
-                child: SiteIcon(SiteIcons.check, size: 8, color: Colors.white, strokeWidth: 3),
-              ),
+          ],
+          const SizedBox(height: 12), // pt-3
+          Container(
+            padding: const EdgeInsets.only(top: 12),
+            decoration: BoxDecoration(
+              border: Border(top: BorderSide(color: AppColors.surfaceMutedLight)),
             ),
+            child: _actions(context),
           ),
         ],
       ),
     );
   }
 
-  Widget _nameAndCity(BuildContext context) {
-    final theme = Theme.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          designer.fullName,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: theme.textTheme.displaySmall?.copyWith(
-            fontSize: 14,
-            fontWeight: FontWeight.w700,
-            color: AppColors.dark,
-          ),
+  Widget _stat(ThemeData theme, String value, String label, {bool olive = false}) => Column(
+    children: [
+      Text(
+        value,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: theme.textTheme.titleMedium?.copyWith(
+          fontSize: 18, // text-lg
+          fontWeight: FontWeight.w700,
+          color: olive ? AppColors.olive : AppColors.dark,
         ),
-        const SizedBox(height: 2),
-        Row(
-          children: [
-            SiteIcon(SiteIcons.mapPin, size: 11, color: AppColors.dark.withValues(alpha: 0.3)),
-            const SizedBox(width: 4),
-            Flexible(
-              child: Text(
-                CityLabels.label(designer.city),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.labelSmall?.copyWith(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.dark.withValues(alpha: 0.5),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _specAndTags(BuildContext context) {
-    final theme = Theme.of(context);
-    Widget pill(String text, {bool accent = false}) => Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        color: accent ? AppColors.olive.withValues(alpha: 0.1) : AppColors.surfaceAltLight,
-        borderRadius: BorderRadius.circular(AppRadius.pill),
-        border: accent ? null : Border.all(color: AppColors.borderLight),
       ),
-      child: Text(
-        text,
+      Text(
+        label.toUpperCase(),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: theme.textTheme.labelSmall?.copyWith(
-          fontSize: 10.5,
-          fontWeight: accent ? FontWeight.w700 : FontWeight.w600,
-          color: accent ? AppColors.olive : AppColors.dark.withValues(alpha: 0.5),
+          fontSize: 11,
+          letterSpacing: 0.5,
+          color: AppColors.dark.withValues(alpha: 0.4),
         ),
       ),
-    );
+    ],
+  );
 
-    return Wrap(
-      spacing: 5,
-      runSpacing: 5,
-      children: [
-        pill(DesignersTexts.specLabel(designer.specialization), accent: true),
-        // Yarim kenglikda usta kartasidagidek dastlabki ikkita teg ko'rsatiladi.
-        for (final tag in designer.tags.take(2)) pill(tag),
-      ],
-    );
-  }
+  Widget _statDivider() => Container(
+    width: 1,
+    height: 40, // h-10
+    color: AppColors.borderLight,
+  );
 
-  /// Uchta ko'rsatkich: bajarilgan loyihalar, tajriba va boshlang'ich narx.
-  Widget _stats(BuildContext context) {
-    final theme = Theme.of(context);
-
-    Widget cell(String value, String label, {Color? color, int flex = 2}) => Expanded(
-      flex: flex,
-      child: Column(
-        children: [
-          Text(
-            value,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: theme.textTheme.titleMedium?.copyWith(
-              // Narx uch xonali guruhlar bilan yoziladi — uchdan bir kenglikka sig'ishi uchun 11.
-              fontSize: 11,
-              fontWeight: FontWeight.w700,
-              color: color ?? AppColors.dark,
-            ),
-          ),
-          Text(
-            label.toUpperCase(),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: theme.textTheme.labelSmall?.copyWith(
-              fontSize: 8,
-              letterSpacing: 0.3,
-              color: AppColors.dark.withValues(alpha: 0.4),
-            ),
-          ),
-        ],
-      ),
-    );
-
-    const separator = SizedBox(
-      width: 1,
-      height: 26,
-      child: ColoredBox(color: AppColors.borderLight),
-    );
-
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceAltLight,
-        borderRadius: BorderRadius.circular(AppRadius.sm),
-      ),
-      child: Row(
-        children: [
-          cell('${designer.completedProjects}', DesignersTexts.projects),
-          separator,
-          cell('${designer.experience}', DesignersTexts.years),
-          separator,
-          // Saytda `formatPrice()` — valyuta konvertatsiyasisiz.
-          cell(
-            formatNumber(designer.priceFrom),
-            DesignersTexts.priceFromLabel,
-            color: AppColors.olive,
-            // Narx eng uzun qiymat — unga qo'shni ikki katakdan kengroq joy beriladi.
-            flex: 3,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _portfolio(BuildContext context) {
-    return Row(
-      children: [
-        for (final (i, image) in designer.portfolio.take(3).indexed) ...[
-          if (i > 0) const SizedBox(width: 5),
-          Expanded(
-            child: AspectRatio(
-              aspectRatio: 4 / 3,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(6), // rounded-lg
-                child: AppImage(
-                  imageUrl: image,
-                  fit: BoxFit.cover,
-                  placeholder: (_, _) => const ColoredBox(color: AppColors.surfaceAltLight),
-                  errorWidget: (_, _, _) => const ColoredBox(color: AppColors.surfaceAltLight),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ],
-    );
-  }
-
+  /// "Profilni ko'rish" + qo'ng'iroq + sevimli.
   Widget _actions(BuildContext context) {
     final theme = Theme.of(context);
 
     Widget iconButton(SiteIconData icon, {VoidCallback? onTap, bool active = false}) => Pressable(
-      onTap: onTap,
+      onTap: onTap ?? () {},
       child: Container(
-        width: 30,
-        height: 30,
+        width: 48, // w-12
+        height: 48,
         decoration: BoxDecoration(
-          color: active ? const Color(0xFFFEF2F2) : Colors.transparent, // bg-red-50
-          borderRadius: BorderRadius.circular(9),
+          color: active ? const Color(0xFFFEF2F2) : Colors.white,
+          borderRadius: BorderRadius.circular(AppRadius.md),
           border: Border.all(
-            color: active ? const Color(0xFFFCA5A5) : AppColors.borderLight, // border-red-300
-            width: 1.5,
+            color: active ? const Color(0xFFFCA5A5) : AppColors.borderLight,
+            width: 2,
           ),
         ),
         child: Center(
           child: SiteIcon(
             icon,
-            size: 14,
+            size: 18,
             color: active ? const Color(0xFFEF4444) : AppColors.dark.withValues(alpha: 0.5),
           ),
         ),
@@ -1247,35 +1173,40 @@ class _DesignerCard extends StatelessWidget {
             scale: 0.98,
             onTap: () => context.push('/designers/${designer.id}'),
             child: Container(
-              height: 30,
+              padding: const EdgeInsets.symmetric(vertical: 12), // py-3
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: AppColors.olive,
-                borderRadius: BorderRadius.circular(9),
+                borderRadius: BorderRadius.circular(AppRadius.md),
               ),
               child: Text(
                 DesignersTexts.viewProfile,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.labelSmall?.copyWith(
-                  fontSize: 11.5,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
                   color: Colors.white,
-                  fontWeight: FontWeight.w700,
                 ),
               ),
             ),
           ),
         ),
-        const SizedBox(width: 5),
+        const SizedBox(width: 12), // gap-3
         iconButton(
           SiteIcons.phone,
           onTap: designer.phone.isEmpty
               ? null
               : () => launchUrl(Uri.parse('tel:${designer.phone}')),
         ),
-        const SizedBox(width: 5),
+        const SizedBox(width: 12),
         iconButton(SiteIcons.heart, onTap: onFavorite, active: isFavorite),
       ],
     );
+  }
+
+  static String _initials(String name) {
+    final parts = name.trim().split(RegExp(r'\s+')).where((p) => p.isNotEmpty).toList();
+    if (parts.isEmpty) return '?';
+    if (parts.length == 1) return parts.first.characters.first.toUpperCase();
+    return (parts[0].characters.first + parts[1].characters.first).toUpperCase();
   }
 }
