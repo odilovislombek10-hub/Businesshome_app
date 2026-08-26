@@ -17,3 +17,19 @@ lekin sayt lug'ati yangilansa yana kerak bo'ladi.
 
 Lug'atni yangilash: `python tool/parse_i18n.py && python tool/gen_dart_i18n.py`
 (ikkalasi ham `scratchpad/i18n/` papkasidan foydalanadi — yo'lni skript ichida to'g'irlang).
+
+## Tekshiruv skriptlari (2026-08-27)
+
+Butun ilovani tekshirish uchun. Har biri `python tool/<nom>.py`.
+
+| Skript | Nima tekshiradi |
+|---|---|
+| `check_routes.py` | Ilovadagi barcha `context.go/push` yo'llari router'da bormi |
+| `check_endpoints.py` | Chaqirilgan API yo'llari backend router'larida bormi (metodi bilan) |
+| `check_params.py` | Query parametr nomlari backend imzosiga mos kelyaptimi |
+| `check_payloads.py` | POST/PUT tanasidagi maydonlar backend sxemasida bormi |
+| `check_fields.py` | Model o'qiydigan kalitlar jonli API javobida bormi |
+| `fix_nav.py` | Ro'yxatdan tafsilotga o'tishda `go` → `push` (bir martalik) |
+
+**Diqqat:** Python 3.12 da `sys.stdout` ni `TextIOWrapper` bilan almashtirsang,
+qisqa chiqish buferda qolib ketadi — `sys.stdout.reconfigure(...)` ishlat.
