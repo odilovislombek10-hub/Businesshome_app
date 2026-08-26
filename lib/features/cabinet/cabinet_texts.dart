@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import 'package:flutter/painting.dart';
 
 import '../../core/models/market_user.dart';
@@ -6,105 +7,115 @@ import 'cabinet_repository.dart';
 /// Kabinet matnlari — `cabinet.*` kalitlari `core/i18n/translations/uz.ts` dan aynan olingan.
 abstract final class CabinetTexts {
   // Boshqaruv panelidagi rolga qarab chiziladigan bloklar (`cabinet.component.ts`).
-  static const topListings = "Eng yaxshi e'lonlaringiz";
-  static const marketInsight = "Bozor ma'lumoti";
-  static const marketDesc = "Sizning e'lonlaringiz bozor o'rtacha narxidan yuqori";
-  static const aboveMarket = "O'rtacha bozordan yuqori";
-  static const activeOrdersTitle = 'Faol buyurtmalar';
-  static const progress = 'Bajarildi';
-  static const latestReview = "So'nggi sharh";
-  static const allReviews = 'Barcha sharhlar';
-  static const welcomeUser = 'Xush kelibsiz!';
-  static const welcomeUserDesc = "BusinessHome'da o'zingizga mos uy yoki mutaxassisni toping";
+  static String get topListings => t('cabinet.topListings');
+  static String get marketInsight => t('cabinet.marketInsight');
+  static String get marketDesc => t('cabinet.marketDesc');
+  static String get aboveMarket => t('cabinet.aboveMarket');
+  static String get activeOrdersTitle => t('cabinet.activeOrdersTitle');
+  static String get progress => t('cabinet.progress');
+  static String get latestReview => t('cabinet.latestReview');
+  static String get allReviews => t('cabinet.allReviews');
+  static String get welcomeUser => t('cabinet.welcomeUser');
+  static String get welcomeUserDesc => t('cabinet.welcomeUserDesc');
 
   // Profil bo'limi
-  static const uploadCover = 'Cover yuklash';
-  static const availability = 'Mavjudligim';
-  static const editSpecialistProfile = 'Mutaxassis profilini tahrirlash';
+  static String get uploadCover => t('cabinet.uploadCover');
+  static String get availability => t('cabinet.availability');
+  static String get editSpecialistProfile => t('cabinet.editSpecialistProfile');
   static const availableFromLabel = 'Qachondan boshlab yana qabul qila boshlaysiz?';
   static const coverTooLarge = "Fayl hajmi 5MB dan oshmasligi kerak";
 
   /// Bandlik holatlari — saytdagi `availabilityOptions`.
-  static const availabilityOptions = <({String value, String label, String emoji, Color color})>[
-    (value: 'available', label: 'Mavjud', emoji: '🟢', color: Color(0xFF10B981)),
-    (value: 'busy', label: 'Band', emoji: '🟡', color: Color(0xFFF59E0B)),
-    (value: 'full', label: 'To\u02bcliq', emoji: '🔴', color: Color(0xFFEF4444)),
-    (value: 'vacation', label: 'Ta\u02bctilda', emoji: '🏖️', color: Color(0xFF0EA5E9)),
-    (value: 'offline', label: 'Oflayn', emoji: '⚪', color: Color(0xFF64748B)),
-  ];
+  static List<({String value, String label, String emoji, Color color})> get availabilityOptions =>
+      <({String value, String label, String emoji, Color color})>[
+        (
+          value: 'available',
+          label: t('cabinet.listingStatus.available'),
+          emoji: '🟢',
+          color: Color(0xFF10B981),
+        ),
+        (
+          value: 'busy',
+          label: t('cabinet.listingStatus.reserved'),
+          emoji: '🟡',
+          color: Color(0xFFF59E0B),
+        ),
+        (value: 'full', label: 'To\u02bcliq', emoji: '🔴', color: Color(0xFFEF4444)),
+        (value: 'vacation', label: 'Ta\u02bctilda', emoji: '🏖️', color: Color(0xFF0EA5E9)),
+        (value: 'offline', label: t('chat.offline'), emoji: '⚪', color: Color(0xFF64748B)),
+      ];
 
   // Buyurtma kartasi
-  static const startDate = 'Boshlangan';
-  static const yesterday = 'Kecha';
-  static const today = 'Bugun';
-  static const daysAgo = 'kun oldin';
+  static String get startDate => t('cabinet.startDate');
+  static String get yesterday => t('cabinet.yesterday');
+  static String get today => t('cabinet.today');
+  static String get daysAgo => t('cabinet.daysAgo');
 
   // Buyurtmalarim
-  static const myOrdersEmpty = "Hech qanday buyurtma yo'q";
-  static const writeReview = 'Sharh yozish';
-  static const reviewPlaceholder = 'Tajribangiz haqida yozing...';
+  static String get myOrdersEmpty => t('myOrders.empty');
+  static String get writeReview => t('myOrders.writeReview');
+  static String get reviewPlaceholder => t('myOrders.reviewPlaceholder');
 
   // Xizmat paketlari
-  static const servicesConfirmDelete = "Paketni o'chirishni tasdiqlaysizmi?";
+  static String get servicesConfirmDelete => t('services.confirmDelete');
 
   // Chiqishni tasdiqlash oynasi
-  static const logoutConfirmTitle = 'Tizimdan chiqish';
-  static const logoutConfirmMessage = 'Haqiqatan ham tizimdan chiqmoqchimisiz?';
-  static const logoutConfirmYes = 'Ha, chiqish';
-  static const logoutConfirmCancel = 'Bekor qilish';
+  static String get logoutConfirmTitle => t('cabinet.logoutConfirmTitle');
+  static String get logoutConfirmMessage => t('cabinet.logoutConfirmMessage');
+  static String get logoutConfirmYes => t('cabinet.logoutConfirmYes');
+  static String get logoutConfirmCancel => t('cabinet.logoutConfirmCancel');
 
-  static const logout = 'Chiqish';
-  static const viewAll = "Barchasini ko'rish";
+  static String get logout => t('cabinet.logout');
+  static String get viewAll => t('cabinet.viewAll');
   static const marketplace = 'Marketplace';
-  static const unknownUser = 'Foydalanuvchi';
-  static const kycRequired = 'OneID tasdiqlash kerak';
-  static const kycMessage =
-      "E'lon berish va sotuvchi profilingiz ko'rinishi uchun davlat OneID orqali tasdiqlanish kerak";
+  static String get unknownUser => t('cabinet.role.user');
+  static String get kycRequired => t('cabinet.kycRequired');
+  static String get kycMessage => t('cabinet.kycMessage');
   static const kycAction = 'OneID orqali kirish';
 
   /// `cabinet.tab.*`
-  static const tabLabels = <String, String>{
-    'dashboard': 'Bosh sahifa',
-    'listings': "Mening e'lonlarim",
-    'favorites': 'Sevimlilar',
-    'viewed': "Yaqinda ko'rilganlar",
-    'inquiries': "So'rovlar",
-    'orders': 'Buyurtmalar',
-    'portfolio': 'Portfolio',
-    'projects': 'Loyihalarim',
-    'reels': 'Reels',
-    'services': 'Xizmatlar',
-    'reviews': 'Sharhlar',
-    'earnings': 'Daromad',
-    'messages': 'Xabarlar',
-    'profile': 'Profil',
-    'settings': 'Sozlamalar',
-    'agent-profile': 'Agentlik profili',
-    'my-orders': 'Mening buyurtmalarim',
-    'kyc': 'KYC tasdiqlash',
+  static Map<String, String> get tabLabels => <String, String>{
+    'dashboard': t('cabinet.tab.dashboard'),
+    'listings': t('cabinet.tab.listings'),
+    'favorites': t('cabinet.tab.favorites'),
+    'viewed': t('cabinet.tab.viewed'),
+    'inquiries': t('cabinet.tab.inquiries'),
+    'orders': t('cabinet.tab.orders'),
+    'portfolio': t('cabinet.tab.portfolio'),
+    'projects': t('cabinet.tab.projects'),
+    'reels': t('cabinet.tab.reels'),
+    'services': t('cabinet.tab.services'),
+    'reviews': t('cabinet.tab.reviews'),
+    'earnings': t('cabinet.tab.earnings'),
+    'messages': t('cabinet.tab.messages'),
+    'profile': t('cabinet.tab.profile'),
+    'settings': t('cabinet.tab.settings'),
+    'agent-profile': t('cabinet.tab.agentProfile'),
+    'my-orders': t('cabinet.tab.myOrders'),
+    'kyc': t('cabinet.tab.kyc'),
   };
 
   static String tabLabel(String id) => tabLabels[id] ?? 'Kabinet';
 
   /// `cabinet.stat.*` — API yorliqni kalit sifatida qaytaradi.
-  static const statLabels = <String, String>{
-    'cabinet.stat.favorites': 'Sevimlilar',
-    'cabinet.stat.viewed': "Ko'rilganlar",
-    'cabinet.stat.searches': 'Qidiruvlar',
-    'cabinet.stat.unread': "O'qilmagan",
-    'cabinet.stat.activeListings': "Faol e'lonlar",
-    'cabinet.stat.todayViews': "Bugungi ko'rishlar",
-    'cabinet.stat.newInquiries': "Yangi so'rovlar",
-    'cabinet.stat.monthEarnings': 'Oylik daromad',
-    'cabinet.stat.activeOrders': 'Faol buyurtmalar',
-    'cabinet.stat.rating': 'Reyting',
-    'cabinet.stat.activeClients': 'Faol mijozlar',
+  static Map<String, String> get statLabels => <String, String>{
+    'cabinet.stat.favorites': t('cabinet.tab.favorites'),
+    'cabinet.stat.viewed': t('cabinet.stat.viewed'),
+    'cabinet.stat.searches': t('cabinet.stat.searches'),
+    'cabinet.stat.unread': t('cabinet.stat.unread'),
+    'cabinet.stat.activeListings': t('cabinet.stat.activeListings'),
+    'cabinet.stat.todayViews': t('cabinet.stat.todayViews'),
+    'cabinet.stat.newInquiries': t('cabinet.stat.newInquiries'),
+    'cabinet.stat.monthEarnings': t('cabinet.monthlyChart'),
+    'cabinet.stat.activeOrders': t('cabinet.activeOrdersTitle'),
+    'cabinet.stat.rating': t('cabinet.stat.rating'),
+    'cabinet.stat.activeClients': t('cabinet.stat.activeClients'),
   };
 
   static String statLabel(String key) => statLabels[key] ?? key;
 
   /// Bosilganda qaysi bo'limga olib boradi — saytdagi `statRouteMap`.
-  static const statRoutes = <String, String>{
+  static Map<String, String> get statRoutes => <String, String>{
     'cabinet.stat.activeListings': 'listings',
     'cabinet.stat.todayViews': 'listings',
     'cabinet.stat.newInquiries': 'inquiries',
@@ -119,11 +130,11 @@ abstract final class CabinetTexts {
 
   /// `cabinet.role.*`
   static String roleLabel(MarketRole role) => switch (role) {
-    MarketRole.user => 'Foydalanuvchi',
-    MarketRole.agent => 'Agent',
-    MarketRole.designer => 'Dizayner',
-    MarketRole.master => 'Usta',
-    MarketRole.developer => 'Quruvchi',
+    MarketRole.user => t('cabinet.role.user'),
+    MarketRole.agent => t('cabinet.role.agent'),
+    MarketRole.designer => t('cabinet.favBadge.designer'),
+    MarketRole.master => t('cabinet.favBadge.master'),
+    MarketRole.developer => t('detail.developer'),
   };
 
   /// Boshqaruv panelidagi sarlavha ostidagi izoh — saytdagi `dashSubtitle`.
@@ -137,21 +148,21 @@ abstract final class CabinetTexts {
   static const greeting = 'Assalomu alaykum';
 
   // ── mening e'lonlarim ─────────────────────────────────────────────────────
-  static const newListing = "Yangi e'lon berish";
-  static const createListing = "E'lon yaratish";
-  static const noListings = "Sizda hali e'lonlar yo'q";
-  static const noListingsDesc = "Birinchi e'loningizni yarating va mijozlar bilan bog'laning";
-  static const edit = 'Tahrirlash';
-  static const cancel = 'Bekor qilish';
-  static const deleteConfirmTitle = "E'lonni o'chirish";
-  static const deleteConfirmMessage = "Bu e'lonni o'chirmoqchimisiz?";
-  static const deleteConfirmYes = "Ha, o'chirish";
+  static String get newListing => t('cabinet.newListing');
+  static String get createListing => t('cabinet.createListing');
+  static String get noListings => t('cabinet.noListings');
+  static String get noListingsDesc => t('cabinet.noListingsDesc');
+  static String get edit => t('cabinet.edit');
+  static String get cancel => t('cabinet.logoutConfirmCancel');
+  static String get deleteConfirmTitle => t('cabinet.deleteConfirmTitle');
+  static String get deleteConfirmMessage => t('cabinet.deleteConfirmMessage');
+  static String get deleteConfirmYes => t('cabinet.deleteConfirmYes');
 
   /// `cabinet.dealType.*`
   static String dealTypeLabel(String value) => switch (value) {
-    'sell' => 'Sotuv',
-    'rent' => 'Ijara',
-    'exchange' => 'Almashish',
+    'sell' => t('cabinet.dealType.sell'),
+    'rent' => t('cabinet.dealType.rent'),
+    'exchange' => t('cabinet.dealType.exchange'),
     _ => value,
   };
 
@@ -159,7 +170,7 @@ abstract final class CabinetTexts {
   static String modLabel(String value) => switch (value) {
     'active' => 'Aktiv',
     'pending' => 'Tasdiqlanmoqda',
-    'rejected' => 'Rad etilgan',
+    'rejected' => t('cabinet.reels.statusRejected'),
     'paused' => 'Yashirilgan',
     'sold' => 'Yopilgan',
     _ => value,
@@ -176,17 +187,17 @@ abstract final class CabinetTexts {
   };
 
   // ── mening buyurtmalarim ──────────────────────────────────────────────────
-  static const noOrders = "Hozircha buyurtmalar yo'q";
+  static String get noOrders => t('cabinet.noOrders');
 
   /// `cabinet.orderStatus.*`
   static String orderStatusLabel(String status) => switch (status) {
-    'pending' => 'Kutilmoqda',
-    'accepted' => 'Qabul qilindi',
-    'in_progress' => 'Jarayonda',
-    'completed' => 'Tugatilgan',
-    'awaiting_confirm' => 'Tasdiqlash kutilmoqda',
-    'cancelled' => 'Bekor qilingan',
-    'rejected' => 'Rad etildi',
+    'pending' => t('cabinet.reels.statusPending'),
+    'accepted' => t('cabinet.orderStatus.accepted'),
+    'in_progress' => t('cabinet.inquiryStatus.in_progress'),
+    'completed' => t('cabinet.orderStatus.completed'),
+    'awaiting_confirm' => t('cabinet.orderStatus.awaiting_confirm'),
+    'cancelled' => t('cabinet.orderStatus.cancelled'),
+    'rejected' => t('cabinet.orderStatus.rejected'),
     _ => status,
   };
 
@@ -242,136 +253,134 @@ abstract final class CabinetTexts {
   };
 
   // ── sevimlilar ────────────────────────────────────────────────────────────
-  static const noFavorites = "Hali sevimlilar yo'q";
-  static const noFavoritesDesc =
-      "Yoqtirgan e'lonlaringizni saqlab qo'ying — ularni bu yerda topasiz";
-  static const noFavoritesInCategory = "Bu kategoriyada sevimlilar yo'q";
-  static const startSearch = 'Qidirishni boshlash';
+  static String get noFavorites => t('cabinet.noFavorites');
+  static String get noFavoritesDesc => t('cabinet.noFavoritesDesc');
+  static String get noFavoritesInCategory => t('cabinet.noFavoritesInCategory');
+  static String get startSearch => t('cabinet.startSearch');
 
   /// `cabinet.favFilter.*` — filtr tugmalari; tartibi shablondagidek.
-  static const _favFilters = <(String, String)>[
-    ('new-project', 'Yangi loyihalar'),
-    ('secondary', 'Ikkilamchi'),
-    ('rent', 'Ijara'),
-    ('viewer-apartment', '3D kvartiralar'),
-    ('ads', "E'lonlar"),
-    ('designer', 'Dizaynerlar'),
-    ('master', 'Ustalar'),
+  static List<(String, String)> get _favFilters => <(String, String)>[
+    ('new-project', t('cabinet.favFilter.newProject')),
+    ('secondary', t('cabinet.favFilter.secondary')),
+    ('rent', t('cabinet.dealType.rent')),
+    ('viewer-apartment', t('cabinet.favFilter.viewer')),
+    ('ads', t('cabinet.favFilter.ads')),
+    ('designer', t('cabinet.favFilter.designer')),
+    ('master', t('cabinet.favFilter.master')),
   ];
 
   static List<(String, String)> favoriteTabsFor(Set<String> sources) => [
-    ('all', 'Hammasi'),
+    ('all', t('cabinet.favFilter.all')),
     for (final (key, label) in _favFilters)
       if (sources.contains(key)) (key, label),
   ];
 
   // ── loyihalarim ───────────────────────────────────────────────────────────
-  static const projectsSubtitle = "Bajargan loyihalaringizni qo'shing — mijozlar sizga ishonsin";
-  static const projectAddNew = 'Yangi loyiha';
-  static const projectAddFirst = "Birinchi loyihangizni qo'shing";
-  static const projectsEmpty = "Hali loyihalar yo'q";
-  static const projectEdit = 'Loyihani tahrirlash';
-  static const projectDraft = 'Qoralama';
-  static const projectTitle = 'Loyiha sarlavhasi';
-  static const projectTitlePlaceholder = 'Misol: Zamonaviy 3 xonali kvartira dizayni';
-  static const projectDescription = 'Tavsif';
-  static const projectDescPlaceholder = 'Loyiha haqida qisqacha. Qanday yechim toptingiz...';
-  static const projectImages = 'Rasmlar';
-  static const projectUploadImages = 'Rasm yuklash';
-  static const projectCover = 'Asosiy';
-  static const projectCity = 'Shahar';
-  static const projectDistrict = 'Tuman';
-  static const projectArea = 'Maydon';
-  static const projectType = 'Obyekt turi';
-  static const projectBudget = 'Smeta';
-  static const projectBudgetSuffix = "so'm dan";
-  static const projectCompletedAt = 'Tugatilgan sana';
+  static String get projectsSubtitle => t('cabinet.projects.subtitle');
+  static String get projectAddNew => t('cabinet.newProject');
+  static String get projectAddFirst => t('cabinet.projects.addFirst');
+  static String get projectsEmpty => t('cabinet.projects.empty');
+  static String get projectEdit => t('cabinet.projects.edit');
+  static String get projectDraft => t('cabinet.projects.draft');
+  static String get projectTitle => t('cabinet.projects.title');
+  static String get projectTitlePlaceholder => t('cabinet.projects.titlePlaceholder');
+  static String get projectDescription => t('cabinet.projects.description');
+  static String get projectDescPlaceholder => t('cabinet.projects.descPlaceholder');
+  static String get projectImages => t('cabinet.projects.images');
+  static String get projectUploadImages => t('cabinet.projects.uploadImages');
+  static String get projectCover => t('cabinet.projects.cover');
+  static String get projectCity => t('cabinet.projects.city');
+  static String get projectDistrict => t('cabinet.district');
+  static String get projectArea => t('cabinet.projects.area');
+  static String get projectType => t('cabinet.projects.projectType');
+  static String get projectBudget => t('cabinet.projects.budget');
+  static String get projectBudgetSuffix => t('createSpecialist.priceSuffix');
+  static String get projectCompletedAt => t('cabinet.projects.completedAt');
   static const projectSaveError = "Loyihani saqlab bo'lmadi";
   static const projectDeleteError = "O'chirib bo'lmadi";
   static const projectsLoadError = "Loyihalarni yuklab bo'lmadi";
-  static const save = 'Saqlash';
+  static String get save => t('common.save');
 
   /// `createListing.type*` — obyekt turi ro'yxati.
-  static const projectTypes = <(String, String)>[
-    ('apartment', 'Kvartira'),
-    ('house', 'Hovli uy'),
-    ('office', 'Ofis'),
-    ('shop', "Do'kon"),
+  static List<(String, String)> get projectTypes => <(String, String)>[
+    ('apartment', t('header.dropdown.apartment')),
+    ('house', t('header.dropdown.house')),
+    ('office', t('header.dropdown.office')),
+    ('shop', t('header.dropdown.shop')),
   ];
 
   // ── xizmatlar (paketlar) ──────────────────────────────────────────────────
-  static const serviceAdd = "Paket qo'shish";
-  static const serviceEdit = 'Paketni tahrirlash';
-  static const servicesEmpty = "Paketlar hali yo'q";
-  static const servicesEmptyDesc = 'Birinchi xizmat paketingizni yarating';
-  static const serviceTitle = 'Nomi';
-  static const servicePrice = 'Narx';
-  static const serviceDelivery = 'Muddat (kun)';
-  static const serviceFeatures = 'Xususiyatlar';
-  static const serviceFeaturesHint = 'har birini yangi qatorda';
-  static const serviceDays = 'kun';
-  static const serviceRecommended = 'TAVSIYA ETILGAN';
-  static const serviceMakeRecommended = 'Tavsiya etilgan qilish';
+  static String get serviceAdd => t('services.add');
+  static String get serviceEdit => t('services.edit');
+  static String get servicesEmpty => t('services.empty');
+  static String get servicesEmptyDesc => t('services.emptyDesc');
+  static String get serviceTitle => t('services.title');
+  static String get servicePrice => t('services.price');
+  static String get serviceDelivery => t('services.delivery');
+  static String get serviceFeatures => t('services.features');
+  static String get serviceFeaturesHint => t('services.featuresHint');
+  static String get serviceDays => t('services.days');
+  static String get serviceRecommended => t('services.recommended');
+  static String get serviceMakeRecommended => t('services.makeRecommended');
   static const servicesLoadError = "Paketlarni yuklab bo'lmadi";
   static const serviceSaveError = "Paketni saqlab bo'lmadi";
-  static const delete = "O'chirish";
+  static String get delete => t('common.delete');
 
   // ── so'rovlar (agent) ─────────────────────────────────────────────────────
-  static const inquiryReply = 'Javob berish';
-  static const inquiryCall = "Qo'ng'iroq";
+  static String get inquiryReply => t('cabinet.reply');
+  static String get inquiryCall => t('cabinet.call');
   static const inquiriesEmpty = "Hali so'rovlar yo'q";
   static const inquiriesLoadError = "So'rovlarni yuklab bo'lmadi";
   static const inquiryChatError = "Suhbatni ochib bo'lmadi";
 
   /// `cabinet.inquiryStatus.*` — yorliq, matn rangi va foni.
   static (String, Color, Color) inquiryStatusStyle(String status) => switch (status) {
-    'new' => ('Yangi', Color(0xFF1D4ED8), Color(0xFFDBEAFE)),
-    'in_progress' => ('Jarayonda', Color(0xFFB45309), Color(0xFFFEF3C7)),
-    'completed' => ('Yakunlangan', Color(0xFF047857), Color(0xFFD1FAE5)),
+    'new' => (t('cabinet.inquiryStatus.new'), Color(0xFF1D4ED8), Color(0xFFDBEAFE)),
+    'in_progress' => (t('cabinet.inquiryStatus.in_progress'), Color(0xFFB45309), Color(0xFFFEF3C7)),
+    'completed' => (t('cabinet.inquiryStatus.completed'), Color(0xFF047857), Color(0xFFD1FAE5)),
     _ => (status, Color(0xFF4B5563), Color(0xFFF3F4F6)),
   };
 
   // ── agentlik profili ──────────────────────────────────────────────────────
-  static const agentDisplayName = "Ko'rsatiladigan ism";
-  static const agentAgency = 'Agentlik nomi';
-  static const agentBio = "O'zingiz haqida";
-  static const agentExperience = 'Tajriba (yil)';
-  static const agentLicense = 'Litsenziya raqami';
+  static String get agentDisplayName => t('agentProfile.displayName');
+  static String get agentAgency => t('agentProfile.agency');
+  static String get agentBio => t('agentProfile.bio');
+  static String get agentExperience => t('agentProfile.experience');
+  static String get agentLicense => t('agentProfile.license');
   static const agentTelegram = 'Telegram';
   static const agentInstagram = 'Instagram';
   static const agentHandleHint = '@username';
   static const agentLoadError = "Profilni yuklab bo'lmadi";
 
   // ── KYC ───────────────────────────────────────────────────────────────────
-  static const kycIntro =
-      "KYC tasdiqlash uchun pasport va kasbiy hujjat yuklang. Admin ko'rib chiqadi.";
-  static const kycPassport = 'Pasport';
-  static const kycDiploma = 'Diplom';
-  static const kycLicense = 'Litsenziya';
-  static const kycSubmit = 'Tasdiqlash uchun yuborish';
+  static String get kycIntro => t('kyc.intro');
+  static String get kycPassport => t('kyc.passport');
+  static String get kycDiploma => t('kyc.diploma');
+  static String get kycLicense => t('kyc.license');
+  static String get kycSubmit => t('kyc.submit');
   static const kycChooseFile = 'Fayl tanlash';
   static const kycSubmitError = "Hujjatlarni yuborib bo'lmadi";
   static const kycNeedPassport = 'Avval pasport nusxasini tanlang';
 
   /// `kyc.status.*` — yorliq, matn rangi va fon.
   static (String, Color, Color) kycStatusStyle(String status) => switch (status) {
-    'approved' => ('Tasdiqlangan', Color(0xFF047857), Color(0xFFECFDF5)),
-    'pending' => ('Tekshirilmoqda', Color(0xFFB45309), Color(0xFFFFFBEB)),
-    'rejected' => ('Rad etilgan', Color(0xFFB91C1C), Color(0xFFFEF2F2)),
-    _ => ('Yuborilmagan', Color(0x993D3D3D), Color(0xFFF3F4F6)),
+    'approved' => (t('cabinet.reels.statusApproved'), Color(0xFF047857), Color(0xFFECFDF5)),
+    'pending' => (t('kyc.status.pending'), Color(0xFFB45309), Color(0xFFFFFBEB)),
+    'rejected' => (t('cabinet.reels.statusRejected'), Color(0xFFB91C1C), Color(0xFFFEF2F2)),
+    _ => (t('kyc.status.none'), Color(0x993D3D3D), Color(0xFFF3F4F6)),
   };
 
   // ── sharhlar ──────────────────────────────────────────────────────────────
-  static const reviewReply = 'Javob berish';
-  static const reviewSendReply = 'Javob yuborish';
-  static const reviewSpecialistReply = 'Mutaxassis javobi';
-  static const reviewReplyPlaceholder = 'Mijozga javobingizni yozing...';
+  static String get reviewReply => t('cabinet.reply');
+  static String get reviewSendReply => t('reviews.sendReply');
+  static String get reviewSpecialistReply => t('reviews.specialistReply');
+  static String get reviewReplyPlaceholder => t('reviews.replyPlaceholder');
   static const reviewsEmpty = "Hali sharhlar yo'q";
   static const reviewsLoadError = "Sharhlarni yuklab bo'lmadi";
   static const reviewReplyError = "Javobni yuborib bo'lmadi";
 
   // ── daromad ───────────────────────────────────────────────────────────────
-  static const totalEarnings = 'Umumiy daromad';
+  static String get totalEarnings => t('cabinet.totalEarnings');
   static const earningsQuick = 'Tezkor:';
   static const earningsFrom = 'Dan';
   static const earningsTo = 'Gacha';
@@ -381,15 +390,15 @@ abstract final class CabinetTexts {
   static const earningsLoadError = "Daromadni yuklab bo'lmadi";
 
   /// Tezkor davr tugmalari — kalit, yorliq va sarlavha ostidagi izoh.
-  static const earningRanges = <(String, String, String)>[
+  static List<(String, String, String)> get earningRanges => <(String, String, String)>[
     ('week', 'Hafta', 'Oxirgi 7 kun'),
     ('month', 'Oy', 'Oxirgi 30 kun'),
     ('quarter', '3 oy', 'Oxirgi 3 oy'),
     ('year', 'Yil', 'Oxirgi 1 yil'),
-    ('all', 'Hammasi', 'Barcha vaqt'),
+    ('all', t('cabinet.favFilter.all'), 'Barcha vaqt'),
   ];
 
-  static const earningGranularities = <(String, String)>[
+  static List<(String, String)> get earningGranularities => <(String, String)>[
     ('day', "Kun bo'yicha"),
     ('month', "Oy bo'yicha"),
     ('year', "Yil bo'yicha"),
@@ -436,18 +445,14 @@ abstract final class CabinetTexts {
   }
 
   // ── reels ─────────────────────────────────────────────────────────────────
-  static const reelsSubtitle =
-      "Qisqa video joylab portfoliongizni jonlantiring — admin tasdiqlagandan keyin reels "
-      "bo'limida ko'rinadi";
-  static const reelUpload = 'Reel yuklash';
-  static const reelUploading = 'Yuklanmoqda...';
-  static const reelsEmpty = "Hali reels yo'q";
-  static const reelsModerationNote =
-      "Yangi reel admin tomonidan tasdiqlanguncha jamoatga ko'rinmaydi. Rad etilsa, sababi "
-      "ko'rsatiladi.";
-  static const reelRejectReason = 'Sabab';
-  static const reelResubmit = 'Qayta yuborish';
-  static const reelViews = "ko'rishlar";
+  static String get reelsSubtitle => t('cabinet.reels.subtitle');
+  static String get reelUpload => t('cabinet.reels.upload');
+  static String get reelUploading => t('cabinet.reels.uploading');
+  static String get reelsEmpty => t('cabinet.reels.empty');
+  static String get reelsModerationNote => t('cabinet.reels.moderationNote');
+  static String get reelRejectReason => t('cabinet.reels.rejectReason');
+  static String get reelResubmit => t('cabinet.reels.resubmit');
+  static String get reelViews => t('cabinet.views');
   static const reelTitlePrompt = 'Reel sarlavhasi:';
   static const reelTooBig = "Video 100 MB dan katta bo'lmasligi kerak";
   static const reelSent = 'Reel yuborildi. Admin tasdiqlashini kuting.';
@@ -456,38 +461,38 @@ abstract final class CabinetTexts {
 
   /// Moderatsiya nishonchasi — yorliq va foni.
   static (String, Color)? reelStatus(String status) => switch (status) {
-    'pending' => ('Kutilmoqda', Color(0xFFF59E0B)),
-    'approved' => ('Tasdiqlangan', Color(0xFF10B981)),
-    'rejected' => ('Rad etilgan', Color(0xFFEF4444)),
+    'pending' => (t('cabinet.reels.statusPending'), Color(0xFFF59E0B)),
+    'approved' => (t('cabinet.reels.statusApproved'), Color(0xFF10B981)),
+    'rejected' => (t('cabinet.reels.statusRejected'), Color(0xFFEF4444)),
     _ => null,
   };
 
   // ── portfolio ─────────────────────────────────────────────────────────────
-  static const addProject = "Loyiha qo'shish";
-  static const noPortfolio = "Portfolio bo'sh";
+  static String get addProject => t('cabinet.addProject');
+  static String get noPortfolio => t('cabinet.noPortfolio');
   static const portfolioRemoveConfirm = "Rasmni o'chirishni xohlaysizmi?";
   static const portfolioUploadError = "Rasmlarni yuklab bo'lmadi";
   static const portfolioRemoveError = "O'chirib bo'lmadi";
   static const portfolioLoadError = "Portfolioni yuklab bo'lmadi";
 
   // ── buyurtmalar (dizayner/usta) ────────────────────────────────────────────
-  static const activeOrders = 'Faol buyurtmalar';
-  static const activeOrdersHint = "Muddat bo'yicha tartiblangan";
-  static const amountLabel = 'Summa';
-  static const soum = "so'm";
+  static String get activeOrders => t('cabinet.activeOrdersTitle');
+  static String get activeOrdersHint => t('cabinet.activeOrdersHint');
+  static String get amountLabel => t('cabinet.amount');
+  static String get soum => t('hero.currency');
   static const deadlineLabel = 'Muddat:';
   static const timeLabel = 'Vaqt:';
   static const doneLabel = 'Bajarildi:';
-  static const doneShort = 'Bajarildi';
+  static String get doneShort => t('cabinet.progress');
   static const noDeadline = 'Muddat belgilanmagan';
   static const noOrdersInCategory = "Bu kategoriyada buyurtmalar yo'q";
 
   /// Saralash tugmalari — yorliq, holat kaliti va faol holatdagi rangi.
-  static const orderFilters = <(String, String, Color)>[
-    ('all', 'Hammasi', Color(0xFF87885C)),
-    ('pending', 'Yangi', Color(0xFFF59E0B)),
-    ('in_progress', 'Jarayonda', Color(0xFF87885C)),
-    ('completed', 'Tugatilgan', Color(0xFF10B981)),
+  static List<(String, String, Color)> get orderFilters => <(String, String, Color)>[
+    ('all', t('cabinet.favFilter.all'), Color(0xFF87885C)),
+    ('pending', t('cabinet.inquiryStatus.new'), Color(0xFFF59E0B)),
+    ('in_progress', t('cabinet.inquiryStatus.in_progress'), Color(0xFF87885C)),
+    ('completed', t('cabinet.orderStatus.completed'), Color(0xFF10B981)),
   ];
 
   /// `orderProgressBarClass` — vaqt progressi chizig'ining rangi.
@@ -498,33 +503,33 @@ abstract final class CabinetTexts {
   };
 
   // ── xabarlar ──────────────────────────────────────────────────────────────
-  static const noMessages = "Hali xabarlar yo'q";
-  static const noMessagesDesc = "Sizga kelgan xabarlar shu yerda ko'rsatiladi";
+  static String get noMessages => t('cabinet.noMessages');
+  static String get noMessagesDesc => t('cabinet.noMessagesDesc');
 
   /// Saytdagi `formatRelativeTime` — `time.*` kalitlari bilan.
   static String relativeTime(DateTime? at) {
     if (at == null) return '';
     final diff = DateTime.now().difference(at).inSeconds;
-    if (diff < 60) return 'hozir';
-    if (diff < 3600) return '${diff ~/ 60} daqiqa oldin';
-    if (diff < 86400) return '${diff ~/ 3600} soat oldin';
-    if (diff < 7 * 86400) return '${diff ~/ 86400} kun oldin';
+    if (diff < 60) return t('time.now');
+    if (diff < 3600) return '${diff ~/ 60} ${t('time.minAgo')}';
+    if (diff < 86400) return '${diff ~/ 3600} ${t('time.hourAgo')}';
+    if (diff < 7 * 86400) return '${diff ~/ 86400} ${t('time.dayAgo')}';
     final d = at.toLocal();
     return '${d.day}.${d.month.toString().padLeft(2, '0')}.${d.year}';
   }
 
   // ── profil ────────────────────────────────────────────────────────────────
-  static const basicInfo = "Asosiy ma'lumotlar";
-  static const fullName = "To'liq ism";
-  static const phone = 'Telefon';
-  static const region = 'Viloyat';
-  static const roleFieldLabel = 'Rol';
-  static const saveChanges = "O'zgarishlarni saqlash";
-  static const saving = 'Saqlanmoqda...';
-  static const profileSaved = 'Profil muvaffaqiyatli saqlandi';
-  static const profileError = 'Profilni saqlashda xato yuz berdi';
-  static const allRegions = 'Viloyatni tanlang';
-  static const allDistricts = 'Tumanlarning hammasi';
+  static String get basicInfo => t('cabinet.basicInfo');
+  static String get fullName => t('cabinet.fullName');
+  static String get phone => t('cabinet.phone');
+  static String get region => t('cabinet.region');
+  static String get roleFieldLabel => t('cabinet.role.label');
+  static String get saveChanges => t('cabinet.saveChanges');
+  static String get saving => t('cabinet.saving');
+  static String get profileSaved => t('cabinet.profileSaved');
+  static String get profileError => t('cabinet.profileError');
+  static String get allRegions => t('cabinet.allRegions');
+  static String get allDistricts => t('cabinet.allDistricts');
   static const avatarTooBig = "Fayl hajmi 5MB dan oshmasligi kerak";
 
   /// `getRoleColor()` — avatar o'rnidagi tekis fon.
@@ -554,44 +559,44 @@ abstract final class CabinetTexts {
   };
 
   // ── sozlamalar ────────────────────────────────────────────────────────────
-  static const notifications = 'Bildirishnomalar';
-  static const notificationsDesc = "Yangi xabarlar va so'rovlar haqida bildirishnoma";
-  static const emailUpdates = 'Email yangiliklar';
-  static const emailUpdatesDesc = 'Haftalik dayjest va yangi takliflar';
-  static const changePassword = "Parolni o'zgartirish";
-  static const updatePassword = 'Yangilash';
-  static const currentPassword = 'Joriy parol';
-  static const newPassword = 'Yangi parol';
-  static const confirmNewPassword = 'Yangi parolni tasdiqlang';
-  static const passwordChanged = "Parol muvaffaqiyatli o'zgartirildi";
-  static const passwordError = "Parolni o'zgartirishda xato";
+  static String get notifications => t('cabinet.notifications');
+  static String get notificationsDesc => t('cabinet.notificationsDesc');
+  static String get emailUpdates => t('cabinet.emailUpdates');
+  static String get emailUpdatesDesc => t('cabinet.emailUpdatesDesc');
+  static String get changePassword => t('cabinet.changePassword');
+  static String get updatePassword => t('cabinet.updatePassword');
+  static String get currentPassword => t('cabinet.currentPassword');
+  static String get newPassword => t('cabinet.newPassword');
+  static String get confirmNewPassword => t('cabinet.confirmNewPassword');
+  static String get passwordChanged => t('cabinet.passwordChanged');
+  static String get passwordError => t('cabinet.passwordError');
 
   /// `auth.errorPasswordMin` / `auth.errorPasswordMatch` — parol formasi shularni ko'rsatadi.
-  static const errorPasswordMin = "Parol kamida 6 belgidan iborat bo'lishi kerak";
-  static const errorPasswordMatch = 'Parollar mos kelmaydi';
+  static String get errorPasswordMin => t('auth.errorPasswordMin');
+  static String get errorPasswordMatch => t('auth.errorPasswordMatch');
   static const currentPasswordMissing = 'Joriy parol kiritilmagan';
 
   /// Shablonda bu sarlavha tarjimasiz, to'g'ridan-to'g'ri yozilgan.
-  static const languageAndTheme = 'Til va Mavzu';
-  static const language = 'Til';
-  static const theme = 'Mavzu';
+  static String get languageAndTheme => t('cabinet.languageTheme');
+  static String get language => t('cabinet.language');
+  static String get theme => t('cabinet.theme');
   static const themeLight = "☀ Yorug'";
   static const themeDark = "🌙 Qorong'u";
   static const languageUz = "O'zbekcha";
 
-  static const dangerZone = 'Xavfli zona';
-  static const deleteAccount = "Hisobni o'chirish";
-  static const deleteAccountDesc = "Hisobingizni o'chirsangiz, qaytarib bo'lmaydi.";
-  static const deleteAccountConfirm = "Haqiqatan ham hisobingizni o'chirmoqchimisiz?";
+  static String get dangerZone => t('cabinet.dangerZone');
+  static String get deleteAccount => t('cabinet.deleteAccount');
+  static String get deleteAccountDesc => t('cabinet.deleteAccountDesc');
+  static String get deleteAccountConfirm => t('cabinet.deleteAccountConfirm');
 
   /// `cabinet.favBadge.*` + rasm ustidagi rangi.
   static (String, Color)? favoriteBadge(String source) => switch (source) {
     'viewer-apartment' => ('3D', Color(0x99000000)),
-    'new-project' => ('Yangi loyiha', Color(0xE687885C)),
-    'rent' => ('Ijara', Color(0xCC3B82F6)),
-    'secondary' => ('Ikkilamchi', Color(0xCCF59E0B)),
-    'designer' => ('Dizayner', Color(0xCCA855F7)),
-    'master' => ('Usta', Color(0xCC14B8A6)),
+    'new-project' => (t('cabinet.newProject'), Color(0xE687885C)),
+    'rent' => (t('cabinet.dealType.rent'), Color(0xCC3B82F6)),
+    'secondary' => (t('cabinet.favFilter.secondary'), Color(0xCCF59E0B)),
+    'designer' => (t('cabinet.favBadge.designer'), Color(0xCCA855F7)),
+    'master' => (t('cabinet.favBadge.master'), Color(0xCC14B8A6)),
     _ => null,
   };
 }

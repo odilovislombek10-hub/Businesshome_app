@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import '../../shared/widgets/app_image.dart';
 import 'dart:async';
 
@@ -32,12 +33,8 @@ import 'secondary_texts.dart';
 /// The filter panel is a full-screen overlay on phones (`lg:hidden fixed inset-0`), opened from
 /// the button inside the search card — see [SecondaryFilterSheet].
 class SecondaryScreen extends StatefulWidget {
-  const SecondaryScreen({
-    super.key,
-    this.config = ListingsConfig.secondary,
-    this.initialCity,
-    this.openFilters = false,
-  });
+  SecondaryScreen({super.key, ListingsConfig? config, this.initialCity, this.openFilters = false})
+    : config = config ?? ListingsConfig.secondary;
 
   /// Which of the two listing pages this is — see [ListingsConfig].
   final ListingsConfig config;
@@ -246,7 +243,7 @@ class _SecondaryScreenState extends State<SecondaryScreen> {
                           '${snapshot.data?.total ?? _last?.total ?? 0} '
                           '${SecondaryTexts.activeListings}',
                     ),
-                    const _HeroStat(dotColor: AppColors.olive, label: SecondaryTexts.updatedToday),
+                    _HeroStat(dotColor: AppColors.olive, label: SecondaryTexts.updatedToday),
                   ],
                 ),
               ),
@@ -517,7 +514,7 @@ class _SecondaryScreenState extends State<SecondaryScreen> {
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
-        children: [option('uzs', "so'm"), option('usd', '\$')],
+        children: [option('uzs', t('secondary.currency')), option('usd', '\$')],
       ),
     );
   }

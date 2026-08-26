@@ -66,14 +66,11 @@ class _CabinetPortfolioState extends State<CabinetPortfolio> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text(CabinetTexts.cancel),
+            child: Text(CabinetTexts.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text(
-              CabinetTexts.deleteConfirmYes,
-              style: TextStyle(color: AppColors.danger),
-            ),
+            child: Text(CabinetTexts.deleteConfirmYes, style: TextStyle(color: AppColors.danger)),
           ),
         ],
       ),

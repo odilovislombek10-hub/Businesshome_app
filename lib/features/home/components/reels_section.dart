@@ -1,3 +1,4 @@
+import '../../../core/i18n/translate.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -73,7 +74,7 @@ class _ReelsSectionState extends State<ReelsSection> {
                         GestureDetector(
                           onTap: () => context.go('/reels'),
                           child: Text(
-                            "Barchasini ko'rish",
+                            t('news.viewAll'),
                             style: theme.textTheme.bodyMedium?.copyWith(color: AppColors.olive),
                           ),
                         ),
@@ -99,7 +100,7 @@ class _ReelsSectionState extends State<ReelsSection> {
                 padding: const EdgeInsets.symmetric(vertical: 48),
                 child: Center(
                   child: Text(
-                    "Hozircha videolar yo'q",
+                    t('reels.empty'),
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: AppColors.dark.withValues(alpha: 0.4),
                     ),

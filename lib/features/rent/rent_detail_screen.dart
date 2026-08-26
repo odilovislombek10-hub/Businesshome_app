@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -147,7 +148,7 @@ class _RentDetailScreenState extends State<RentDetailScreen> {
             FilledButton(
               style: FilledButton.styleFrom(backgroundColor: AppColors.olive),
               onPressed: () => context.go('/rent'),
-              child: const Text(RentDetailTexts.backToList),
+              child: Text(RentDetailTexts.backToList),
             ),
           ],
         ),
@@ -358,7 +359,7 @@ class _RentDetailScreenState extends State<RentDetailScreen> {
   Future<void> _share(PropertyListing p) async {
     await Clipboard.setData(ClipboardData(text: 'https://businesshome.uz/property/rent/${p.id}'));
     if (!mounted) return;
-    showSiteToast(context, 'Link nusxalandi');
+    showSiteToast(context, t('share.linkCopied'));
   }
 
   /// Saytda kirgan foydalanuvchi uchun ko'rish qayd etiladi — kabinetdagi
@@ -747,13 +748,13 @@ class _RentDetailScreenState extends State<RentDetailScreen> {
   }
 
   static String _typeLabel(String type) => switch (type) {
-    'apartment' => 'Kvartira',
-    'house' => 'Hovli uy',
-    'office' => 'Ofis',
-    'shop' => "Do'kon",
-    'land' => 'Yer',
-    'building' => 'Omborxona',
-    'parking' => 'Avto-turargoh',
+    'apartment' => t('rent.typeApartment'),
+    'house' => t('rent.typeHouse'),
+    'office' => t('rent.typeOffice'),
+    'shop' => t('rent.typeShop'),
+    'land' => t('rent.typeLand'),
+    'building' => t('rent.amenity.omborxona'),
+    'parking' => t('header.dropdown.parking'),
     _ => type,
   };
 }

@@ -128,10 +128,7 @@ class _NewProjectsFilterSheetState extends State<NewProjectsFilterSheet> {
                         icon: const SiteIcon(SiteIcons.chevronDown, size: 16),
                         style: theme.textTheme.bodyMedium?.copyWith(color: AppColors.dark),
                         items: [
-                          const DropdownMenuItem(
-                            value: '',
-                            child: Text(NewProjectsTexts.allCities),
-                          ),
+                          DropdownMenuItem(value: '', child: Text(NewProjectsTexts.allCities)),
                           for (final (value, label) in CityLabels.options)
                             DropdownMenuItem(value: value, child: Text(label)),
                         ],

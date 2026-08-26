@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -230,7 +231,7 @@ class _PaymentSheetState extends State<PaymentSheet> {
             Padding(
               padding: const EdgeInsets.only(bottom: 4),
               child: Text(
-                "so'm",
+                t('hero.currency'),
                 style: theme.textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w500,
                   color: AppColors.dark.withValues(alpha: 0.4),
@@ -545,7 +546,7 @@ class _PaymentSheetState extends State<PaymentSheet> {
           _error = '';
         }),
         child: Text(
-          'Orqaga',
+          t('common.back'),
           style: theme.textTheme.bodyMedium?.copyWith(color: AppColors.dark.withValues(alpha: 0.5)),
         ),
       ),
@@ -612,7 +613,7 @@ class _PaymentSheetState extends State<PaymentSheet> {
         ),
       ),
       const SizedBox(height: 20),
-      _primaryButton(theme, 'Yopish', onTap: () => Navigator.of(context).pop(true)),
+      _primaryButton(theme, t('ai.close'), onTap: () => Navigator.of(context).pop(true)),
     ];
   }
 

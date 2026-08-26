@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -38,15 +39,15 @@ class _AdsScreenState extends State<AdsScreen> {
   late Future<AdsPage> _future = _repo.list(_filter);
   bool _scrolled = false;
 
-  static const _dealTypes = <(String, String)>[
+  static List<(String, String)> get _dealTypes => <(String, String)>[
     ('', AdsTexts.allDeals),
     ('sell', AdsTexts.dealSell),
     ('rent', AdsTexts.dealRent),
     ('exchange', AdsTexts.dealExchange),
   ];
 
-  static const _types = <String>['apartment', 'house', 'office', 'shop', 'land'];
-  static const _roomOptions = <int>[1, 2, 3, 4, 5];
+  static List<String> get _types => <String>['apartment', 'house', 'office', 'shop', 'land'];
+  static List<int> get _roomOptions => <int>[1, 2, 3, 4, 5];
 
   @override
   void initState() {
@@ -265,7 +266,7 @@ class _AdsScreenState extends State<AdsScreen> {
           isExpanded: true,
           style: theme.textTheme.bodyMedium?.copyWith(fontSize: 14, color: AppColors.dark),
           items: [
-            const DropdownMenuItem(value: '', child: Text(AdsTexts.allCities)),
+            DropdownMenuItem(value: '', child: Text(AdsTexts.allCities)),
             for (final (value, label) in CityLabels.options)
               if (value.isNotEmpty) DropdownMenuItem(value: value, child: Text(label)),
           ],
@@ -404,7 +405,7 @@ class _AdsScreenState extends State<AdsScreen> {
                       fontSize: 14,
                       color: AppColors.dark,
                     ),
-                    items: const [
+                    items: [
                       DropdownMenuItem(value: 'newest', child: Text(AdsTexts.sortNewest)),
                       DropdownMenuItem(value: 'price_asc', child: Text(AdsTexts.sortPriceAsc)),
                       DropdownMenuItem(value: 'price_desc', child: Text(AdsTexts.sortPriceDesc)),
@@ -879,7 +880,7 @@ class _AdsScreenState extends State<AdsScreen> {
                         if (ad.isUrgent)
                           _imageBadge(theme, AdsTexts.urgent, const Color(0xFFEF4444)),
                         if (ad.isUrgent && ad.isTop) const SizedBox(width: 8),
-                        if (ad.isTop) _imageBadge(theme, 'TOP', const Color(0xFFF59E0B)),
+                        if (ad.isTop) _imageBadge(theme, t('ads.top'), const Color(0xFFF59E0B)),
                       ],
                     ),
                   ),

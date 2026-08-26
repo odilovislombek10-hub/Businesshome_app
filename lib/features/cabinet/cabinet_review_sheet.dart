@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import 'package:flutter/material.dart';
 
 import '../../app/theme.dart';
@@ -233,7 +234,7 @@ class _ReviewSheetState extends State<ReviewSheet> {
                           borderRadius: BorderRadius.circular(AppRadius.md),
                         ),
                         child: Text(
-                          'Yuborish',
+                          t('common.submit'),
                           style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white),
                         ),
                       ),

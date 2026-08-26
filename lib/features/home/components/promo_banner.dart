@@ -1,3 +1,4 @@
+import '../../../core/i18n/translate.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -71,7 +72,7 @@ class PromoBanner extends StatelessWidget {
                             borderRadius: BorderRadius.circular(AppRadius.pill),
                           ),
                           child: Text(
-                            content.bannerBadge ?? 'Premium loyiha',
+                            content.bannerBadge ?? t('promo.badge'),
                             style: theme.textTheme.labelSmall?.copyWith(
                               fontSize: 10,
                               color: AppColors.cream,
@@ -92,7 +93,7 @@ class PromoBanner extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          content.bannerSubtitle ?? "Tabiat, arxitektura va qulaylik uyg'unligi",
+                          content.bannerSubtitle ?? t('promo.subtitle'),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: theme.textTheme.labelSmall?.copyWith(
@@ -110,7 +111,7 @@ class PromoBanner extends StatelessWidget {
                             border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
                           ),
                           child: Text(
-                            "Batafsil ma'lumot",
+                            t('promo.button'),
                             style: theme.textTheme.labelSmall?.copyWith(
                               fontSize: 12,
                               color: AppColors.cream,

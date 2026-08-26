@@ -35,11 +35,4 @@ class LanguageService extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_storageKey, code);
   }
-
-  /// `header.back` — uz.ts, ru.ts va ky.ts dan aynan olingan.
-  String get back => switch (_code) {
-    'ru' => 'Назад',
-    'ky' => 'Артка',
-    _ => 'Orqaga',
-  };
 }

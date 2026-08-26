@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -46,7 +47,7 @@ class CabinetScreen extends StatefulWidget {
   final String tab;
 
   /// Saytdagi `validTabs`; noma'lum bo'lim `dashboard` ga tushadi.
-  static const tabs = <String>[
+  static List<String> get tabs => <String>[
     'dashboard',
     'listings',
     'favorites',
@@ -315,17 +316,17 @@ class _CabinetScreenState extends State<CabinetScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text(CabinetTexts.logoutConfirmTitle),
-        content: const Text(CabinetTexts.logoutConfirmMessage),
+        title: Text(CabinetTexts.logoutConfirmTitle),
+        content: Text(CabinetTexts.logoutConfirmMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text(CabinetTexts.logoutConfirmCancel),
+            child: Text(CabinetTexts.logoutConfirmCancel),
           ),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: const Color(0xFFDC2626)),
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text(CabinetTexts.logoutConfirmYes),
+            child: Text(CabinetTexts.logoutConfirmYes),
           ),
         ],
       ),
@@ -665,7 +666,7 @@ class _SignedOutView extends StatelessWidget {
               FilledButton(
                 style: FilledButton.styleFrom(backgroundColor: AppColors.olive),
                 onPressed: () => context.push('/login'),
-                child: const Text('Kirish'),
+                child: Text(t('header.login')),
               ),
             ],
           ),

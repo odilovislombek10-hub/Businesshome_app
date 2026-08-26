@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -799,7 +800,7 @@ class _BriefCard extends StatelessWidget {
 
 /// Saytdagi `formatBudget` — millionlar "mln", qolgani "K" bilan qisqartiriladi.
 String formatBudget(Brief brief) {
-  final currency = brief.currency.toUpperCase() == 'USD' ? '\$' : "so'm";
+  final currency = brief.currency.toUpperCase() == 'USD' ? '\$' : t('hero.currency');
   String short(int n) =>
       n >= 1000000 ? '${(n / 1000000).toStringAsFixed(1)} mln' : '${(n / 1000).round()} K';
 
@@ -1181,7 +1182,7 @@ class _RespondSheetState extends State<_RespondSheet> {
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    child: const Text(BirjaTexts.cancel),
+                    child: Text(BirjaTexts.cancel),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -1191,7 +1192,7 @@ class _RespondSheetState extends State<_RespondSheet> {
                     onPressed: _controller.text.trim().isEmpty
                         ? null
                         : () => Navigator.of(context).pop(_controller.text.trim()),
-                    child: const Text(BirjaTexts.send),
+                    child: Text(BirjaTexts.send),
                   ),
                 ),
               ],

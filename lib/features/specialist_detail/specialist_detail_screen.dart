@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import '../../core/i18n/translate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -32,22 +34,20 @@ import 'specialist_detail_texts.dart';
 /// | Yon panel | javob vaqti (soat), javob darajasi | kelish vaqti (daq), kafolat, radius |
 /// | Qo'shimcha | — | "Shoshilinch chaqiriq" bloki |
 enum SpecialistKind {
-  designer(
-    endpoint: 'designers',
-    listPath: '/designers',
-    breadcrumb: SpecialistDetailTexts.breadcrumbDesigners,
-  ),
-  master(
-    endpoint: 'masters',
-    listPath: '/masters',
-    breadcrumb: SpecialistDetailTexts.breadcrumbMasters,
-  );
+  designer(endpoint: 'designers', listPath: '/designers', breadcrumbKey: 'breadcrumb.designers'),
+  master(endpoint: 'masters', listPath: '/masters', breadcrumbKey: 'breadcrumb.masters');
 
-  const SpecialistKind({required this.endpoint, required this.listPath, required this.breadcrumb});
+  const SpecialistKind({
+    required this.endpoint,
+    required this.listPath,
+    required this.breadcrumbKey,
+  });
 
   final String endpoint;
   final String listPath;
-  final String breadcrumb;
+  final String breadcrumbKey;
+
+  String get breadcrumb => t(breadcrumbKey);
 
   bool get isDesigner => this == SpecialistKind.designer;
 }
@@ -131,7 +131,7 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
             FilledButton(
               style: FilledButton.styleFrom(backgroundColor: AppColors.olive),
               onPressed: () => context.go(widget.kind.listPath),
-              child: const Text(SpecialistDetailTexts.backToList),
+              child: Text(SpecialistDetailTexts.backToList),
             ),
           ],
         ),
@@ -314,7 +314,7 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
               if (widget.kind.isDesigner)
                 _heroStat('${s.experience}', SpecialistDetailTexts.years)
               else if (s.isAvailable)
-                _heroStat('24/7', SpecialistDetailTexts.emergency),
+                _heroStat(t('createSpecialist.tag247'), SpecialistDetailTexts.emergency),
             ],
           ),
         ],

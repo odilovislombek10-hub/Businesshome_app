@@ -1,3 +1,4 @@
+import '../../../core/i18n/translate.dart';
 import 'package:flutter/material.dart';
 
 import '../../../shared/widgets/app_image.dart';
@@ -62,7 +63,7 @@ class _DevelopersSliderState extends State<DevelopersSlider> {
                 children: [
                   Expanded(
                     child: Text(
-                      "O'zbekistondagi qurilish kompaniyalar bo'yicha loyihalar",
+                      t('developers.title'),
                       style: theme.textTheme.displaySmall?.copyWith(
                         fontSize: 24,
                         color: AppColors.dark,
@@ -227,7 +228,7 @@ class _DeveloperCard extends StatelessWidget {
             style: theme.textTheme.titleMedium?.copyWith(color: AppColors.dark),
           ),
           Text(
-            '${developer.projectsCount} ta loyiha',
+            '${developer.projectsCount} ${t('developers.projects')}',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: AppColors.dark.withValues(alpha: 0.5),
             ),

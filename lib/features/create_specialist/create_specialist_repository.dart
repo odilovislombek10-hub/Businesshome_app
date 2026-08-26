@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -35,7 +36,9 @@ class CreateSpecialistRepository {
     final data = res.data;
     if (res.statusCode != 200 && res.statusCode != 201) {
       throw SpecialistException(
-        data is Map && data['detail'] != null ? data['detail'].toString() : 'Saqlashda xatolik',
+        data is Map && data['detail'] != null
+            ? data['detail'].toString()
+            : t('completeProfile.errorSave'),
       );
     }
     return data is Map<String, dynamic> ? data : null;

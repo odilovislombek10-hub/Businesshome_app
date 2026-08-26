@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -20,7 +21,7 @@ class CurrencyService extends ChangeNotifier {
   double _rate = 0;
 
   String get display => _display;
-  String get symbol => _display == 'usd' ? '\$' : "so'm";
+  String get symbol => _display == 'usd' ? '\$' : t('hero.currency');
 
   /// Joriy kurs. `/my-home` sahifasidagi valyuta almashtirgichi shundan foydalanadi; kurs hali
   /// kelmagan bo'lsa saytdagi standart qiymat (12 500) ishlatiladi.

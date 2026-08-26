@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -372,7 +373,7 @@ class _ListingCard extends StatelessWidget {
   ].join(' | ');
 
   /// Saytdagi `getCurrencyLabel` — e'lonning o'z valyutasi.
-  String _currencyLabel() => listing.currency?.toLowerCase() == 'usd' ? '\$' : "so'm";
+  String _currencyLabel() => listing.currency?.toLowerCase() == 'usd' ? '\$' : t('hero.currency');
 
   /// `formatListingDate()` — bugun, kecha, N kun oldin, keyin esa sana.
   static String _date(DateTime value) {
@@ -401,12 +402,12 @@ class _ListingCard extends StatelessWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text(CabinetTexts.deleteConfirmTitle),
+        title: Text(CabinetTexts.deleteConfirmTitle),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(CabinetTexts.deleteConfirmMessage),
+            Text(CabinetTexts.deleteConfirmMessage),
             const SizedBox(height: 8),
             Text('"${listing.title}"', style: const TextStyle(fontWeight: FontWeight.w600)),
           ],
@@ -414,12 +415,12 @@ class _ListingCard extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text(CabinetTexts.cancel),
+            child: Text(CabinetTexts.cancel),
           ),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: const Color(0xFFDC2626)),
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text(CabinetTexts.deleteConfirmYes),
+            child: Text(CabinetTexts.deleteConfirmYes),
           ),
         ],
       ),

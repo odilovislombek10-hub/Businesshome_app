@@ -70,7 +70,7 @@ class SocialButton extends StatelessWidget {
 class GoogleMark extends StatelessWidget {
   const GoogleMark({super.key});
 
-  static const _paths = <(String, Color)>[
+  static List<(String, Color)> get _paths => <(String, Color)>[
     (
       'M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z',
       Color(0xFF4285F4),

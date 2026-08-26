@@ -241,7 +241,7 @@ class _CabinetAvailabilityState extends State<CabinetAvailability> {
   }
 
   Widget _statusGrid(ThemeData theme) {
-    const options = CabinetTexts.availabilityOptions;
+    final options = CabinetTexts.availabilityOptions;
     final columns = Bp.pick(context, base: 2, sm: 5);
     final rows = <Widget>[];
     for (var i = 0; i < options.length; i += columns) {

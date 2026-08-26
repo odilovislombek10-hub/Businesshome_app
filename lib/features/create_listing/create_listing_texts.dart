@@ -1,3 +1,5 @@
+import '../../core/i18n/translate.dart';
+
 /// BU FAYL SAYT MANBASIDAN AVTOMATIK YARATILGAN — qo'lda tahrirlamang.
 /// Manba: `core/i18n/translations/uz.ts` dagi `createListing.*` kalitlari.
 ///
@@ -5,355 +7,350 @@
 /// `create_listing_data.dart` dagi `ListingOption` ichida turadi.
 abstract final class CreateListingTexts {
   /// `createListing.address`
-  static const address = 'Manzil';
+  static String get address => t('createListing.section3');
 
   /// `createListing.addressPlaceholder`
-  static const addressPlaceholder = "Ko'cha, uy raqami";
+  static String get addressPlaceholder => t('createListing.addressPlaceholder');
 
   /// `createListing.amenities`
-  static const amenities = "Qo'shimcha imkoniyatlar";
+  static String get amenities => t('createListing.amenities');
 
   /// `createListing.area`
-  static const area = 'Maydon';
+  static String get area => t('createListing.area');
 
   /// `createListing.areaPlaceholder`
-  static const areaPlaceholder = 'Maydonni kiriting';
+  static String get areaPlaceholder => t('createListing.errorArea');
 
   /// `createListing.areaSection.balcony`
-  static const areaSectionBalcony = 'Balkon/Lodji maydoni';
+  static String get areaSectionBalcony => t('createListing.areaSection.balcony');
 
   /// `createListing.areaSection.hint`
-  static const areaSectionHint = 'Umumiy maydon avtomat hisoblanadi: yashash + balkon/lodji';
+  static String get areaSectionHint => t('createListing.areaSection.hint');
 
   /// `createListing.areaSection.label`
-  static const areaSectionLabel = 'Maydon (m²)';
+  static String get areaSectionLabel => t('createListing.areaSection.label');
 
   /// `createListing.areaSection.living`
-  static const areaSectionLiving = 'Yashash maydoni';
+  static String get areaSectionLiving => t('createListing.areaSection.living');
 
   /// `createListing.areaSection.total`
-  static const areaSectionTotal = 'Umumiy maydon';
+  static String get areaSectionTotal => t('createListing.areaSection.total');
 
   /// `createListing.bathLayout.label`
-  static const bathLayoutLabel = 'Sanuzel';
+  static String get bathLayoutLabel => t('createListing.bathLayout.label');
 
   /// `createListing.bathroomCount`
-  static const bathroomCount = 'Sanuzellar soni';
+  static String get bathroomCount => t('createListing.bathroomCount');
 
   /// `createListing.bathroomPrivate`
-  static const bathroomPrivate = 'Alohida';
+  static String get bathroomPrivate => t('createListing.bathroomPrivate');
 
   /// `createListing.bathroomShared`
-  static const bathroomShared = 'Umumiy';
+  static String get bathroomShared => t('createListing.bathroomShared');
 
   /// `createListing.bathroomType`
-  static const bathroomType = 'Sanuzel turi';
+  static String get bathroomType => t('createListing.bathroomType');
 
   /// `createListing.bathrooms`
-  static const bathrooms = 'Sanuzel soni';
+  static String get bathrooms => t('createListing.bathrooms');
 
   /// `createListing.cancel`
-  static const cancel = 'Bekor qilish';
+  static String get cancel => t('createListing.cancel');
 
   /// `createListing.ceiling.label`
-  static const ceilingLabel = 'Shipi';
+  static String get ceilingLabel => t('createListing.ceiling.label');
 
   /// `createListing.city`
-  static const city = 'Shahar';
+  static String get city => t('createListing.city');
 
   /// `createListing.clearLocation`
-  static const clearLocation = 'Tozalash';
+  static String get clearLocation => t('createListing.clearLocation');
 
   /// `createListing.clickMapToSelect`
-  static const clickMapToSelect = "Xaritaga bosing va marker qo'yiladi";
+  static String get clickMapToSelect => t('createListing.clickMapToSelect');
 
   /// `createListing.dealHint.exchange`
-  static const dealHintExchange = "Mulkni boshqa mulkga almashtirish uchun ma'lumotlarni kiriting";
+  static String get dealHintExchange => t('createListing.dealHint.exchange');
 
   /// `createListing.dealHint.rent`
-  static const dealHintRent = "Ijara berish uchun ma'lumotlarni kiriting";
+  static String get dealHintRent => t('createListing.dealHint.rent');
 
   /// `createListing.dealHint.sell`
-  static const dealHintSell = "Tayyor mulkni sotish uchun ma'lumotlarni kiriting";
+  static String get dealHintSell => t('createListing.dealHint.sell');
 
   /// `createListing.dealType`
-  static const dealType = "E'lon turi";
+  static String get dealType => t('createListing.dealType');
 
   /// `createListing.description`
-  static const description = 'Tavsif';
+  static String get description => t('createListing.description');
 
   /// `createListing.descriptionPlaceholder`
-  static const descriptionPlaceholder = "Mulk haqida batafsil ma'lumot yozing";
+  static String get descriptionPlaceholder => t('createListing.descriptionPlaceholder');
 
   /// `createListing.designStyle.label`
-  static const designStyleLabel = 'Dizayn uslubi';
+  static String get designStyleLabel => t('createListing.designStyle.label');
 
   /// `createListing.district`
-  static const district = 'Tuman';
+  static String get district => t('createListing.district');
 
   /// `createListing.districtPlaceholder`
-  static const districtPlaceholder = 'Tuman nomini kiriting';
+  static String get districtPlaceholder => t('createListing.districtPlaceholder');
 
   /// `createListing.errorArea`
-  static const errorArea = 'Maydonni kiriting';
+  static String get errorArea => t('createListing.errorArea');
 
   /// `createListing.errorCity`
-  static const errorCity = 'Shaharni tanlang';
+  static String get errorCity => t('createListing.selectCity');
 
   /// `createListing.errorPrice`
-  static const errorPrice = 'Narxni kiriting';
+  static String get errorPrice => t('createListing.errorPrice');
 
   /// `createListing.extraRoom.hint`
-  static const extraRoomHint = "Garderob, ombor, yerto'la, garaj soni";
+  static String get extraRoomHint => t('createListing.extraRoom.hint');
 
   /// `createListing.extraRoom.label`
-  static const extraRoomLabel = "Qo'shimcha xonalar";
+  static String get extraRoomLabel => t('createListing.extraRoom.label');
 
   /// `createListing.floor`
-  static const floor = 'Qavat';
+  static String get floor => t('createListing.floor');
 
   /// `createListing.floorMat.label`
-  static const floorMatLabel = 'Pol qoplamasi';
+  static String get floorMatLabel => t('createListing.floorMat.label');
 
   /// `createListing.floorPlaceholder`
-  static const floorPlaceholder = 'Qavatni kiriting';
+  static String get floorPlaceholder => t('createListing.floorPlaceholder');
 
   /// `createListing.hasBalcony`
-  static const hasBalcony = 'Balkon mavjud';
+  static String get hasBalcony => t('createListing.hasBalcony');
 
   /// `createListing.hasBalconyHint`
-  static const hasBalconyHint = 'Kvartira/uyda balkon yoki lodjiya bormi';
+  static String get hasBalconyHint => t('createListing.hasBalconyHint');
 
   /// `createListing.hasBathroom`
-  static const hasBathroom = 'Sanuzel mavjud';
+  static String get hasBathroom => t('createListing.hasBathroom');
 
   /// `createListing.hasBathroomHint`
-  static const hasBathroomHint = 'Obyektda sanuzel bormi';
+  static String get hasBathroomHint => t('createListing.hasBathroomHint');
 
   /// `createListing.hasLoggia`
-  static const hasLoggia = 'Lodji mavjud';
+  static String get hasLoggia => t('createListing.hasLoggia');
 
   /// `createListing.hasLoggiaHint`
-  static const hasLoggiaHint = 'Balkondan farqli — uy ichiga kirib turadi';
+  static String get hasLoggiaHint => t('createListing.hasLoggiaHint');
 
   /// `createListing.hasRepair`
-  static const hasRepair = 'Remont qilingan';
+  static String get hasRepair => t('createListing.hasRepair');
 
   /// `createListing.hasRepairHint`
-  static const hasRepairHint = 'Yangi yoki yaxshi remont qilinganmi';
+  static String get hasRepairHint => t('createListing.hasRepairHint');
 
   /// `createListing.hasRooms`
-  static const hasRooms = 'Alohida xona bormi';
+  static String get hasRooms => t('createListing.hasRooms');
 
   /// `createListing.hasRoomsHint`
-  static const hasRoomsHint = "Omborxonada bo'lingan alohida xonalar bo'lsa yoqing";
+  static String get hasRoomsHint => t('createListing.hasRoomsHint');
 
   /// `createListing.hasVremenka`
-  static const hasVremenka = 'Vremenka mavjud';
+  static String get hasVremenka => t('createListing.hasVremenka');
 
   /// `createListing.hasVremenkaHint`
-  static const hasVremenkaHint = "Hovlida qo'shimcha kichik bino (vremenka) bormi";
+  static String get hasVremenkaHint => t('createListing.hasVremenkaHint');
 
   /// `createListing.heating.label`
-  static const heatingLabel = 'Isitish';
+  static String get heatingLabel => t('createListing.heating.label');
 
   /// `createListing.houseFloors`
-  static const houseFloors = 'Uy qavatlari soni';
+  static String get houseFloors => t('createListing.houseFloors');
 
   /// `createListing.houseFloorsHint`
-  static const houseFloorsHint = 'Masalan, 1 qavatli, 2 qavatli yoki 3 qavatli hovli';
+  static String get houseFloorsHint => t('createListing.houseFloorsHint');
 
   /// `createListing.houseFloorsPlaceholder`
-  static const houseFloorsPlaceholder = 'Masalan: 2';
+  static String get houseFloorsPlaceholder => t('createListing.houseFloorsPlaceholder');
 
   /// `createListing.kitchen.label`
-  static const kitchenLabel = 'Oshxona';
+  static String get kitchenLabel => t('createListing.kitchen.label');
 
   /// `createListing.landArea`
-  static const landArea = 'Yer maydoni';
+  static String get landArea => t('createListing.landArea');
 
   /// `createListing.landAreaPlaceholder`
-  static const landAreaPlaceholder = 'Yer maydonini kiriting';
+  static String get landAreaPlaceholder => t('createListing.landAreaPlaceholder');
 
   /// `createListing.locationSelected`
-  static const locationSelected = 'Lokatsiya tanlangan';
+  static String get locationSelected => t('createListing.locationSelected');
 
   /// `createListing.mapLocation`
-  static const mapLocation = 'Xaritada lokatsiya';
+  static String get mapLocation => t('createListing.mapLocation');
 
   /// `createListing.mapLocationHint`
-  static const mapLocationHint = 'Xaritaga bosib, aniq joylashuvingizni belgilang';
+  static String get mapLocationHint => t('createListing.mapLocationHint');
 
   /// `createListing.maxImages`
-  static const maxImages = 'Maksimum 10 ta rasm';
+  static String get maxImages => t('createListing.maxImages');
 
   /// `createListing.pageSubtitle`
-  static const pageSubtitle = "Mulkingiz haqida to'liq ma'lumot kiriting";
+  static String get pageSubtitle => t('createListing.pageSubtitle');
 
   /// `createListing.pageTitle`
-  static const pageTitle = "E'lon joylash";
+  static String get pageTitle => t('createListing.pageTitle');
 
   /// `createListing.payment.hint`
-  static const paymentHint = 'Bir nechta variant tanlash mumkin';
+  static String get paymentHint => t('createListing.payment.hint');
 
   /// `createListing.payment.label`
-  static const paymentLabel = "To'lov turlari";
+  static String get paymentLabel => t('createListing.payment.label');
 
   /// `createListing.price`
-  static const price = 'Narx';
+  static String get price => t('createListing.price');
 
   /// `createListing.pricePlaceholder`
-  static const pricePlaceholder = 'Narxni kiriting';
+  static String get pricePlaceholder => t('createListing.errorPrice');
 
   /// `createListing.priceSection.hint`
-  static const priceSectionHint =
-      'Bittasini kiriting — ikkinchisi avtomat hisoblanadi (umumiy maydonga asosan)';
+  static String get priceSectionHint => t('createListing.priceSection.hint');
 
   /// `createListing.priceSection.perM2`
-  static const priceSectionPerM2 = '1 m² narxi';
+  static String get priceSectionPerM2 => t('createListing.priceSection.perM2');
 
   /// `createListing.priceSection.total`
-  static const priceSectionTotal = 'Umumiy narx';
+  static String get priceSectionTotal => t('createListing.priceSection.total');
 
   /// `createListing.propertyType`
-  static const propertyType = 'Mulk turi';
+  static String get propertyType => t('createListing.propertyType');
 
   /// `createListing.repair.details`
-  static const repairDetails = "Batafsil ma'lumot (AI baholash uchun)";
+  static String get repairDetails => t('createListing.repair.details');
 
   /// `createListing.repair.hint`
-  static const repairHint = 'Mulkning remont holati va dizayni';
+  static String get repairHint => t('createListing.repair.hint');
 
   /// `createListing.repair.title`
-  static const repairTitle = 'Remont';
+  static String get repairTitle => t('createListing.repair.title');
 
   /// `createListing.repairType.label`
-  static const repairTypeLabel = 'Remont turi';
+  static String get repairTypeLabel => t('createListing.repairType.label');
 
   /// `createListing.rooms`
-  static const rooms = 'Xonalar soni';
+  static String get rooms => t('createListing.rooms');
 
   /// `createListing.sectionBasic`
-  static const sectionBasic = "Asosiy ma'lumotlar";
+  static String get sectionBasic => t('createListing.section1');
 
   /// `createListing.sectionExtras`
-  static const sectionExtras = "Qo'shimcha";
+  static String get sectionExtras => t('createListing.section5');
 
   /// `createListing.sectionFeatures`
-  static const sectionFeatures = 'Xususiyatlar';
+  static String get sectionFeatures => t('createListing.section2');
 
   /// `createListing.sectionImages`
-  static const sectionImages = 'Rasmlar';
+  static String get sectionImages => t('createListing.section4');
 
   /// `createListing.sectionLocation`
-  static const sectionLocation = 'Manzil';
+  static String get sectionLocation => t('createListing.section3');
 
   /// `createListing.segment.hint`
-  static const segmentHint = 'Mulkning sinfini tanlang (ixtiyoriy)';
+  static String get segmentHint => t('createListing.segment.hint');
 
   /// `createListing.segment.label`
-  static const segmentLabel = 'Premium kategoriya';
+  static String get segmentLabel => t('createListing.segment.label');
 
   /// `createListing.selectCity`
-  static const selectCity = 'Shaharni tanlang';
+  static String get selectCity => t('createListing.selectCity');
 
   /// `createListing.selectFiles`
-  static const selectFiles = 'Fayllarni tanlang';
+  static String get selectFiles => t('createListing.selectFiles');
 
   /// `createListing.submit`
-  static const submit = "E'lon joylash";
+  static String get submit => t('createListing.pageTitle');
 
   /// `createListing.title`
-  static const title = 'Sarlavha';
+  static String get title => t('createListing.title');
 
   /// `createListing.titlePlaceholder`
-  static const titlePlaceholder = "E'lon sarlavhasini kiriting";
+  static String get titlePlaceholder => t('createListing.titlePlaceholder');
 
   /// `createListing.totalArea`
-  static const totalArea = 'Umumiy maydon';
+  static String get totalArea => t('createListing.areaSection.total');
 
   /// `createListing.totalFloors`
-  static const totalFloors = 'Umumiy qavatlar';
+  static String get totalFloors => t('createListing.totalFloors');
 
   /// `createListing.totalFloorsPlaceholder`
-  static const totalFloorsPlaceholder = 'Umumiy qavatlar';
+  static String get totalFloorsPlaceholder => t('createListing.totalFloors');
 
   /// `createListing.tour360.demoBtn`
-  static const tour360DemoBtn = "Demo variantni ko'rish";
+  static String get tour360DemoBtn => t('createListing.tour360.demoBtn');
 
   /// `createListing.tour360.description`
-  static const tour360Description =
-      'Professional 360° tur mulkning sotilish ehtimolini 3 barobar oshiradi';
+  static String get tour360Description => t('createListing.tour360.description');
 
   /// `createListing.tour360.hint`
-  static const tour360Hint = "Ariza qoldirgandan so'ng mutaxassisimiz siz bilan bog'lanadi";
+  static String get tour360Hint => t('createListing.tour360.hint');
 
   /// `createListing.tour360.modalAddress`
-  static const tour360ModalAddress = 'Mulk manzili';
+  static String get tour360ModalAddress => t('createListing.tour360.modalAddress');
 
   /// `createListing.tour360.modalAddressPh`
-  static const tour360ModalAddressPh = "Shahar, tuman, ko'cha, uy raqami";
+  static String get tour360ModalAddressPh => t('createListing.tour360.modalAddressPh');
 
   /// `createListing.tour360.modalComment`
-  static const tour360ModalComment = "Qo'shimcha izoh (ixtiyoriy)";
+  static String get tour360ModalComment => t('createListing.tour360.modalComment');
 
   /// `createListing.tour360.modalCommentPh`
-  static const tour360ModalCommentPh = 'Maxsus iltimoslar, qulay vaqt va h.k.';
+  static String get tour360ModalCommentPh => t('createListing.tour360.modalCommentPh');
 
   /// `createListing.tour360.modalInfo`
-  static const tour360ModalInfo =
-      "Mutaxassisimiz belgilangan vaqtda kelib, mulkingizning 360° turini olib chiqadi. Xizmat narxi va shartlari haqida bog'langanda batafsil aytib beramiz.";
+  static String get tour360ModalInfo => t('createListing.tour360.modalInfo');
 
   /// `createListing.tour360.modalPhone`
-  static const tour360ModalPhone = 'Telefon raqamingiz';
+  static String get tour360ModalPhone => t('createListing.tour360.modalPhone');
 
   /// `createListing.tour360.modalSubmit`
-  static const tour360ModalSubmit = 'Yuborish';
+  static String get tour360ModalSubmit => t('createListing.tour360.modalSubmit');
 
   /// `createListing.tour360.modalSubtitle`
-  static const tour360ModalSubtitle = "Bo'sh maydonlarni to'ldiring";
+  static String get tour360ModalSubtitle => t('createListing.tour360.modalSubtitle');
 
   /// `createListing.tour360.modalTitle`
-  static const tour360ModalTitle = '360° tur uchun ariza';
+  static String get tour360ModalTitle => t('createListing.tour360.modalTitle');
 
   /// `createListing.tour360.requestBtn`
-  static const tour360RequestBtn = 'Ariza qoldirish';
+  static String get tour360RequestBtn => t('createListing.tour360.requestBtn');
 
   /// `createListing.tour360.requestSentMessage`
-  static const tour360RequestSentMessage =
-      "Arizangiz qabul qilindi! Tez orada siz bilan bog'lanamiz.";
+  static String get tour360RequestSentMessage => t('createListing.tour360.requestSentMessage');
 
   /// `createListing.tour360.title`
-  static const tour360Title = '360° virtual tur';
+  static String get tour360Title => t('createListing.tour360.title');
 
   /// `createListing.uploadHint`
-  static const uploadHint = 'JPG, PNG formatda, max 5MB';
+  static String get uploadHint => t('createListing.uploadHint');
 
   /// `createListing.uploadImages`
-  static const uploadImages = 'Rasmlarni yuklang';
+  static String get uploadImages => t('createListing.uploadImages');
 
   /// `createListing.urgent`
-  static const urgent = "Shoshilinch e'lon";
+  static String get urgent => t('createListing.urgentAd');
 
   /// `createListing.urgentHint`
-  static const urgentHint = "E'lon yuqorida ko'rsatiladi";
+  static String get urgentHint => t('createListing.urgentHint');
 
   /// `createListing.urgentInProgress`
-  static const urgentInProgress =
-      "Bu funksiya hozircha jarayonda. Tez orada shoshilinch e'lon joylash imkoniyati ochiladi.";
+  static String get urgentInProgress => t('createListing.urgentInProgress');
 
   /// `createListing.vremenkaArea`
-  static const vremenkaArea = 'Vremenka maydoni';
+  static String get vremenkaArea => t('createListing.vremenkaArea');
 
   /// `createListing.vremenkaRooms`
-  static const vremenkaRooms = 'Vremenkada xonalar soni';
+  static String get vremenkaRooms => t('createListing.vremenkaRooms');
 
   /// `createListing.wallFin.label`
-  static const wallFinLabel = 'Devor bezagi';
+  static String get wallFinLabel => t('createListing.wallFin.label');
 
   /// `createListing.window.label`
-  static const windowLabel = 'Deraza';
+  static String get windowLabel => t('createListing.window.label');
 
   /// `createListing.yourLocation`
-  static const yourLocation = 'Sizning lokatsiyangiz';
+  static String get yourLocation => t('createListing.yourLocation');
 }

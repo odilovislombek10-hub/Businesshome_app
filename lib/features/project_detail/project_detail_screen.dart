@@ -142,7 +142,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
             FilledButton(
               style: FilledButton.styleFrom(backgroundColor: AppColors.olive),
               onPressed: () => context.go('/'),
-              child: const Text(ProjectDetailTexts.backHome),
+              child: Text(ProjectDetailTexts.backHome),
             ),
           ],
         ),

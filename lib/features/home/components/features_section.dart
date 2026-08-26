@@ -1,3 +1,4 @@
+import '../../../core/i18n/translate.dart';
 import 'package:flutter/material.dart';
 
 import '../../../app/theme.dart';
@@ -45,7 +46,7 @@ class FeaturesSection extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              'Yangi uy sotib olishning eng qulay va ishonchli usuli',
+              t('featuresSection.subtitle'),
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium?.copyWith(color: AppColors.textMutedDark),
             ),

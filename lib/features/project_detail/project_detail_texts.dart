@@ -1,38 +1,37 @@
+import '../../core/i18n/translate.dart';
+
 /// `uz.ts` dagi loyiha sahifasi matnlari — qiymatlar aynan ko'chirilgan.
 abstract final class ProjectDetailTexts {
-  static const back = 'Orqaga';
-  static const photos = 'Rasmlar';
-  static const brochure = 'Broshyura';
-  static const selectApartment = 'Kvartira tanlash';
+  static String get back => t('detail.back');
+  static String get photos => t('detail.photos');
+  static String get brochure => t('detail.brochure');
+  static String get selectApartment => t('detail.selectApartment');
 
-  static const highlightsTitle = 'Xususiyatlar';
+  static String get highlightsTitle => t('highlights.title');
 
-  static const viewer3dView = "3D'ni ko'rish";
-  static const viewer3dReady = "Ko'rish uchun bosing";
-  static const viewer3dPreloading = '3D tayyorlanmoqda…';
+  static String get viewer3dView => t('viewer3d.view');
+  static String get viewer3dReady => t('viewer3d.ready');
+  static String get viewer3dPreloading => t('viewer3d.preloading');
 
-  static const smartTitle = 'Aqlli uy';
-  static const smartDetails = 'Batafsil';
-  static const smartMainDesc =
-      '1.1.3 korpusida aqlli uy tizimi kvartiraga qurilish bosqichida '
-      "o'rnatilgan. Ko'ching va foydalaning: yorug'lik va mikroklimatni ilova "
-      'yoki ovoz orqali boshqaring.';
+  static String get smartTitle => t('smart.title');
+  static String get smartDetails => t('highlights.details');
+  static String get smartMainDesc => t('smart.mainDesc');
 
-  static const docsTitle = 'Loyiha hujjatlari';
-  static const docsDocument = 'hujjat';
+  static String get docsTitle => t('docs.title');
+  static String get docsDocument => t('docs.document');
 
-  static const notFound = 'Loyiha topilmadi';
-  static const backHome = 'Bosh sahifaga qaytish';
+  static String get notFound => t('detail.notFoundTitle');
+  static String get backHome => t('detail.backToHome');
 
   // `present.*` — prezentatsiya rejimi (`?present=1`)
-  static const presentLabel = 'Prezentatsiya';
-  static const presentPause = 'Pauza';
-  static const presentResume = 'Davom';
-  static const presentView3d = "3D ko'rinish";
-  static const presentExit = 'Chiqish';
+  static String get presentLabel => t('present.label');
+  static String get presentPause => t('present.pause');
+  static String get presentResume => t('present.resume');
+  static String get presentView3d => t('present.view3d');
+  static String get presentExit => t('present.exit');
 
   /// Hero'dagi belgilar — saytda ham shu qo'shimchalar bilan yoziladi.
-  static const blocks = 'blok';
-  static const apartments = 'xonadon';
-  static const year = 'yil';
+  static String get blocks => t('detail.unitBlock');
+  static String get apartments => t('detail.unitApartment');
+  static String get year => t('detail.year');
 }

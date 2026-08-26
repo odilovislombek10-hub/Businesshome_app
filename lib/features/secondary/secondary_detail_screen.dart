@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/services.dart';
@@ -151,12 +152,12 @@ class _SecondaryDetailScreenState extends State<SecondaryDetailScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Mulk topilmadi',
+              t('detail.notFound'),
               style: theme.textTheme.displaySmall?.copyWith(fontSize: 24, color: AppColors.dark),
             ),
             const SizedBox(height: 8),
             Text(
-              "Bu e'lon mavjud emas yoki olib tashlangan",
+              t('detail.notFoundDesc'),
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: AppColors.dark.withValues(alpha: 0.6),
@@ -166,7 +167,7 @@ class _SecondaryDetailScreenState extends State<SecondaryDetailScreen> {
             FilledButton(
               style: FilledButton.styleFrom(backgroundColor: AppColors.olive),
               onPressed: () => context.go('/secondary'),
-              child: const Text("Ro'yxatga qaytish"),
+              child: Text(t('detail.backToList')),
             ),
           ],
         ),
@@ -222,12 +223,12 @@ class _SecondaryDetailScreenState extends State<SecondaryDetailScreen> {
         _priceCard(context, p),
         const SizedBox(height: 16),
 
-        _card(context, 'Asosiy ma\'lumot', _keyFacts(context, p)),
+        _card(context, t('detail.keyFacts'), _keyFacts(context, p)),
         if (p.description?.isNotEmpty ?? false) ...[
           const SizedBox(height: 16),
           _card(
             context,
-            'Tavsif',
+            t('detail.aboutTitle'),
             Text(
               p.description!,
               style: theme.textTheme.bodyMedium?.copyWith(
@@ -286,14 +287,14 @@ class _SecondaryDetailScreenState extends State<SecondaryDetailScreen> {
         children: [
           Pressable(
             onTap: () => context.go('/'),
-            child: Text('Bosh sahifa', style: muted),
+            child: Text(t('rent.home'), style: muted),
           ),
           const SizedBox(width: 8),
           const SiteIcon(SiteIcons.chevronRight, size: 12),
           const SizedBox(width: 8),
           Pressable(
             onTap: () => context.go('/secondary'),
-            child: Text('Ikkilamchi', style: muted),
+            child: Text(t('header.nav.business'), style: muted),
           ),
           const SizedBox(width: 8),
           const SiteIcon(SiteIcons.chevronRight, size: 12),
@@ -343,7 +344,7 @@ class _SecondaryDetailScreenState extends State<SecondaryDetailScreen> {
           ),
         if (p.hasVirtualTour)
           badge(
-            '360° Virtual tur',
+            t('tours.360Title'),
             const Color(0xFFEFF6FF), // blue-50
             const Color(0xFF2563EB),
             onTap: () => _open(p.videoUrl),
@@ -431,7 +432,7 @@ class _SecondaryDetailScreenState extends State<SecondaryDetailScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Narxi',
+            t('detail.price'),
             style: theme.textTheme.labelSmall?.copyWith(
               fontSize: 12,
               color: Colors.white.withValues(alpha: 0.7),
@@ -447,10 +448,13 @@ class _SecondaryDetailScreenState extends State<SecondaryDetailScreen> {
             spacing: 8,
             runSpacing: 8,
             children: [
-              if (p.rooms != null) stat('${p.rooms}', 'Xonalar'),
-              if (p.area != null) stat('${p.area!.round()} m²', 'Maydon'),
+              if (p.rooms != null) stat('${p.rooms}', t('secondary.rooms')),
+              if (p.area != null) stat('${p.area!.round()} m²', t('detail.area')),
               if (p.floor != null)
-                stat('${p.floor}${p.totalFloors == null ? '' : '/${p.totalFloors}'}', 'Qavat'),
+                stat(
+                  '${p.floor}${p.totalFloors == null ? '' : '/${p.totalFloors}'}',
+                  t('rent.floor'),
+                ),
             ],
           ),
         ],
@@ -491,15 +495,18 @@ class _SecondaryDetailScreenState extends State<SecondaryDetailScreen> {
     final theme = Theme.of(context);
     final currency = CurrencyService.instance;
     final facts = <(String, String)>[
-      if (p.type case final type?) ('Turi', _typeLabel(type)),
-      if (p.rooms != null) ('Xonalar', '${p.rooms}'),
-      if (p.bathrooms != null) ('Sanuzellar', '${p.bathrooms}'),
-      if (p.area != null) ('Maydon', '${p.area!.round()} m²'),
-      if (p.floor != null) ('Qavat', '${p.floor} / ${p.totalFloors ?? ''}'),
-      ('Balkon', p.hasBalcony ? 'Ha' : "Yo'q"),
-      if (p.status case final status?) ('Holat', _statusLabel(status)),
+      if (p.type case final type?) (t('detail.type'), _typeLabel(type)),
+      if (p.rooms != null) (t('secondary.rooms'), '${p.rooms}'),
+      if (p.bathrooms != null) (t('rent.bathrooms'), '${p.bathrooms}'),
+      if (p.area != null) (t('detail.area'), '${p.area!.round()} m²'),
+      if (p.floor != null) (t('rent.floor'), '${p.floor} / ${p.totalFloors ?? ''}'),
+      (t('detail.balcony'), p.hasBalcony ? t('common.yes') : t('common.no')),
+      if (p.status case final status?) (t('detail.status'), _statusLabel(status)),
       if (p.price != null && (p.area ?? 0) > 0)
-        ('1 m² narxi', currency.formatWithSymbol(p.price! / p.area!, from: p.currency ?? 'uzs')),
+        (
+          t('detail.pricePerM2'),
+          currency.formatWithSymbol(p.price! / p.area!, from: p.currency ?? 'uzs'),
+        ),
     ];
 
     // Saytda `grid-cols-2 md:grid-cols-4` — yorliq tepada, qiymat pastda.
@@ -531,7 +538,7 @@ class _SecondaryDetailScreenState extends State<SecondaryDetailScreen> {
                             Text(
                               slice[c].$2,
                               style: theme.textTheme.bodyMedium?.copyWith(
-                                color: slice[c].$1 == 'Holat'
+                                color: slice[c].$1 == t('detail.status')
                                     ? (p.status == 'available'
                                           ? const Color(0xFF059669)
                                           : const Color(0xFFD97706))
@@ -559,7 +566,7 @@ class _SecondaryDetailScreenState extends State<SecondaryDetailScreen> {
       ClipboardData(text: 'https://businesshome.uz/property/secondary/${p.id}'),
     );
     if (!mounted) return;
-    showSiteToast(context, 'Link nusxalandi');
+    showSiteToast(context, t('share.linkCopied'));
   }
 
   /// `detail.similarProperties` — bir xil tur va shahardagi to'rtta e'lon.
@@ -567,7 +574,7 @@ class _SecondaryDetailScreenState extends State<SecondaryDetailScreen> {
     final theme = Theme.of(context);
     return _card(
       context,
-      "O'xshash e'lonlar",
+      t('detail.similarProperties'),
       Column(
         children: [
           for (var i = 0; i < _similar.length; i++) ...[
@@ -677,19 +684,19 @@ class _SecondaryDetailScreenState extends State<SecondaryDetailScreen> {
   );
 
   static String _typeLabel(String type) => switch (type) {
-    'apartment' => 'Kvartira',
-    'house' => 'Hovli uy',
-    'office' => 'Ofis',
-    'shop' => "Do'kon",
-    'building' => 'Bino',
-    'land' => 'Yer',
+    'apartment' => t('secondary.type.apartment'),
+    'house' => t('secondary.type.house'),
+    'office' => t('secondary.type.office'),
+    'shop' => t('secondary.type.shop'),
+    'building' => t('secondary.type.building'),
+    'land' => t('rent.typeLand'),
     _ => type,
   };
 
   static String _statusLabel(String status) => switch (status) {
-    'available' => 'Mavjud',
-    'reserved' => 'Band qilingan',
-    'sold' => 'Sotilgan',
+    'available' => t('detail.statusValue.available'),
+    'reserved' => t('detail.statusValue.reserved'),
+    'sold' => t('detail.statusValue.sold'),
     _ => status,
   };
 

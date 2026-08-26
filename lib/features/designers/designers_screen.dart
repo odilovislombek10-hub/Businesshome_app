@@ -427,7 +427,7 @@ class _DesignersScreenState extends State<DesignersScreen> {
           icon: const SiteIcon(SiteIcons.chevronDown, size: 16),
           style: theme.textTheme.bodyMedium?.copyWith(fontSize: 14, color: AppColors.dark),
           items: [
-            const DropdownMenuItem(value: '', child: Text(DesignersTexts.allCities)),
+            DropdownMenuItem(value: '', child: Text(DesignersTexts.allCities)),
             for (final (value, label) in CityLabels.options)
               DropdownMenuItem(value: value, child: Text(label)),
           ],

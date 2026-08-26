@@ -287,7 +287,7 @@ class _MapSearchScreenState extends State<MapSearchScreen> {
             ),
             style: theme.textTheme.bodyMedium?.copyWith(fontSize: 14, color: AppColors.dark),
             items: [
-              const DropdownMenuItem(value: '', child: Text(MapSearchTexts.allCities)),
+              DropdownMenuItem(value: '', child: Text(MapSearchTexts.allCities)),
               for (final (code, label) in CityLabels.options)
                 DropdownMenuItem(value: code, child: Text(label)),
             ],

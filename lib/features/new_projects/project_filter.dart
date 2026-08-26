@@ -56,7 +56,7 @@ class ProjectFilter {
   ///
   /// Saytdagi `cityMatchesFilter` — baza goh kodni (`tashkent_city`), goh nomni (`Toshkent`,
   /// `Samarqand`) saqlaydi, shuning uchun har bir kod uchun taxalluslar ro'yxati bor.
-  static const _cityAliases = <String, List<String>>{
+  static Map<String, List<String>> get _cityAliases => <String, List<String>>{
     'tashkent_city': ['tashkent_city', 'tashkent', 'toshkent'],
     'samarkand': ['samarkand', 'samarqand'],
     'bukhara': ['bukhara', 'buxoro'],

@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -32,15 +33,16 @@ class _PropertyLocationMapState extends State<PropertyLocationMap> {
   /// Saytning `index.html` dagi kaliti.
   static const _apiKey = '57cd694b-cb63-4a8c-943a-0c03b146bb63';
 
-  static const _categories = <({String id, String label, String icon, String query})>[
-    (id: 'food', label: 'Kafelar', icon: '🍽️', query: 'кафе, ресторан'),
-    (id: 'school', label: 'Maktablar', icon: '🏫', query: 'школа'),
-    (id: 'kindergarten', label: "Bog'chalar", icon: '👶', query: 'детский сад'),
-    (id: 'hospital', label: 'Shifoxonalar', icon: '🏥', query: 'больница, поликлиника'),
-    (id: 'shopping', label: 'Savdo markazlari', icon: '🛒', query: 'торговый центр, магазин'),
-    (id: 'park', label: 'Parklar', icon: '🌳', query: 'парк'),
-    (id: 'metro', label: 'Metro', icon: '🚇', query: 'метро'),
-    (id: 'gym', label: 'Fitnes', icon: '🏋️', query: 'фитнес, спортзал'),
+  static List<({String id, String label, String icon, String query})>
+  get _categories => <({String id, String label, String icon, String query})>[
+    (id: 'food', label: t('map.nearby.food'), icon: '🍽️', query: 'кафе, ресторан'),
+    (id: 'school', label: t('map.nearby.school'), icon: '🏫', query: 'школа'),
+    (id: 'kindergarten', label: t('map.nearby.kindergarten'), icon: '👶', query: 'детский сад'),
+    (id: 'hospital', label: t('map.nearby.hospital'), icon: '🏥', query: 'больница, поликлиника'),
+    (id: 'shopping', label: t('map.nearby.shopping'), icon: '🛒', query: 'торговый центр, магазин'),
+    (id: 'park', label: t('map.nearby.park'), icon: '🌳', query: 'парк'),
+    (id: 'metro', label: t('map.nearby.metro'), icon: '🚇', query: 'метро'),
+    (id: 'gym', label: t('map.nearby.gym'), icon: '🏋️', query: 'фитнес, спортзал'),
   ];
 
   late final WebViewController _controller;
@@ -88,7 +90,7 @@ class _PropertyLocationMapState extends State<PropertyLocationMap> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Joylashuv',
+                  t('map.locationTitle'),
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
@@ -133,7 +135,7 @@ class _PropertyLocationMapState extends State<PropertyLocationMap> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Yaqin atrofda',
+                  t('map.nearbyTitle'),
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,

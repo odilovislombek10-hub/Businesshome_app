@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -18,10 +19,13 @@ class CreateListingRepository {
     final res = await ApiClient.instance.post<dynamic>('$_base/$kind', data: payload);
     final data = res.data;
     if (res.statusCode != 201 && res.statusCode != 200) {
-      throw ListingException(_detail(data) ?? 'Saqlashda xatolik', status: res.statusCode);
+      throw ListingException(
+        _detail(data) ?? t('completeProfile.errorSave'),
+        status: res.statusCode,
+      );
     }
     final id = data is Map ? data['id'] : null;
-    if (id is! int) throw const ListingException('Saqlashda xatolik');
+    if (id is! int) throw ListingException(t('completeProfile.errorSave'));
     return id;
   }
 
@@ -32,7 +36,10 @@ class CreateListingRepository {
   }) async {
     final res = await ApiClient.instance.put<dynamic>('$_base/$kind/$id', data: payload);
     if (res.statusCode != 200) {
-      throw ListingException(_detail(res.data) ?? 'Saqlashda xatolik', status: res.statusCode);
+      throw ListingException(
+        _detail(res.data) ?? t('completeProfile.errorSave'),
+        status: res.statusCode,
+      );
     }
   }
 

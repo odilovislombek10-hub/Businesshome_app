@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -45,13 +46,13 @@ class _VideoUploadBoxState extends State<VideoUploadBox> {
     if (picked == null) return;
     final name = picked.name.toLowerCase();
     if (!(name.endsWith('.mp4') || name.endsWith('.mov') || name.endsWith('.webm'))) {
-      setState(() => _error = 'Faqat video fayl yuklash mumkin (MP4, MOV, WebM)');
+      setState(() => _error = t('reels.videoErrorType'));
       return;
     }
     final file = File(picked.path);
     final size = await file.length();
     if (size > _maxSize) {
-      setState(() => _error = "Video hajmi 100 MB dan kam bo'lishi kerak");
+      setState(() => _error = t('reels.videoErrorSize'));
       return;
     }
     setState(() {
@@ -67,7 +68,7 @@ class _VideoUploadBoxState extends State<VideoUploadBox> {
       if (!mounted) return;
       setState(() {
         _uploading = false;
-        _error = "Videoni o'qib bo'lmadi. Boshqa fayl sinab ko'ring";
+        _error = t('reels.videoErrorRead');
       });
       return;
     }
@@ -136,7 +137,7 @@ class _VideoUploadBoxState extends State<VideoUploadBox> {
             _preview(theme),
             const SizedBox(height: 8), // mt-2
             Text(
-              'Video muvaffaqiyatli yuklandi',
+              t('reels.videoUploadSuccess'),
               style: theme.textTheme.labelSmall?.copyWith(
                 fontSize: 12,
                 color: const Color(0xFF059669), // emerald-600
@@ -169,14 +170,14 @@ class _VideoUploadBoxState extends State<VideoUploadBox> {
             runSpacing: 4,
             children: [
               Text(
-                'Maksimal davomiylik: 60 sekund',
+                t('reels.videoMaxDuration'),
                 style: theme.textTheme.labelSmall?.copyWith(
                   fontSize: 11,
                   color: AppColors.dark.withValues(alpha: 0.5),
                 ),
               ),
               Text(
-                'Format: MP4, vertikal (9:16)',
+                t('reels.videoFormat'),
                 style: theme.textTheme.labelSmall?.copyWith(
                   fontSize: 11,
                   color: AppColors.dark.withValues(alpha: 0.5),
@@ -207,7 +208,7 @@ class _VideoUploadBoxState extends State<VideoUploadBox> {
               children: [
                 Flexible(
                   child: Text(
-                    'Video yuklash (ixtiyoriy)',
+                    t('reels.videoUpload'),
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontSize: 15, // text-[15px]
                       fontWeight: FontWeight.w700,
@@ -223,7 +224,7 @@ class _VideoUploadBoxState extends State<VideoUploadBox> {
                     borderRadius: BorderRadius.circular(AppRadius.sm),
                   ),
                   child: Text(
-                    'Reels',
+                    t('cabinet.tab.reels'),
                     style: theme.textTheme.labelSmall?.copyWith(
                       fontSize: 10,
                       fontWeight: FontWeight.w600,
@@ -272,7 +273,7 @@ class _VideoUploadBoxState extends State<VideoUploadBox> {
           ),
           const SizedBox(height: 8), // gap-2
           Text(
-            'Videoni bu yerga tashlang yoki bosing',
+            t('reels.videoDropHere'),
             textAlign: TextAlign.center,
             style: theme.textTheme.bodyMedium?.copyWith(
               fontSize: 14,
@@ -288,7 +289,7 @@ class _VideoUploadBoxState extends State<VideoUploadBox> {
               borderRadius: BorderRadius.circular(AppRadius.sm),
             ),
             child: Text(
-              'Kompyuterdan tanlash',
+              t('reels.videoSelectFile'),
               style: theme.textTheme.labelSmall?.copyWith(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
@@ -320,7 +321,7 @@ class _VideoUploadBoxState extends State<VideoUploadBox> {
         const SizedBox(width: 12), // gap-3
         Flexible(
           child: Text(
-            'Video yuklanmoqda va tekshirilmoqda...',
+            t('reels.videoUploading'),
             style: theme.textTheme.bodyMedium?.copyWith(
               fontSize: 14,
               color: AppColors.dark.withValues(alpha: 0.7),

@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import 'dart:async';
 import 'dart:io';
 
@@ -1028,7 +1029,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
     children: [
       for (final count in ListingOptions.bathrooms)
         _squareButton(
-          count == 4 ? '4+' : '$count',
+          count == 4 ? t('designers.rating4plus') : '$count',
           selected: _form.bathrooms == count,
           onTap: () => setState(() => _form.bathrooms = count),
         ),
@@ -1708,7 +1709,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
                             border: Border.all(color: const Color(0xFFFDE68A)),
                           ),
                           child: Text(
-                            'Jarayonda',
+                            t('cabinet.inquiryStatus.in_progress'),
                             style: theme.textTheme.labelSmall?.copyWith(
                               fontSize: 10,
                               fontWeight: FontWeight.w600,
@@ -1879,7 +1880,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
       if (!mounted) return;
       setState(() {
         _submitting = false;
-        _errors = const {'general': 'Saqlashda xatolik'};
+        _errors = {'general': t('completeProfile.errorSave')};
       });
     }
   }

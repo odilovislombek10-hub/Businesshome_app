@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -634,7 +635,7 @@ class _CreateReelScreenState extends State<CreateReelScreen> {
                                 borderRadius: BorderRadius.circular(AppRadius.sm),
                               ),
                               child: Text(
-                                'Batafsil',
+                                t('reels.viewDetails'),
                                 style: theme.textTheme.labelSmall?.copyWith(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w600,
@@ -1005,49 +1006,49 @@ class _CreateReelScreenState extends State<CreateReelScreen> {
 
 /// `uz.ts` dagi `createReel.*` kalitlari.
 abstract final class CreateReelTexts {
-  static const title = 'Reel yaratish';
-  static const subtitle = "Ko'chmas mulk videongizni yuklang va e'lon qiling";
-  static const sectionVideo = 'Video';
-  static const sectionAttach = "E'lonni biriktirish";
-  static const sectionDetails = "Ma'lumotlar";
-  static const required = 'Majburiy';
-  static const optional = 'Ixtiyoriy';
-  static const titleLabel = 'Sarlavha';
-  static const titlePlaceholder = 'Masalan: Markazda yangi kvartira';
-  static const subtitleLabel = "Qo'shimcha matn";
-  static const subtitlePlaceholder = 'Qisqa tavsif (ixtiyoriy)';
-  static const attachHint = "Reelni o'z e'loningizga bog'lang (ixtiyoriy)";
-  static const attachLoading = 'Yuklanmoqda...';
-  static const attachEmpty = "Biriktiriladigan e'lon topilmadi";
-  static const attachNone = 'Biriktirmaslik';
-  static const badgeRent = 'Ijara';
-  static const badgeSale = 'Sotuv';
-  static const previewEmpty = 'Video yuklang';
-  static const moderationNote = "Reel admin tekshiruvidan so'ng e'lon qilinadi";
-  static const coverTitle = 'Muqova rasmi';
-  static const coverHint = 'Videodan kadr oling yoki avtomatik tanlanadi';
-  static const captureCover = 'Kadr olish';
-  static const previewTitle = "Ko'rinishi";
-  static const previewTitlePlaceholder = 'Reel sarlavhasi';
-  static const attachProfile = 'Mening profilim';
-  static const videoDropHere = 'Videoni bu yerga tashlang yoki bosing';
-  static const videoSelectFile = 'Kompyuterdan tanlash';
-  static const videoMaxDuration = 'Maksimal davomiylik: 60 sekund';
-  static const videoFormat = 'Format: MP4, vertikal (9:16)';
-  static const videoErrorSize = "Video hajmi 100 MB dan kam bo'lishi kerak";
-  static const videoErrorRead = "Videoni o'qib bo'lmadi. Boshqa fayl sinab ko'ring";
+  static String get title => t('createReel.title');
+  static String get subtitle => t('createReel.subtitle');
+  static String get sectionVideo => t('createReel.sectionVideo');
+  static String get sectionAttach => t('createReel.sectionAttach');
+  static String get sectionDetails => t('createReel.sectionDetails');
+  static String get required => t('createReel.required');
+  static String get optional => t('createReel.optional');
+  static String get titleLabel => t('createReel.titleLabel');
+  static String get titlePlaceholder => t('createReel.titlePlaceholder');
+  static String get subtitleLabel => t('createReel.subtitleLabel');
+  static String get subtitlePlaceholder => t('createReel.subtitlePlaceholder');
+  static String get attachHint => t('createReel.attachHint');
+  static String get attachLoading => t('createReel.attachLoading');
+  static String get attachEmpty => t('createReel.attachEmpty');
+  static String get attachNone => t('createReel.attachNone');
+  static String get badgeRent => t('createReel.badgeRent');
+  static String get badgeSale => t('createReel.badgeSale');
+  static String get previewEmpty => t('createReel.previewEmpty');
+  static String get moderationNote => t('createReel.moderationNote');
+  static String get coverTitle => t('createReel.coverTitle');
+  static String get coverHint => t('createReel.coverHint');
+  static String get captureCover => t('createReel.captureCover');
+  static String get previewTitle => t('createReel.previewTitle');
+  static String get previewTitlePlaceholder => t('createReel.previewTitlePlaceholder');
+  static String get attachProfile => t('createReel.attachProfile');
+  static String get videoDropHere => t('reels.videoDropHere');
+  static String get videoSelectFile => t('reels.videoSelectFile');
+  static String get videoMaxDuration => t('reels.videoMaxDuration');
+  static String get videoFormat => t('reels.videoFormat');
+  static String get videoErrorSize => t('reels.videoErrorSize');
+  static String get videoErrorRead => t('reels.videoErrorRead');
   static String videoErrorDuration(int seconds) =>
       "Video $seconds sekund — 60 sekunddan ko'p bo'lmasligi kerak";
-  static const needVideo = 'Avval video yuklang';
-  static const needTitle = "Sarlavha kamida 3 ta belgi bo'lishi kerak";
-  static const publish = "E'lon qilish";
-  static const publishing = 'Yuklanmoqda...';
-  static const cancel = 'Bekor qilish';
-  static const errorGeneric = "Xatolik yuz berdi. Qayta urinib ko'ring";
-  static const successTitle = 'Reel yuborildi!';
-  static const successText = "Admin tekshiruvidan so'ng e'lon qilinadi";
-  static const successView = "Reellarni ko'rish";
-  static const successAgain = 'Yana yaratish';
+  static String get needVideo => t('createReel.needVideo');
+  static String get needTitle => t('createReel.needTitle');
+  static String get publish => t('createReel.publish');
+  static String get publishing => t('createReel.attachLoading');
+  static String get cancel => t('createReel.cancel');
+  static String get errorGeneric => t('createReel.errorGeneric');
+  static String get successTitle => t('createReel.successTitle');
+  static String get successText => t('createReel.successText');
+  static String get successView => t('createReel.successView');
+  static String get successAgain => t('createReel.successAgain');
 }
 
 /// Biriktirish uchun foydalanuvchining e'loni.

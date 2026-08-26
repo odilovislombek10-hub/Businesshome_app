@@ -1,3 +1,4 @@
+import '../../../core/i18n/translate.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -64,8 +65,11 @@ class StatsBanner extends StatelessWidget {
                     spacing: 24,
                     runSpacing: 16,
                     children: [
-                      _Stat(label: 'Sotib olingan jami', value: _number(stats.totalProperties)),
-                      _Stat(label: 'Onlayn sotib olingan', value: _number(stats.totalProjects)),
+                      _Stat(
+                        label: t('stats.totalPurchased'),
+                        value: _number(stats.totalProperties),
+                      ),
+                      _Stat(label: t('stats.onlinePurchased'), value: _number(stats.totalProjects)),
                     ],
                   ),
                   if (stats.features.isNotEmpty) ...[
@@ -114,7 +118,7 @@ class StatsBanner extends StatelessWidget {
                           ),
                         ),
                         onPressed: () => context.go('/new-projects'),
-                        child: const Text('Onlayn sotib olish'),
+                        child: Text(t('stats.buyOnline')),
                       ),
                       OutlinedButton(
                         style: OutlinedButton.styleFrom(
@@ -126,7 +130,7 @@ class StatsBanner extends StatelessWidget {
                           ),
                         ),
                         onPressed: () => _open('https://wa.me/998901234567'),
-                        child: const Text("Bog'lanish"),
+                        child: Text(t('stats.contact')),
                       ),
                     ],
                   ),

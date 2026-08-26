@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -296,8 +297,8 @@ class _FavoriteCard extends StatelessWidget {
                     Text(
                       // Mutaxassislarda narx "…dan", mulkda oddiy narx.
                       item.isSpecialist
-                          ? '${formatNumber(item.price)} so\'m dan'
-                          : '${formatNumber(item.price)} so\'m',
+                          ? '${formatNumber(item.price)} ${t('hero.currency')} ${t('hero.from')}'
+                          : '${formatNumber(item.price)} ${t('hero.currency')}',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.titleMedium?.copyWith(

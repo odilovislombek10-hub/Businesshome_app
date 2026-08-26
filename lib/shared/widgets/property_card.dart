@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -174,7 +175,7 @@ class _PropertyCardState extends State<PropertyCard> {
     // At half width only the two shortest badges fit; the rest would wrap over the photo.
     if (widget.compact) ...[
       if (property.isTop)
-        const _Badge(label: 'TOP', background: Color(0xFFF59E0B), icon: SiteIcons.star),
+        _Badge(label: t('ads.top'), background: Color(0xFFF59E0B), icon: SiteIcons.star),
       if (property.hasTour)
         _Badge(
           label: '3D',
@@ -183,8 +184,8 @@ class _PropertyCardState extends State<PropertyCard> {
         ),
     ] else ...[
       if (property.isTop)
-        const _Badge(
-          label: 'TOP',
+        _Badge(
+          label: t('ads.top'),
           background: Color(0xFFF59E0B), // amber-500
           icon: SiteIcons.star,
         ),
@@ -206,7 +207,7 @@ class _PropertyCardState extends State<PropertyCard> {
         ),
       if (property.completion case final completion?)
         _Badge(
-          label: 'Topshirish: $completion',
+          label: '${t('propertyCard.completion')}: $completion',
           background: AppColors.olive.withValues(alpha: 0.8),
         ),
     ],
@@ -426,7 +427,7 @@ class _Info extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                'Batafsil',
+                t('propertyCard.details'),
                 style: theme.textTheme.bodyMedium?.copyWith(
                   fontSize: compact ? 12 : 14,
                   color: AppColors.olive,

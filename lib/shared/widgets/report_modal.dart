@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import 'package:flutter/material.dart';
 
 import '../../app/theme.dart';
@@ -37,12 +38,13 @@ class ReportSheet extends StatefulWidget {
 }
 
 class _ReportSheetState extends State<ReportSheet> {
-  static const _reasons = <({String key, String label, String icon})>[
-    (key: 'scam', label: 'Firibgar', icon: '⚠️'),
-    (key: 'fakeAd', label: "Aldovchi e'lon", icon: '🚫'),
-    (key: 'phoneDead', label: 'Telefon raqami ishlamadi', icon: '📵'),
-    (key: 'other', label: "Qo'shimcha", icon: '✏️'),
-  ];
+  static List<({String key, String label, String icon})> get _reasons =>
+      <({String key, String label, String icon})>[
+        (key: 'scam', label: t('report.reason.scam'), icon: '⚠️'),
+        (key: 'fakeAd', label: t('report.reason.fakeAd'), icon: '🚫'),
+        (key: 'phoneDead', label: t('report.reason.phoneDead'), icon: '📵'),
+        (key: 'other', label: t('report.reason.other'), icon: '✏️'),
+      ];
 
   final _other = TextEditingController();
   String? _selected;
@@ -80,9 +82,7 @@ class _ReportSheetState extends State<ReportSheet> {
       Navigator.of(context).pop();
       showSiteToast(
         context,
-        ok
-            ? "Shikoyatingiz qabul qilindi. Tekshirib ko'rib chiqamiz."
-            : 'Shikoyatni yuborib bo\'lmadi',
+        ok ? t('report.success') : 'Shikoyatni yuborib bo\'lmadi',
         kind: ok ? ToastKind.success : ToastKind.error,
       );
     } catch (_) {
@@ -123,7 +123,7 @@ class _ReportSheetState extends State<ReportSheet> {
                         onChanged: (_) => setState(() {}),
                         style: theme.textTheme.bodyMedium?.copyWith(fontSize: 14),
                         decoration: InputDecoration(
-                          hintText: 'Muammoni batafsil yozing...',
+                          hintText: t('report.otherPlaceholder'),
                           filled: true,
                           fillColor: AppColors.surfaceAltLight,
                           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -161,7 +161,7 @@ class _ReportSheetState extends State<ReportSheet> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Shikoyat yuborish',
+                  t('report.title'),
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
@@ -170,7 +170,7 @@ class _ReportSheetState extends State<ReportSheet> {
                 ),
                 const SizedBox(height: 2), // mt-0.5
                 Text(
-                  "E'lon haqida muammoni tanlang",
+                  t('report.subtitle'),
                   style: theme.textTheme.labelSmall?.copyWith(
                     fontSize: 12,
                     color: AppColors.dark.withValues(alpha: 0.5),
@@ -276,7 +276,7 @@ class _ReportSheetState extends State<ReportSheet> {
                   border: Border.all(color: AppColors.borderLight),
                 ),
                 child: Text(
-                  'Bekor qilish',
+                  t('common.cancel'),
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w500,
                     color: AppColors.dark.withValues(alpha: 0.7),
@@ -298,7 +298,7 @@ class _ReportSheetState extends State<ReportSheet> {
                   borderRadius: BorderRadius.circular(AppRadius.md),
                 ),
                 child: Text(
-                  'Yuborish',
+                  t('common.submit'),
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: _canSubmit ? Colors.white : AppColors.dark.withValues(alpha: 0.3),

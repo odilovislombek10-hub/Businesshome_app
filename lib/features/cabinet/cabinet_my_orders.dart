@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -135,7 +136,7 @@ class _OrderCard extends StatelessWidget {
               Row(
                 children: [
                   Text(
-                    'Muddat: ${CabinetTexts.formatDeadline(order.deadlineAt)}',
+                    '${t('order.deadline')}: ${CabinetTexts.formatDeadline(order.deadlineAt)}',
                     style: theme.textTheme.labelSmall?.copyWith(
                       fontSize: 10,
                       color: AppColors.dark.withValues(alpha: 0.6),
@@ -168,7 +169,7 @@ class _OrderCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    "${formatNumber(order.price)} so'm",
+                    "${formatNumber(order.price)} ${t('hero.currency')}",
                     style: theme.textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w700,
                       color: AppColors.olive,

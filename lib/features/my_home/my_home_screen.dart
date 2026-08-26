@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -204,7 +205,7 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
           children: [
             Text(MyHomeTexts.emptyTitle, textAlign: TextAlign.center, style: _titleStyle(20)),
             const SizedBox(height: 16),
-            _button('Kirish', onTap: () => context.push('/login')),
+            _button(t('header.login'), onTap: () => context.push('/login')),
           ],
         ),
         padding: 32,
@@ -452,7 +453,8 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
                   Text(
                     [
                       if (item.property?.area case final area?) '${formatNumber(area)} m²',
-                      if (item.property?.floor case final floor?) '$floor-qavat',
+                      if (item.property?.floor case final floor?)
+                        '$floor-${t('propertyCard.floor')}',
                       if (item.contract?.number.isNotEmpty == true) '№${item.contract!.number}',
                     ].join(' · '),
                     style: theme.textTheme.labelSmall?.copyWith(
@@ -1802,7 +1804,8 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
                           Text(
                             [
                               if (similar.area case final area?) '${formatNumber(area)} m²',
-                              if (similar.rooms case final rooms?) '$rooms-xona',
+                              if (similar.rooms case final rooms?)
+                                '$rooms-${t('propertyCard.rooms')}',
                               ?similar.district,
                             ].join(' · '),
                             style: theme.textTheme.labelSmall?.copyWith(
@@ -1951,7 +1954,7 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
   Future<void> _download(String url, String fileName, {bool save = false}) async {
     if (url.isEmpty) return;
     final messenger = ScaffoldMessenger.of(context);
-    messenger.showSnackBar(const SnackBar(content: Text(MyHomeTexts.downloading)));
+    messenger.showSnackBar(SnackBar(content: Text(MyHomeTexts.downloading)));
     final ok = await downloadAndOpen(url, fileName, saveToDownloads: save);
     if (!ok) {
       messenger.showSnackBar(const SnackBar(content: Text(MyHomeTexts.downloadFailed)));

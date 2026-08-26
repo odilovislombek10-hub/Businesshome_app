@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -179,7 +180,8 @@ class _SecondaryFilterSheetState extends State<SecondaryFilterSheet> {
                   value: '${_draft.bathrooms}',
                   options: [
                     ('0', SecondaryTexts.allOption),
-                    for (final b in SecondaryTexts.bathroomOptions) ('$b', b == 4 ? '4+' : '$b'),
+                    for (final b in SecondaryTexts.bathroomOptions)
+                      ('$b', b == 4 ? t('designers.rating4plus') : '$b'),
                   ],
                   onChanged: (v) =>
                       setState(() => _draft = _draft.copyWith(bathrooms: int.tryParse(v) ?? 0)),
@@ -189,7 +191,7 @@ class _SecondaryFilterSheetState extends State<SecondaryFilterSheet> {
                   label: SecondaryTexts.priceRange,
                   min: _priceMin,
                   max: _priceMax,
-                  suffix: "so'm",
+                  suffix: t('secondary.currency'),
                 ),
                 // `areaLabelKey()`: land types get a different label and unit.
                 _RangeField(
@@ -234,7 +236,7 @@ class _SecondaryFilterSheetState extends State<SecondaryFilterSheet> {
                   contentPadding: EdgeInsets.zero,
                   controlAffinity: ListTileControlAffinity.leading,
                   activeColor: AppColors.olive,
-                  title: const Text(SecondaryTexts.hasVirtualTour),
+                  title: Text(SecondaryTexts.hasVirtualTour),
                 ),
               ],
             ),

@@ -1,3 +1,4 @@
+import '../../../core/i18n/translate.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -42,7 +43,7 @@ class HomeTopPicks extends StatelessWidget {
           children: [
             if (secondary.isNotEmpty)
               _Block(
-                title: 'Sotuvdagi top uylar',
+                title: t('home.topSecondary'),
                 seeAllPath: '/secondary',
                 children: [
                   for (final listing in secondary) _ListingTile(listing: listing, isRent: false),
@@ -50,7 +51,7 @@ class HomeTopPicks extends StatelessWidget {
               ),
             if (rent.isNotEmpty)
               _Block(
-                title: 'Top ijara variantlari',
+                title: t('home.topRent'),
                 seeAllPath: '/rent',
                 children: [
                   for (final listing in rent) _ListingTile(listing: listing, isRent: true),
@@ -58,7 +59,7 @@ class HomeTopPicks extends StatelessWidget {
               ),
             if (designers.isNotEmpty)
               _Block(
-                title: 'Eng yaxshi dizaynerlar',
+                title: t('home.topDesigners'),
                 seeAllPath: '/designers',
                 children: [
                   for (final person in designers)
@@ -67,7 +68,7 @@ class HomeTopPicks extends StatelessWidget {
               ),
             if (masters.isNotEmpty)
               _Block(
-                title: 'Eng yaxshi ustalar',
+                title: t('home.topMasters'),
                 seeAllPath: '/masters',
                 children: [
                   for (final person in masters)
@@ -265,7 +266,7 @@ class _ListingTile extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             [
-              if (listing.rooms != null) '${listing.rooms} xona',
+              if (listing.rooms != null) '${listing.rooms} ${t('propertyCard.rooms')}',
               if (listing.area != null) '${listing.area!.round()} m²',
             ].join(' · '),
             maxLines: 1,

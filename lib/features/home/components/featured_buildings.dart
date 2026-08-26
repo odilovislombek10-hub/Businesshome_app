@@ -1,3 +1,4 @@
+import '../../../core/i18n/translate.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -34,7 +35,7 @@ class FeaturedBuildings extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "O'zbekistondagi yangi loyihalar bilan tanishing",
+              t('featured.title'),
               style: theme.textTheme.displaySmall?.copyWith(
                 // `text-xl sm:text-2xl md:text-3xl lg:text-4xl`
                 fontSize: Bp.pick(context, base: 20.0, sm: 24.0, md: 30.0, lg: 36.0),
@@ -43,7 +44,7 @@ class FeaturedBuildings extends StatelessWidget {
             ),
             SizedBox(height: Bp.pick(context, base: 8.0, sm: 12.0)), // mb-2 sm:mb-3
             Text(
-              "Yangi qurilayotgan loyihalarni kashf eting va doimo xabarda bo'ling.",
+              t('featured.description'),
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: AppColors.dark.withValues(alpha: 0.6),
               ),
@@ -55,7 +56,7 @@ class FeaturedBuildings extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 64), // py-16
                 child: Center(
                   child: Text(
-                    'Bu shaharda hozircha loyihalar mavjud emas',
+                    t('featured.noResults'),
                     textAlign: TextAlign.center,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       fontSize: 18, // text-lg
@@ -100,7 +101,7 @@ class FeaturedBuildings extends StatelessWidget {
                   shape: const StadiumBorder(),
                 ),
                 onPressed: () => context.go('/new-projects'),
-                child: const Text("Barcha yangi loyihalarni ko'rish"),
+                child: Text(t('featured.viewAll')),
               ),
             ),
           ],

@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import 'package:flutter/material.dart';
 
 import '../../app/theme.dart';
@@ -58,7 +59,7 @@ class AmenitiesGrid extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Xususiyatlar va qulayliklar',
+            t('amenities.title'),
             style: theme.textTheme.titleLarge?.copyWith(
               fontSize: 18,
               fontWeight: FontWeight.w700,

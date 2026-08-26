@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -40,8 +41,9 @@ class _PropertyToursCardState extends State<PropertyToursCard> {
   Widget build(BuildContext context) {
     if (!widget.hasAnyTour) return const SizedBox.shrink();
     final tabs = <({String type, String label, String icon})>[
-      if (widget.videoUrl?.isNotEmpty ?? false) (type: 'video', label: 'Video', icon: '🎬'),
-      if (widget.has360Tour) (type: '360', label: '360° Tur', icon: '🌐'),
+      if (widget.videoUrl?.isNotEmpty ?? false)
+        (type: 'video', label: t('tours.video'), icon: '🎬'),
+      if (widget.has360Tour) (type: '360', label: t('tours.360'), icon: '🌐'),
     ];
 
     return Container(
@@ -127,7 +129,7 @@ class _PropertyToursCardState extends State<PropertyToursCard> {
           ),
           const SizedBox(height: 16), // mb-4
           Text(
-            '360° Virtual tur',
+            t('tours.360Title'),
             style: theme.textTheme.titleMedium?.copyWith(
               fontSize: 16,
               fontWeight: FontWeight.w700,
@@ -136,7 +138,7 @@ class _PropertyToursCardState extends State<PropertyToursCard> {
           ),
           const SizedBox(height: 8), // mb-2
           Text(
-            "Mulkni har tomondan ko'ring — go'yo o'z ichida turgandek",
+            t('tours.360Desc'),
             textAlign: TextAlign.center,
             style: theme.textTheme.bodyMedium?.copyWith(
               fontSize: 14,
@@ -159,7 +161,7 @@ class _PropertyToursCardState extends State<PropertyToursCard> {
                 borderRadius: BorderRadius.circular(AppRadius.md),
               ),
               child: Text(
-                "360° ko'rish",
+                t('tours.start360'),
                 style: theme.textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
@@ -295,7 +297,7 @@ class _PanoramaPageState extends State<_PanoramaPage> {
                           ),
                         ),
                         Text(
-                          '360° Virtual tur',
+                          t('tours.360Title'),
                           style: theme.textTheme.labelSmall?.copyWith(
                             fontSize: 10,
                             color: AppColors.cream.withValues(alpha: 0.5),

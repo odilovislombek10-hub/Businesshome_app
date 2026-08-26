@@ -1,3 +1,4 @@
+import '../../../core/i18n/translate.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -29,7 +30,7 @@ class NewsSection extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    'Yangiliklar',
+                    t('news.title'),
                     style: theme.textTheme.displaySmall?.copyWith(
                       fontSize: 24,
                       color: AppColors.dark,
@@ -39,7 +40,7 @@ class NewsSection extends StatelessWidget {
                 GestureDetector(
                   onTap: () => context.go('/news'),
                   child: Text(
-                    "Barchasini ko'rish",
+                    t('news.viewAll'),
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: AppColors.dark.withValues(alpha: 0.6),
                     ),

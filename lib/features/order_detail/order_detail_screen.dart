@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
@@ -136,7 +137,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             FilledButton(
               style: FilledButton.styleFrom(backgroundColor: AppColors.olive),
               onPressed: () => context.go('/cabinet/orders'),
-              child: const Text(OrderTexts.backToOrders),
+              child: Text(OrderTexts.backToOrders),
             ),
           ],
         ),
@@ -328,7 +329,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             ),
             const SizedBox(height: 12),
           ],
-          _row(OrderTexts.amount, "${formatNumber(o.price)} so'm"),
+          _row(OrderTexts.amount, "${formatNumber(o.price)} ${t('hero.currency')}"),
           const SizedBox(height: 4),
           _deadlineRow(o),
           const SizedBox(height: 12),
@@ -907,48 +908,60 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
 /// `uz.ts` dagi `order.*` kalitlari.
 abstract final class OrderTexts {
-  static const backToOrders = 'Buyurtmalarga qaytish';
-  static const notFound = 'Buyurtma topilmadi';
-  static const project = 'Loyiha';
-  static const created = 'Yaratilgan';
-  static const client = 'Mijoz';
-  static const specialist = 'Mutaxassis';
-  static const details = 'Tafsilot';
-  static const description = 'Tavsif';
-  static const amount = 'Summa';
-  static const deadline = 'Muddat';
-  static const deadlineNotSet = 'Belgilanmagan';
-  static const rejectionReason = 'Rad etish sababi';
-  static const specialistCompleted = 'Mutaxassis tugatildi deb belgiladi';
-  static const clientConfirmed = 'Mijoz tasdiqladi';
-  static const accept = 'Qabul qilish';
-  static const start = 'Boshlash';
-  static const complete = 'Tugatish';
-  static const confirm = 'Tasdiqlash';
-  static const documents = 'Hujjatlar';
-  static const uploadDocument = 'Hujjat yuklash';
-  static const uploading = 'Yuklanmoqda...';
-  static const clientUploads = 'Hujjatlarni mijoz yuklaydi';
-  static const maxFilesReached = 'Maksimal fayl chegarasiga yetdingiz';
-  static const deadlineSetLabel = 'Muddatni belgilash';
-  static const deadlineChangeLabel = "O'zgartirish";
-  static const save = 'Saqlash';
-  static const cancel = 'Bekor qilish';
-  static const noDocuments = "Hujjat yo'q";
-  static const docDownload = 'Yuklab olish';
-  static const timeline = 'Tarix';
-  static const timelineCreated = 'Yaratildi';
-  static const timelineAccepted = 'Qabul qilindi';
-  static const timelineStarted = 'Boshlandi';
-  static const messages = 'Xabarlar';
+  static String get backToOrders => t('order.backToOrders');
+  static String get notFound => t('order.notFound');
+  static String get project => t('order.project');
+  static String get created => t('order.created');
+  static String get client => t('order.client');
+  static String get specialist => t('order.specialist');
+  static String get details => t('order.details');
+  static String get description => t('order.description');
+  static String get amount => t('order.amount');
+  static String get deadline => t('order.deadline');
+  static String get deadlineNotSet => t('order.deadlineNotSet');
+  static String get rejectionReason => t('order.rejectionReason');
+  static String get specialistCompleted => t('order.specialistCompleted');
+  static String get clientConfirmed => t('order.clientConfirmed');
+  static String get accept => t('order.accept');
+  static String get start => t('order.start');
+  static String get complete => t('order.complete');
+  static String get confirm => t('order.confirm');
+  static String get documents => t('order.documents');
+  static String get uploadDocument => t('order.uploadDocument');
+  static String get uploading => t('order.uploading');
+  static String get clientUploads => t('order.clientUploads');
+  static String get maxFilesReached => t('order.maxFilesReached');
+  static String get deadlineSetLabel => t('order.deadlineSetLabel');
+  static String get deadlineChangeLabel => t('order.deadlineChangeLabel');
+  static String get save => t('common.save');
+  static String get cancel => t('orders.cancel');
+  static String get noDocuments => t('order.noDocuments');
+  static String get docDownload => t('order.docDownload');
+  static String get timeline => t('order.timeline');
+  static String get timelineCreated => t('order.timelineCreated');
+  static String get timelineAccepted => t('order.accepted');
+  static String get timelineStarted => t('order.timelineStarted');
+  static String get messages => t('cabinet.tab.messages');
 
   /// Kabinetdagi buyurtma holatlari bilan bir xil ranglar.
   static (String, Color, Color) status(String value) => switch (value) {
-    'pending' => ('Kutilmoqda', const Color(0xFFB45309), const Color(0xFFFEF3C7)),
-    'accepted' => ('Qabul qilindi', const Color(0xFF1D4ED8), const Color(0xFFDBEAFE)),
-    'in_progress' => ('Jarayonda', const Color(0xFF1D4ED8), const Color(0xFFDBEAFE)),
-    'completed' => ('Tugatildi', const Color(0xFF047857), const Color(0xFFD1FAE5)),
-    'rejected' => ('Rad etildi', const Color(0xFFBE123C), const Color(0xFFFFE4E6)),
+    'pending' => (
+      t('cabinet.reels.statusPending'),
+      const Color(0xFFB45309),
+      const Color(0xFFFEF3C7),
+    ),
+    'accepted' => (t('order.accepted'), const Color(0xFF1D4ED8), const Color(0xFFDBEAFE)),
+    'in_progress' => (
+      t('cabinet.inquiryStatus.in_progress'),
+      const Color(0xFF1D4ED8),
+      const Color(0xFFDBEAFE),
+    ),
+    'completed' => (t('order.timelineCompleted'), const Color(0xFF047857), const Color(0xFFD1FAE5)),
+    'rejected' => (
+      t('cabinet.orderStatus.rejected'),
+      const Color(0xFFBE123C),
+      const Color(0xFFFFE4E6),
+    ),
     'cancelled' => ('Bekor qilindi', const Color(0xFFBE123C), const Color(0xFFFFE4E6)),
     _ => (value, const Color(0xFF3D3D3D), const Color(0xFFF3F4F6)),
   };
@@ -1041,7 +1054,7 @@ class OrderAttachment {
   final String url;
 
   factory OrderAttachment.fromJson(Map row) => OrderAttachment(
-    name: row['name']?.toString() ?? row['filename']?.toString() ?? 'hujjat',
+    name: row['name']?.toString() ?? row['filename']?.toString() ?? t('docs.document'),
     url: row['url']?.toString() ?? '',
   );
 }

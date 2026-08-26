@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -286,10 +287,10 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
   /// Saytdagi `formatRelative`.
   static String _relative(DateTime at) {
     final diff = DateTime.now().difference(at);
-    if (diff.inMinutes < 1) return 'hozir';
-    if (diff.inHours < 1) return '${diff.inMinutes} daqiqa oldin';
-    if (diff.inDays < 1) return '${diff.inHours} soat oldin';
-    return '${diff.inDays} kun oldin';
+    if (diff.inMinutes < 1) return t('time.now');
+    if (diff.inHours < 1) return '${diff.inMinutes} ${t('time.minAgo')}';
+    if (diff.inDays < 1) return '${diff.inHours} ${t('time.hourAgo')}';
+    return '${diff.inDays} ${t('time.dayAgo')}';
   }
 
   Future<void> _openOrderSheet() async {
@@ -414,7 +415,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                         Expanded(
                           child: _orderButton(
                             theme,
-                            'Qabul qilish',
+                            t('orders.accept'),
                             background: const Color(0xFF10B981),
                             foreground: Colors.white,
                             onTap: () => _setOrderStatus(order, 'accepted'),
@@ -423,7 +424,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                         const SizedBox(width: 8), // gap-2
                         _orderButton(
                           theme,
-                          'Rad etish',
+                          t('common.reject'),
                           background: AppColors.surfaceAltLight,
                           foreground: AppColors.dark,
                           onTap: () => _rejectOrder(order),
@@ -435,7 +436,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                     const SizedBox(height: 8), // mt-2
                     _orderButton(
                       theme,
-                      'Buyurtmani ko\'rish',
+                      t('order.view'),
                       background: Colors.white,
                       foreground: AppColors.dark,
                       border: AppColors.borderLight,
@@ -503,16 +504,16 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
     final reason = await showDialog<String>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Rad etish sababini kiriting:'),
+        title: Text(t('orders.rejectReasonPrompt')),
         content: TextField(controller: controller, autofocus: true),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Bekor qilish'),
+            child: Text(t('common.cancel')),
           ),
           FilledButton(
             onPressed: () => Navigator.of(dialogContext).pop(controller.text.trim()),
-            child: const Text('Yuborish'),
+            child: Text(t('chat.send')),
           ),
         ],
       ),
@@ -649,14 +650,14 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
 }
 
 abstract final class ChatTexts {
-  static const empty = "Hozircha xabarlar yo'q";
-  static const typeMessage = 'Xabar yozing...';
-  static const send = 'Yuborish';
-  static const online = 'Onlayn';
-  static const offline = 'Oflayn';
-  static const lastSeen = 'Oxirgi marta';
-  static const createOrder = 'Buyurtma berish';
-  static const createOrderMobile = 'Buyurtma';
+  static String get empty => t('chat.empty');
+  static String get typeMessage => t('chat.typeMessage');
+  static String get send => t('chat.send');
+  static String get online => t('chat.online');
+  static String get offline => t('chat.offline');
+  static String get lastSeen => t('chat.lastSeen');
+  static String get createOrder => t('chat.createOrder');
+  static String get createOrderMobile => t('chat.createOrderMobile');
 }
 
 /// `/market/cabinet/messages/{id}` javobi.

@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import 'package:flutter/material.dart';
 
 import '../../app/theme.dart';
@@ -116,7 +117,7 @@ class _ChatOrderSheetState extends State<ChatOrderSheet> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Buyurtma berish',
+                t('chat.createOrder'),
                 style: theme.textTheme.titleLarge?.copyWith(
                   fontSize: 18, // text-lg
                   fontWeight: FontWeight.w700,
@@ -124,13 +125,13 @@ class _ChatOrderSheetState extends State<ChatOrderSheet> {
                 ),
               ),
               const SizedBox(height: 16), // mb-4
-              _label(theme, 'Loyiha nomi'),
+              _label(theme, t('chat.orderTitle')),
               _field(theme, _title),
               const SizedBox(height: 12), // space-y-3
-              _label(theme, 'Tavsif'),
+              _label(theme, t('chat.orderDescription')),
               _field(theme, _description, lines: 3),
               const SizedBox(height: 12),
-              _label(theme, 'Narx'),
+              _label(theme, t('services.price')),
               Row(
                 children: [
                   Expanded(child: _field(theme, _price, hint: '0', number: true)),
@@ -184,7 +185,7 @@ class _ChatOrderSheetState extends State<ChatOrderSheet> {
                           borderRadius: BorderRadius.circular(AppRadius.md),
                         ),
                         child: Text(
-                          'Bekor qilish',
+                          t('common.cancel'),
                           style: theme.textTheme.bodyMedium?.copyWith(color: AppColors.dark),
                         ),
                       ),
@@ -204,7 +205,7 @@ class _ChatOrderSheetState extends State<ChatOrderSheet> {
                             borderRadius: BorderRadius.circular(AppRadius.md),
                           ),
                           child: Text(
-                            _sending ? 'Yuklanmoqda...' : 'Yuborish',
+                            _sending ? t('common.loading') : t('chat.send'),
                             style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white),
                           ),
                         ),
@@ -284,7 +285,7 @@ class _ChatOrderSheetState extends State<ChatOrderSheet> {
     clipBehavior: Clip.antiAlias,
     child: Row(
       children: [
-        for (final (value, label) in const [('uzs', "so'm"), ('usd', r'$')])
+        for (final (value, label) in [('uzs', t('hero.currency')), ('usd', r'$')])
           Pressable(
             onTap: () => setState(() => _currency = value),
             child: Container(

@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -128,9 +129,9 @@ class _BirjaCreateSheetState extends State<BirjaCreateSheet> {
                   _label(theme, 'Mutaxassis turi *'),
                   Row(
                     children: [
-                      for (final (value, label) in const [
-                        ('designer', 'Dizayner'),
-                        ('master', 'Usta'),
+                      for (final (value, label) in [
+                        ('designer', t('header.nav.designer')),
+                        ('master', t('cabinet.favBadge.master')),
                       ]) ...[
                         if (value != 'designer') const SizedBox(width: 8),
                         _Choice(
@@ -151,7 +152,7 @@ class _BirjaCreateSheetState extends State<BirjaCreateSheet> {
                   ),
                   const SizedBox(height: 16),
 
-                  _label(theme, 'Tafsilot'),
+                  _label(theme, t('birja.details')),
                   _Field(
                     controller: _description,
                     maxLines: 4,
@@ -184,7 +185,7 @@ class _BirjaCreateSheetState extends State<BirjaCreateSheet> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _label(theme, 'Maydon (m²)'),
+                            _label(theme, t('createListing.areaSection.label')),
                             _Field(controller: _area, numeric: true),
                           ],
                         ),
@@ -221,7 +222,7 @@ class _BirjaCreateSheetState extends State<BirjaCreateSheet> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _label(theme, 'Tuman'),
+                            _label(theme, t('cabinet.district')),
                             _Select(
                               value: _district,
                               enabled: _city.isNotEmpty,
@@ -247,7 +248,7 @@ class _BirjaCreateSheetState extends State<BirjaCreateSheet> {
                               controller: _budgetFrom,
                               numeric: true,
                               hint: '0',
-                              suffix: _currency == 'USD' ? '\$' : "so'm",
+                              suffix: _currency == 'USD' ? '\$' : t('hero.currency'),
                             ),
                           ],
                         ),
@@ -262,7 +263,7 @@ class _BirjaCreateSheetState extends State<BirjaCreateSheet> {
                               controller: _budgetTo,
                               numeric: true,
                               hint: '0',
-                              suffix: _currency == 'USD' ? '\$' : "so'm",
+                              suffix: _currency == 'USD' ? '\$' : t('hero.currency'),
                             ),
                           ],
                         ),
@@ -291,7 +292,7 @@ class _BirjaCreateSheetState extends State<BirjaCreateSheet> {
                   ),
                   const SizedBox(height: 16),
 
-                  _label(theme, 'Muddati'),
+                  _label(theme, t('birja.deadline')),
                   Pressable(
                     scale: 1,
                     onTap: _pickDeadline,
@@ -330,14 +331,14 @@ class _BirjaCreateSheetState extends State<BirjaCreateSheet> {
                   children: [
                     OutlinedButton(
                       onPressed: () => Navigator.of(context).pop(),
-                      child: const Text(BirjaTexts.cancel),
+                      child: Text(BirjaTexts.cancel),
                     ),
                     const SizedBox(width: 12),
                     FilledButton(
                       style: FilledButton.styleFrom(backgroundColor: AppColors.olive),
                       // Saytda ham tugma sarlavha bo'sh bo'lsa o'chiq turadi.
                       onPressed: _title.text.trim().isEmpty ? null : _submit,
-                      child: const Text('Joylash'),
+                      child: Text(t('birja.post')),
                     ),
                   ],
                 ),

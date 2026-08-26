@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import 'package:flutter/material.dart';
 
 import '../../app/theme.dart';
@@ -227,7 +228,7 @@ class _ChatSheetState extends State<_ChatSheet> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          'Aziza — AI yordamchi',
+                          t('ai.title'),
                           style: theme.textTheme.titleMedium?.copyWith(color: Colors.white),
                         ),
                         Row(
@@ -246,7 +247,7 @@ class _ChatSheetState extends State<_ChatSheet> {
                             ),
                             const SizedBox(width: 6),
                             Text(
-                              'onlayn',
+                              t('ai.online'),
                               style: theme.textTheme.labelSmall?.copyWith(color: Colors.white70),
                             ),
                           ],
@@ -345,7 +346,10 @@ class _ChatSheetState extends State<_ChatSheet> {
                       maxLines: 4,
                       textInputAction: TextInputAction.send,
                       onSubmitted: (_) => _send(),
-                      decoration: const InputDecoration(hintText: 'Xabar yozing...', isDense: true),
+                      decoration: InputDecoration(
+                        hintText: t('ai.inputPlaceholder'),
+                        isDense: true,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 8),

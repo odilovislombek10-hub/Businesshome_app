@@ -1,10 +1,12 @@
+import '../../core/i18n/translate.dart';
+
 /// A marketplace account, as returned by `/api/market/auth/me` and inside every auth response.
 ///
 /// One phone number can hold several accounts — the backend allows the same number to register
 /// separately as a user, agent, designer, master and developer — so [role] is part of the
 /// identity, not a flag on it. That is why login can ask which role to sign in as.
 class MarketUser {
-  const MarketUser({
+  MarketUser({
     required this.id,
     required this.phone,
     required this.fullName,
@@ -54,19 +56,21 @@ class MarketUser {
 
 /// `Role = Literal["user", "agent", "designer", "master", "developer"]` in the backend schema.
 enum MarketRole {
-  user('user', 'Foydalanuvchi'),
-  agent('agent', 'Agent'),
-  designer('designer', 'Dizayner'),
-  master('master', 'Usta'),
-  developer('developer', 'Quruvchi');
+  user('user', 'cabinet.role.user'),
+  agent('agent', 'contact.agent'),
+  designer('designer', 'header.nav.designer'),
+  master('master', 'cabinet.favBadge.master'),
+  developer('developer', 'detail.developer');
 
-  const MarketRole(this.wire, this.label);
+  const MarketRole(this.wire, this._labelKey);
 
   /// The value the API sends and expects.
   final String wire;
 
-  /// How the site labels the role in Uzbek.
-  final String label;
+  /// Saytdagi i18n kaliti — nom tanlangan tilda chiqadi.
+  final String _labelKey;
+
+  String get label => t(_labelKey);
 
   static MarketRole parse(String? value) =>
       MarketRole.values.firstWhere((r) => r.wire == value, orElse: () => MarketRole.user);

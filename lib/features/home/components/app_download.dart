@@ -1,3 +1,4 @@
+import '../../../core/i18n/translate.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -45,7 +46,7 @@ class AppDownload extends StatelessWidget {
             ),
             const SizedBox(height: 24), // mb-6
             Text(
-              "O'zbekistonning eng ishonchli mulk qidiruv ilovasini yuklab oling",
+              t('appDownload.title'),
               style: theme.textTheme.displaySmall?.copyWith(
                 fontSize: 30, // text-3xl
                 color: AppColors.dark,
@@ -54,7 +55,7 @@ class AppDownload extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              "BusinessHome ilovasini o'rnating va aqlliroq qidiruvni boshlang.",
+              t('appDownload.description'),
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w400,
                 color: AppColors.dark.withValues(alpha: 0.6),

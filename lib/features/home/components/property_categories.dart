@@ -1,3 +1,4 @@
+import '../../../core/i18n/translate.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -37,7 +38,7 @@ class PropertyCategories extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Kvartiralardan tashqari',
+              t('categories.title'),
               style: theme.textTheme.displaySmall?.copyWith(fontSize: 24, color: AppColors.dark),
             ),
             const SizedBox(height: 20),

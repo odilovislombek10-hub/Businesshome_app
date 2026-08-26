@@ -157,7 +157,7 @@ class _MastersFilterSheetState extends State<MastersFilterSheet> {
                         color: AppColors.dark,
                       ),
                       items: [
-                        const DropdownMenuItem(value: '', child: Text(MastersTexts.allCities)),
+                        DropdownMenuItem(value: '', child: Text(MastersTexts.allCities)),
                         for (final (value, label) in CityLabels.options)
                           DropdownMenuItem(value: value, child: Text(label)),
                       ],

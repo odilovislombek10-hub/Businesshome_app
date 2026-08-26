@@ -1,33 +1,34 @@
+import '../../core/i18n/translate.dart';
+
 /// `/new-projects` sahifasining matnlari — `newProjects.*` kalitlari `uz.ts` dan aynan olingan.
 abstract final class NewProjectsTexts {
-  static const heroTitle = 'Yangi Loyihalar';
-  static const heroDesc =
-      "O'zbekistondagi eng yangi novostroykalar — qurilayotgan binolar va kelgusi turar-joy loyihalari";
-  static const searchPlaceholder = 'Qidirish: nomi, tuman...';
-  static const searchOnMap = 'Xaritadan qidirish';
-  static const allCities = 'Barcha shaharlar';
+  static String get heroTitle => t('newProjects.heroTitle');
+  static String get heroDesc => t('newProjects.heroDesc');
+  static String get searchPlaceholder => t('newProjects.searchPlaceholder');
+  static String get searchOnMap => t('newProjects.searchOnMap');
+  static String get allCities => t('newProjects.allCities');
 
-  static const activeListings = 'ta faol loyiha';
-  static const updatedToday = 'Bugun yangilangan';
+  static String get activeListings => t('newProjects.activeListings');
+  static String get updatedToday => t('newProjects.updatedToday');
 
-  static const filters = 'Filterlar';
-  static const resetAll = 'Tozalash';
-  static const resultsFound = 'ta topildi';
-  static const city = 'Shahar';
-  static const priceRange = "Narx oralig'i";
-  static const from = 'dan';
-  static const to = 'gacha';
-  static const priceUnit = "so'm";
-  static const completion = 'Topshirish muddati';
+  static String get filters => t('newProjects.filters');
+  static String get resetAll => t('newProjects.resetAll');
+  static String get resultsFound => t('newProjects.resultsFound');
+  static String get city => t('newProjects.city');
+  static String get priceRange => t('newProjects.priceRange');
+  static String get from => t('newProjects.from');
+  static String get to => t('newProjects.to');
+  static String get priceUnit => t('newProjects.priceUnit');
+  static String get completion => t('newProjects.completion');
   static const completionHint = '2026 yoki 2026-Q2';
 
-  static const noResults = 'Hech narsa topilmadi';
-  static const noResultsDesc = "Qidiruv shartlarini o'zgartiring yoki filterlarni tozalang";
+  static String get noResults => t('newProjects.noResults');
+  static String get noResultsDesc => t('newProjects.noResultsDesc');
 
-  static const sortOptions = <(String, String)>[
-    ('newest', 'Eng yangi'),
-    ('price_asc', 'Arzon → Qimmat'),
-    ('price_desc', 'Qimmat → Arzon'),
-    ('area_desc', 'Katta maydon'),
+  static List<(String, String)> get sortOptions => <(String, String)>[
+    ('newest', t('newProjects.sortNewest')),
+    ('price_asc', t('newProjects.sortPriceAsc')),
+    ('price_desc', t('newProjects.sortPriceDesc')),
+    ('area_desc', t('newProjects.sortAreaDesc')),
   ];
 }

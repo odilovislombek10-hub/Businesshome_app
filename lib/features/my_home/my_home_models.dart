@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import '../../core/api/media_url.dart';
 
 /// `/api/market/cabinet/my-home` javobining modellari — saytdagi `my-home.types.ts` dan.
@@ -366,7 +367,7 @@ class MyHomeItem {
     final number = property?.apartmentNumber.isNotEmpty == true
         ? property!.apartmentNumber
         : (contract?.number ?? '');
-    final kind = isShop ? "Do'kon" : 'Kvartira';
+    final kind = isShop ? t('header.dropdown.shop') : t('header.dropdown.apartment');
     final title = '$kind $number'.trim();
     return title.isEmpty ? 'Mulk ${index + 1}' : title;
   }

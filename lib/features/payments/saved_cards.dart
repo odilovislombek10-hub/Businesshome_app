@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -136,11 +137,11 @@ class _SavedCardsSectionState extends State<SavedCardsSection> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Bekor qilish'),
+            child: Text(t('cabinet.logoutConfirmCancel')),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text("O'chirish", style: TextStyle(color: AppColors.danger)),
+            child: Text(t('common.delete'), style: TextStyle(color: AppColors.danger)),
           ),
         ],
       ),
@@ -400,7 +401,7 @@ class _SavedCardsSectionState extends State<SavedCardsSection> {
           Expanded(
             child: _button(
               theme,
-              'Bekor qilish',
+              t('cabinet.logoutConfirmCancel'),
               outlined: true,
               onTap: () => setState(() {
                 _step = _AddStep.closed;
@@ -412,7 +413,7 @@ class _SavedCardsSectionState extends State<SavedCardsSection> {
           Expanded(
             child: _button(
               theme,
-              _submitting ? 'Yuborilmoqda…' : 'Davom etish',
+              _submitting ? 'Yuborilmoqda…' : t('common.continue'),
               onTap: _submitting ? null : _submitCard,
             ),
           ),
@@ -491,7 +492,7 @@ class _SavedCardsSectionState extends State<SavedCardsSection> {
           Expanded(
             child: _button(
               theme,
-              'Orqaga',
+              t('common.back'),
               outlined: true,
               onTap: () => setState(() {
                 _step = _AddStep.card;

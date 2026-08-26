@@ -69,9 +69,9 @@ class _CabinetAgentProfileState extends State<CabinetAgentProfile> {
         'telegram': _telegram.text.trim(),
         'instagram': _instagram.text.trim(),
       });
-      messenger.showSnackBar(const SnackBar(content: Text(CabinetTexts.profileSaved)));
+      messenger.showSnackBar(SnackBar(content: Text(CabinetTexts.profileSaved)));
     } catch (_) {
-      messenger.showSnackBar(const SnackBar(content: Text(CabinetTexts.profileError)));
+      messenger.showSnackBar(SnackBar(content: Text(CabinetTexts.profileError)));
     } finally {
       if (mounted) setState(() => _saving = false);
     }

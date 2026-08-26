@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -105,7 +106,7 @@ class _AgentPublicScreenState extends State<AgentPublicScreen> {
             FilledButton(
               style: FilledButton.styleFrom(backgroundColor: AppColors.olive),
               onPressed: () => context.go('/'),
-              child: const Text('Bosh sahifa'),
+              child: Text(t('cabinet.tab.dashboard')),
             ),
           ],
         ),
@@ -134,7 +135,7 @@ class _AgentPublicScreenState extends State<AgentPublicScreen> {
         const SizedBox(height: 16),
       ],
       if (a.specialization.isNotEmpty) ...[
-        _section('Mutaxassislik', _chips(a.specialization.map(_specLabel).toList())),
+        _section(t('designers.specialization'), _chips(a.specialization.map(_specLabel).toList())),
         const SizedBox(height: 16),
       ],
       if (a.regions.isNotEmpty) ...[
@@ -254,7 +255,7 @@ class _AgentPublicScreenState extends State<AgentPublicScreen> {
                           borderRadius: BorderRadius.circular(AppRadius.pill),
                         ),
                         child: Text(
-                          'Agent',
+                          t('cabinet.role.agent'),
                           style: theme.textTheme.labelSmall?.copyWith(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
@@ -272,7 +273,7 @@ class _AgentPublicScreenState extends State<AgentPublicScreen> {
                         ),
                       if (a.experienceYears > 0)
                         Text(
-                          '${a.experienceYears} yil tajriba',
+                          '${a.experienceYears} ${t('designerDetail.years')}',
                           style: theme.textTheme.bodyMedium?.copyWith(
                             fontSize: 13,
                             color: AppColors.dark.withValues(alpha: 0.6),
@@ -392,7 +393,7 @@ class _AgentPublicScreenState extends State<AgentPublicScreen> {
                 Text(
                   [
                     CityLabels.label(listing.city),
-                    if (listing.rooms > 0) '${listing.rooms} xona',
+                    if (listing.rooms > 0) '${listing.rooms} ${t('propertyCard.rooms')}',
                     if (listing.area > 0) '${formatNumber(listing.area)} m²',
                   ].join(' · '),
                   style: theme.textTheme.labelSmall?.copyWith(
@@ -405,7 +406,7 @@ class _AgentPublicScreenState extends State<AgentPublicScreen> {
                   Text(
                     listing.currency == 'usd'
                         ? '\$${formatNumber(price)}'
-                        : "${formatNumber(price)} so'm",
+                        : "${formatNumber(price)} ${t('hero.currency')}",
                     style: theme.textTheme.bodyMedium?.copyWith(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
@@ -450,7 +451,7 @@ class _AgentPublicScreenState extends State<AgentPublicScreen> {
     );
 
     return _section(
-      "Bog'lanish",
+      t('stats.contact'),
       Column(
         children: [
           Pressable(
@@ -466,7 +467,7 @@ class _AgentPublicScreenState extends State<AgentPublicScreen> {
                 borderRadius: BorderRadius.circular(AppRadius.md),
               ),
               child: Text(
-                'Yozish',
+                t('chat.write'),
                 style: theme.textTheme.bodyMedium?.copyWith(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
@@ -535,8 +536,8 @@ class _AgentPublicScreenState extends State<AgentPublicScreen> {
 
   /// Saytdagi `specLabel`.
   static String _specLabel(String code) => switch (code) {
-    'sale' => 'Sotish',
-    'rent' => 'Ijara',
+    'sale' => t('map.search.sell'),
+    'rent' => t('header.nav.rent'),
     'commercial' => 'Tijoriy',
     _ => code,
   };

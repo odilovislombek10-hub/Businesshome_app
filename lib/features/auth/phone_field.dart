@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -22,7 +23,7 @@ class PhoneField extends StatelessWidget {
         _UzPhoneFormatter(),
       ],
       decoration: InputDecoration(
-        labelText: label ?? 'Telefon raqam',
+        labelText: label ?? t('auth.phone'),
         prefixText: '+998 ',
         hintText: '90 123 45 67',
       ),

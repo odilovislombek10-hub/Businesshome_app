@@ -1,3 +1,4 @@
+import '../../../core/i18n/translate.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -19,30 +20,30 @@ class SiteFooter extends StatelessWidget {
   final List<Region> regions;
   final String? contactPhone;
 
-  static const _services = [
-    ('Ipoteka', '/mortgage'),
+  static List<(String, String)> get _services => [
+    (t('footer.mortgage'), '/mortgage'),
     ('BusinessHome-Ijara', '/rent'),
     ('BusinessHome-Sport', '/sport'),
     ('BusinessHome-Servis', '/service'),
   ];
 
-  static const _company = [
-    ('Kompaniya haqida', '/about'),
-    ('Investorlarga', '/investors'),
+  static List<(String, String)> get _company => [
+    (t('footer.aboutCompany'), '/about'),
+    (t('footer.investors'), '/investors'),
     ('For Investors', '/for-investors'),
-    ('Jamiyat', '/community'),
-    ('Matbuot', '/press'),
-    ('Karyera', '/career'),
-    ('Tenderlar', '/tenders'),
+    (t('footer.community'), '/community'),
+    (t('footer.press'), '/press'),
+    (t('footer.career'), '/career'),
+    (t('footer.tenders'), '/tenders'),
   ];
 
-  static const _support = [
-    ('FAQ', '/faq'),
-    ('Onlayn xarid', '/online-purchase'),
-    ('Ekskursiyalar', '/tours'),
-    ('Kontaktlar', '/contacts'),
-    ('Firibgarlikka qarshi', '/anti-fraud'),
-    ('Maxfiylik siyosati', '/privacy'),
+  static List<(String, String)> get _support => [
+    (t('footer.faq'), '/faq'),
+    (t('footer.onlinePurchase'), '/online-purchase'),
+    (t('footer.tours'), '/tours'),
+    (t('footer.contacts'), '/contacts'),
+    (t('footer.antiFraud'), '/anti-fraud'),
+    (t('footer.privacy'), '/privacy'),
   ];
 
   static const _social = [
@@ -76,8 +77,8 @@ class SiteFooter extends StatelessWidget {
             child: Column(
               children: [
                 _CtaBlock(
-                  title: 'BusinessHome yangi loyihalari',
-                  button: 'Batafsil',
+                  title: t('footer.newProjects'),
+                  button: t('footer.details'),
                   onPressed: () => context.go('/new-projects'),
                 ),
                 const SizedBox(height: 32), // gap-8
@@ -93,15 +94,15 @@ class SiteFooter extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     _PillButton(
-                      label: "Qo'ng'iroq qilish",
+                      label: t('footer.call'),
                       onPressed: () => _open('tel:${phone.replaceAll(' ', '')}'),
                     ),
                   ],
                 ),
                 const SizedBox(height: 32),
                 _CtaBlock(
-                  title: 'Shikoyat yoki taklifingiz bormi?',
-                  button: "BusinessHome'ga murojaat",
+                  title: t('footer.complaint'),
+                  button: t('footer.contact'),
                   onPressed: () => _open('https://t.me/businesshome'),
                 ),
               ],
@@ -118,7 +119,7 @@ class SiteFooter extends StatelessWidget {
                   children: [
                     Expanded(
                       child: _LinkColumn(
-                        title: 'Hududlar',
+                        title: t('footer.regions'),
                         links: [
                           for (final region in regionsLeft)
                             (region.label, '/secondary?city=${region.value}'),
@@ -143,11 +144,11 @@ class SiteFooter extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
-                      child: _LinkColumn(title: 'Xizmatlar', links: _services),
+                      child: _LinkColumn(title: t('footer.services'), links: _services),
                     ),
                     const SizedBox(width: 32),
                     Expanded(
-                      child: _LinkColumn(title: 'Kompaniya', links: _company),
+                      child: _LinkColumn(title: t('footer.company'), links: _company),
                     ),
                   ],
                 ),
@@ -156,11 +157,11 @@ class SiteFooter extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
-                      child: _LinkColumn(title: 'Ijtimoiy tarmoqlar', links: _social),
+                      child: _LinkColumn(title: t('footer.social'), links: _social),
                     ),
                     const SizedBox(width: 32),
                     Expanded(
-                      child: _LinkColumn(title: "Qo'llab-quvvatlash", links: _support),
+                      child: _LinkColumn(title: t('footer.support'), links: _support),
                     ),
                   ],
                 ),
@@ -178,7 +179,7 @@ class SiteFooter extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '© ${DateTime.now().year} BusinessHome. Barcha huquqlar himoyalangan.',
+                  '© ${DateTime.now().year} BusinessHome. ${t('footer.rights')}',
                   style: theme.textTheme.labelSmall?.copyWith(
                     fontSize: 12,
                     color: AppColors.dark.withValues(alpha: 0.5),
@@ -188,8 +189,8 @@ class SiteFooter extends StatelessWidget {
                 Wrap(
                   spacing: 20,
                   children: [
-                    _FooterLink(label: 'Maxfiylik siyosati', path: '/privacy'),
-                    _FooterLink(label: 'Foydalanish shartlari', path: '/terms'),
+                    _FooterLink(label: t('footer.privacy'), path: '/privacy'),
+                    _FooterLink(label: t('footer.terms'), path: '/terms'),
                   ],
                 ),
               ],

@@ -1,8 +1,9 @@
+import '../../core/i18n/translate.dart';
 import 'package:flutter/painting.dart';
 
 /// "Mening uyim" sahifasining matnlari — `my-home.component.html` dan aynan olingan.
 abstract final class MyHomeTexts {
-  static const title = 'Mening uyim';
+  static String get title => t('myHome.title');
   static const subtitle = "Siz sotib olgan xonadon, shartnoma, to'lovlar va qurilish jarayoni";
   static const listTitle = 'Mening uylarim';
   static String listSubtitle(int count) =>
@@ -10,13 +11,13 @@ abstract final class MyHomeTexts {
   static const backToList = "Mulklar ro'yxatiga qaytish";
   static String myProperties(int count) => 'Sizning mulklaringiz ($count)';
   static const open = "Ochish →";
-  static const apartment = 'Kvartira';
-  static const shop = "Do'kon";
+  static String get apartment => t('header.dropdown.apartment');
+  static String get shop => t('header.dropdown.shop');
   static const totalPriceShort = 'Jami narx';
 
   static const errorTitle = "Ma'lumotni yuklab bo'lmadi";
   static const errorText = 'Server bilan aloqada xatolik. Iltimos qayta urinib ko\'ring.';
-  static const retry = 'Qayta urinish';
+  static String get retry => t('panorama.retry');
 
   static const emptyTitle = "Sizda hali aktiv xonadon yo'q";
   static const emptyText =
@@ -31,41 +32,41 @@ abstract final class MyHomeTexts {
   static const linkSubtitle = "Pasport ma'lumotlari orqali tizimda shartnomangizni topamiz";
   static const linkPassportSeries = 'Pasport seriya';
   static const linkPassportNumber = 'Pasport raqami';
-  static const linkOr = 'yoki';
+  static String get linkOr => t('auth.or');
   static const linkPhone = 'CRM dagi telefon raqamingiz';
   static const linkPhoneHint = 'Quruvchi kompaniyasiga taqdim etgan telefon raqam';
   static const linkOneId = 'OneID orqali (tez orada)';
-  static const linkCancel = 'Bekor qilish';
+  static String get linkCancel => t('common.cancel');
   static const linkSubmit = "Topish va bog'lash";
-  static const linkSearching = 'Qidirilmoqda...';
+  static String get linkSearching => t('map.amenity.searching');
   static const linkNotFound = "Shartnoma topilmadi. Ma'lumotlarni tekshirib qayta urining.";
   static String linkSuccess(String? number) =>
       "Shartnoma ${number ?? ''} muvaffaqiyatli bog'landi!".replaceAll('  ', ' ');
 
   // ── bo'limlar ─────────────────────────────────────────────────────────────
-  static const tabs = <(String, String)>[
-    ('overview', 'Umumiy'),
+  static List<(String, String)> get tabs => <(String, String)>[
+    ('overview', t('createListing.bathroomShared')),
     ('contract', 'Shartnoma'),
     ('payments', "To'lov grafigi"),
     ('construction', 'Qurilish jarayoni'),
     ('market', 'Bozor analizi'),
-    ('documents', 'Hujjatlar'),
+    ('documents', t('order.documents')),
   ];
 
   // Xonadon xulosasi
-  static const block = 'Blok';
+  static String get block => t('newProjects.blocks');
   static const entrance = "Pod'yezd";
-  static const floor = 'Qavat';
+  static String get floor => t('detail.floor');
   static const apartmentNo = 'Xonadon';
-  static const rooms = 'Xonalar';
-  static const area = 'Maydon';
+  static String get rooms => t('detail.rooms');
+  static String get area => t('cabinet.projects.area');
   static const delivery = 'Topshirilish';
   static const constructionProgress = 'Qurilish progressi';
-  static const project = 'Loyiha';
-  static const address = 'Manzil';
+  static String get project => t('order.project');
+  static String get address => t('detail.address');
   static const propertyInfo = "Xonadon ma'lumotlari";
   static const layout = 'Planirovka';
-  static const statusSection = 'Holat';
+  static String get statusSection => t('common.status');
   static const contractWord = 'Shartnoma';
   static const construction = 'Qurilish';
   static const remainingSum = 'Qolgan summa';
@@ -74,7 +75,7 @@ abstract final class MyHomeTexts {
   // Moliya kartasi
   static const remaining = 'Qoldiq';
   static const nextPayment = "Keyingi to'lov";
-  static const soum = "so'm";
+  static String get soum => t('mortgage.som');
   static const bought = 'Sotib olingan';
   static const currentMarket = 'Hozirgi bozor';
   static const investmentGrowth = "Inv. o'sishi";
@@ -91,17 +92,17 @@ abstract final class MyHomeTexts {
   static const developer = 'Developer';
   static const totalAmount = 'Umumiy summa';
   static const paymentType = "To'lov turi";
-  static const warranty = 'Kafolat';
+  static String get warranty => t('masterDetail.warranty');
   static String warrantyMonths(int months) => '$months oy';
   static const lateTerms = "Kechikish shartlari";
-  static const notes = "Qo'shimcha";
+  static String get notes => t('report.reason.other');
   static const contractPdf = 'Shartnoma PDF';
-  static const view = "Ko'rish";
-  static const downloading = 'Yuklanmoqda...';
+  static String get view => t('designers.view');
+  static String get downloading => t('common.loading');
   static const downloadFailed = "Faylni yuklab bo'lmadi";
 
   // To'lov grafigi
-  static const totalLabel = 'Umumiy';
+  static String get totalLabel => t('createListing.bathroomShared');
   static String paidWithPercent(int percent) => "To'langan ($percent%)";
   static const remainingLabel = 'Qolgan';
   static const nextLabel = 'Keyingi';
@@ -115,7 +116,7 @@ abstract final class MyHomeTexts {
   /// `paymentStatusLabel` va rangi.
   static (String, Color, Color) paymentStatus(String status) => switch (status) {
     'paid' => ("To'langan", Color(0xFF047857), Color(0xFFECFDF5)),
-    'pending' => ('Kutilmoqda', Color(0xFFB45309), Color(0xFFFFFBEB)),
+    'pending' => (t('cabinet.reels.statusPending'), Color(0xFFB45309), Color(0xFFFFFBEB)),
     'overdue' => ('Kechikkan', Color(0xFFB91C1C), Color(0xFFFEF2F2)),
     _ => ('Kelgusi', Color(0xFF475569), Color(0xFFF1F5F9)),
   };
@@ -139,17 +140,17 @@ abstract final class MyHomeTexts {
 
   // Hujjatlar
   static const noDocuments = "Hujjatlar yo'q";
-  static const download = 'Yuklab olish';
+  static String get download => t('order.docDownload');
 
   /// `docCategories` — kalit, yorliq va belgi.
-  static const documentCategories = <(String, String, String)>[
+  static List<(String, String, String)> get documentCategories => <(String, String, String)>[
     ('contract', 'Shartnoma', '📄'),
     ('receipts', 'Cheklar', '🧾'),
-    ('cadastre', 'Kadastr', '🗺️'),
-    ('warranty', 'Kafolat', '🛡️'),
+    ('cadastre', t('rent.amenity.kadastr'), '🗺️'),
+    ('warranty', t('masterDetail.warranty'), '🛡️'),
     ('layout', 'Planirovka', '📐'),
     ('design', 'Dizayn', '🎨'),
-    ('other', 'Boshqa', '📁'),
+    ('other', t('masters.spec.other'), '📁'),
   ];
 
   /// Fayl hajmi — saytdagi `fmtSize`.

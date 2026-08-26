@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -372,7 +373,7 @@ class _NewsDetailScreenState extends State<NewsDetailScreen> {
                     children: [
                       if (project.minPrice case final price? when price > 0) ...[
                         Text(
-                          "${formatNumber(price)} so'm",
+                          "${formatNumber(price)} ${t('hero.currency')}",
                           style: theme.textTheme.bodyMedium?.copyWith(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,

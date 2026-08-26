@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -567,10 +568,10 @@ class _ReelsScreenState extends State<ReelsScreen> {
 }
 
 abstract final class ReelsTexts {
-  static const empty = "Hozircha videolar yo'q";
-  static const back = 'Ortga';
-  static const share = 'Ulash';
-  static const info = 'Info';
-  static const viewDetails = 'Batafsil';
-  static const swipeUp = 'Yuqoriga suring';
+  static String get empty => t('reels.empty');
+  static String get back => t('reels.back');
+  static String get share => t('reels.share');
+  static String get info => t('reels.info');
+  static String get viewDetails => t('reels.viewDetails');
+  static String get swipeUp => t('reels.swipeUp');
 }

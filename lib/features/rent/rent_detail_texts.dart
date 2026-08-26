@@ -1,48 +1,50 @@
+import '../../core/i18n/translate.dart';
+
 /// `uz.ts` dagi `rentDetail.*` va u bilan ishlatiladigan `detail.*` kalitlari.
 abstract final class RentDetailTexts {
-  static const forRent = 'Ijaraga';
-  static const monthlyRent = 'Oylik ijara';
-  static const somMonth = "so'm/oy";
-  static const yearlyTotal = 'Yillik jami';
-  static const rentalTerms = 'Ijara shartlari';
+  static String get forRent => t('rent.forRent');
+  static String get monthlyRent => t('rentDetail.monthlyRent');
+  static String get somMonth => t('rentDetail.somMonth');
+  static String get yearlyTotal => t('rentDetail.yearlyTotal');
+  static String get rentalTerms => t('rentDetail.rentalTerms');
 
-  static const deposit = 'Kafolat depoziti';
-  static const depositHint = '2 oylik ijara miqdori';
-  static const minLease = 'Minimal muddat';
-  static const minLeaseValue = '6 oy';
-  static const longTermDiscount = 'Uzoq muddatga chegirma';
-  static const utilities = "Kommunal to'lovlar";
-  static const utilitiesNotIncluded = "Alohida to'lanadi";
-  static const moveIn = "Ko'chib kirish";
-  static const availableNow = 'Darhol mumkin';
-  static const moveInHint = 'Tayyor kvartira';
-  static const petPolicy = 'Uy hayvonlari';
-  static const petsNegotiable = 'Kelishiladi';
-  static const petDiscuss = 'Egasi bilan gaplashing';
-  static const furnishing = 'Meblangan';
-  static const furnished = 'Meblangan';
-  static const unfurnished = 'Meblsiz';
-  static const furnishingHint = "Foto va tavsifni ko'ring";
-  static const totalMoveIn = 'Birinchi oylik umumiy';
-  static const firstMonth = '1-oy';
-  static const similarRentals = "O'xshash ijara e'lonlari";
+  static String get deposit => t('rentDetail.deposit');
+  static String get depositHint => t('rentDetail.depositHint');
+  static String get minLease => t('rentDetail.minLease');
+  static String get minLeaseValue => t('rentDetail.minLeaseValue');
+  static String get longTermDiscount => t('rentDetail.longTermDiscount');
+  static String get utilities => t('rentDetail.utilities');
+  static String get utilitiesNotIncluded => t('rentDetail.utilitiesNotIncluded');
+  static String get moveIn => t('rentDetail.moveIn');
+  static String get availableNow => t('rentDetail.availableNow');
+  static String get moveInHint => t('rentDetail.moveInHint');
+  static String get petPolicy => t('rentDetail.petPolicy');
+  static String get petsNegotiable => t('rentDetail.petsNegotiable');
+  static String get petDiscuss => t('rentDetail.petDiscuss');
+  static String get furnishing => t('rentDetail.furnishing');
+  static String get furnished => t('rentDetail.furnishing');
+  static String get unfurnished => t('rentDetail.unfurnished');
+  static String get furnishingHint => t('rentDetail.furnishingHint');
+  static String get totalMoveIn => t('rentDetail.totalMoveIn');
+  static String get firstMonth => t('rentDetail.firstMonth');
+  static String get similarRentals => t('rentDetail.similarRentals');
 
   /// Saytda kommunal izohi qattiq yozilgan.
   static const utilitiesHint = "~300,000-500,000 so'm/oy";
 
   // `detail.*` va `breadcrumb.*`
-  static const breadcrumbHome = 'Bosh sahifa';
-  static const breadcrumbRent = 'Ijara';
-  static const about = 'Tavsif';
-  static const rooms = 'Xonalar';
-  static const floor = 'Qavat';
-  static const roomShort = 'x';
-  static const virtualTour = 'Virtual tur';
-  static const withBalcony = 'Balkonli';
-  static const som = "so'm";
-  static const notFound = 'Mulk topilmadi';
-  static const notFoundDesc = "Bu e'lon mavjud emas yoki olib tashlangan";
-  static const backToList = "Ro'yxatga qaytish";
+  static String get breadcrumbHome => t('rent.home');
+  static String get breadcrumbRent => t('rent.pageTitle');
+  static String get about => t('detail.aboutTitle');
+  static String get rooms => t('detail.rooms');
+  static String get floor => t('detail.floor');
+  static String get roomShort => t('detail.roomShort');
+  static String get virtualTour => t('detail.virtualTour');
+  static String get withBalcony => t('detail.withBalcony');
+  static String get som => t('detail.som');
+  static String get notFound => t('detail.notFound');
+  static String get notFoundDesc => t('detail.notFoundDesc');
+  static String get backToList => t('detail.backToList');
   static const amenities = 'Qulayliklar';
-  static const location = 'Joylashuv';
+  static String get location => t('map.locationTitle');
 }

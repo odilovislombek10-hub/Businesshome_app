@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import 'secondary_texts.dart';
 
 /// What differs between `/secondary` and `/rent`.
@@ -38,7 +39,7 @@ class ListingsConfig {
   /// Only the secondary page filters by payment method — `rent.component.ts` has no such field.
   final bool hasPaymentFilter;
 
-  static const secondary = ListingsConfig(
+  static ListingsConfig get secondary => ListingsConfig(
     path: '/secondary',
     endpoint: '/market/secondary',
     propertyType: 'secondary',
@@ -51,18 +52,18 @@ class ListingsConfig {
     hasPaymentFilter: true,
   );
 
-  static const rent = ListingsConfig(
+  static ListingsConfig get rent => ListingsConfig(
     path: '/rent',
     endpoint: '/market/rent',
     propertyType: 'rent',
-    heroTitle: "Ijara e'lonlari",
+    heroTitle: t('rent.heroTitle'),
     heroDesc:
         "Kvartira, hovli uy, ofis, do'kon va boshqa mulklarni qisqa yoki uzoq muddatga "
         "ijaraga olish",
     // The site's rent hero photo, hard-coded in `rent.component.ts`.
     heroImage: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920&q=80',
-    searchPlaceholder: "Tuman, ko'cha yoki bino nomi...",
-    noResultsDesc: "Boshqa filterlarni tanlang yoki qidiruv so'zini o'zgartiring",
+    searchPlaceholder: t('rent.searchPlaceholder'),
+    noResultsDesc: t('rent.noResultsDesc'),
     detailPathPrefix: '/property/rent',
     hasPaymentFilter: false,
   );

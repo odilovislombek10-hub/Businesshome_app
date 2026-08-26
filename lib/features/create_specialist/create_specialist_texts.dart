@@ -1,132 +1,134 @@
+import '../../core/i18n/translate.dart';
+
 /// BU FAYL SAYT MANBASIDAN AVTOMATIK YARATILGAN — qo'lda tahrirlamang.
 /// Manba: `features/create-specialist/create-specialist.component.ts` va `uz.ts`.
 abstract final class CreateSpecialistTexts {
   /// `createSpecialist.addTag`
-  static const addTag = "Teg qo'shish";
+  static String get addTag => t('createSpecialist.addTag');
 
   /// `createSpecialist.cancel`
-  static const cancel = 'Bekor qilish';
+  static String get cancel => t('createSpecialist.cancel');
 
   /// `createSpecialist.city`
-  static const city = 'Shahar';
+  static String get city => t('createSpecialist.city');
 
   /// `createSpecialist.description`
-  static const description = "O'zingiz haqingizda";
+  static String get description => t('createSpecialist.description');
 
   /// `createSpecialist.descriptionPlaceholder`
-  static const descriptionPlaceholder = 'Tajribangiz va xizmatlaringiz haqida yozing';
+  static String get descriptionPlaceholder => t('createSpecialist.descriptionPlaceholder');
 
   /// `createSpecialist.experience`
-  static const experience = 'Tajriba (yil)';
+  static String get experience => t('createSpecialist.experience');
 
   /// `createSpecialist.experiencePlaceholder`
-  static const experiencePlaceholder = 'Tajribangizni kiriting';
+  static String get experiencePlaceholder => t('createSpecialist.experiencePlaceholder');
 
   /// `createSpecialist.fullName`
-  static const fullName = "To'liq ism";
+  static String get fullName => t('createSpecialist.fullName');
 
   /// `createSpecialist.fullNamePlaceholder`
-  static const fullNamePlaceholder = 'Ismingizni kiriting';
+  static String get fullNamePlaceholder => t('createSpecialist.fullNamePlaceholder');
 
   /// `createSpecialist.imagesCount`
-  static const imagesCount = 'ta rasm yuklangan';
+  static String get imagesCount => t('createSpecialist.imagesCount');
 
   /// `createSpecialist.phone`
-  static const phone = 'Telefon raqam';
+  static String get phone => t('createSpecialist.phone');
 
   /// `createSpecialist.price`
-  static const price = 'Narx';
+  static String get price => t('createSpecialist.price');
 
   /// `createSpecialist.pricePlaceholder`
-  static const pricePlaceholder = 'Narxni kiriting';
+  static String get pricePlaceholder => t('createSpecialist.pricePlaceholder');
 
   /// `createSpecialist.priceSuffix`
-  static const priceSuffix = "so'm dan";
+  static String get priceSuffix => t('createSpecialist.priceSuffix');
 
   /// `createSpecialist.roleLockedNote`
-  static const roleLockedNote = 'Sizning rolingiz allaqachon belgilangan';
+  static String get roleLockedNote => t('createSpecialist.roleLockedNote');
 
   /// `createSpecialist.sectionPersonal`
-  static const sectionPersonal = "Shaxsiy ma'lumotlar";
+  static String get sectionPersonal => t('createSpecialist.section1');
 
   /// `createSpecialist.sectionPortfolio`
-  static const sectionPortfolio = 'Portfolio';
+  static String get sectionPortfolio => t('createSpecialist.section3');
 
   /// `createSpecialist.sectionProfessional`
-  static const sectionProfessional = "Kasbiy ma'lumotlar";
+  static String get sectionProfessional => t('createSpecialist.section2');
 
   /// `createSpecialist.sectionTags`
-  static const sectionTags = 'Teglar';
+  static String get sectionTags => t('createSpecialist.section4');
 
   /// `createSpecialist.selectCity`
-  static const selectCity = 'Shaharni tanlang';
+  static String get selectCity => t('createSpecialist.selectCity');
 
   /// `createSpecialist.specialization`
-  static const specialization = 'Mutaxassislik';
+  static String get specialization => t('createSpecialist.specialization');
 
   /// `createSpecialist.submit`
-  static const submit = "E'lon joylash";
+  static String get submit => t('createSpecialist.submit');
 
   /// `createSpecialist.subtitle`
-  static const subtitle = 'Kasbiy profilingizni yarating va mijozlarni toping';
+  static String get subtitle => t('createSpecialist.subtitle');
 
   /// `createSpecialist.suggestedTags`
-  static const suggestedTags = 'Tavsiya etiladigan teglar';
+  static String get suggestedTags => t('createSpecialist.suggestedTags');
 
   /// `createSpecialist.tagPlaceholder`
-  static const tagPlaceholder = 'Teg kiriting';
+  static String get tagPlaceholder => t('createSpecialist.tagPlaceholder');
 
   /// `createSpecialist.title`
-  static const title = "Mutaxassis sifatida ro'yxatdan o'tish";
+  static String get title => t('createSpecialist.pageTitle');
 
   /// `createSpecialist.type`
-  static const type = 'Mutaxassislik turi';
+  static String get type => t('createSpecialist.type');
 
   /// `createSpecialist.typeDesigner`
-  static const typeDesigner = 'Dizayner';
+  static String get typeDesigner => t('createSpecialist.designer');
 
   /// `createSpecialist.typeMaster`
-  static const typeMaster = 'Usta';
+  static String get typeMaster => t('createSpecialist.master');
 
   /// `createSpecialist.update`
-  static const update = 'Saqlash';
+  static String get update => t('createSpecialist.update');
 
   /// `createSpecialist.uploadHint`
-  static const uploadHint = 'JPG, PNG formatda, max 5MB';
+  static String get uploadHint => t('createSpecialist.uploadHint');
 
   /// `createSpecialist.uploadTitle`
-  static const uploadTitle = 'Portfolio rasmlarini yuklang';
+  static String get uploadTitle => t('createSpecialist.uploadTitle');
 
   /// `createSpecialist.years`
-  static const years = 'yil';
+  static String get years => t('createSpecialist.years');
 
   /// Dizayner mutaxassisliklari (`designerSpecs`).
-  static const designerSpecs = <(String, String)>[
-    ('interior', 'Interer dizayn'),
-    ('exterior', 'Eksterer dizayn'),
-    ('landscape', 'Landshaft'),
-    ('architecture', 'Arxitektura'),
+  static List<(String, String)> get designerSpecs => <(String, String)>[
+    ('interior', t('createSpecialist.specInterior')),
+    ('exterior', t('createSpecialist.specExterior')),
+    ('landscape', t('createSpecialist.specLandscape')),
+    ('architecture', t('createSpecialist.specArchitecture')),
   ];
 
   /// Usta mutaxassisliklari (`masterSpecs`).
-  static const masterSpecs = <(String, String)>[
-    ('santexnik', 'Santexnik'),
-    ('elektrik', 'Elektrik'),
-    ('boyoqchi', "Bo'yoqchi"),
-    ('duradgor', 'Duradgor'),
-    ('plitachi', 'Plitachi'),
-    ('payvandchi', 'Payvandchi'),
+  static List<(String, String)> get masterSpecs => <(String, String)>[
+    ('santexnik', t('createSpecialist.specPlumber')),
+    ('elektrik', t('createSpecialist.specElectrician')),
+    ('boyoqchi', t('createSpecialist.specPainter')),
+    ('duradgor', t('createSpecialist.specCarpenter')),
+    ('plitachi', t('createSpecialist.specTiler')),
+    ('payvandchi', t('createSpecialist.specWelder')),
   ];
 
   /// Tayyor teglar (`predefinedTagKeys`) — saytdagi tartibda.
-  static const suggestedTagList = <String>[
-    'Tez ishlash',
-    'Sifatli',
-    'Arzon',
-    'Tajribali',
-    'Kafolat',
-    '24/7',
-    'Bepul konsultatsiya',
-    'Chiqib borish',
+  static List<String> get suggestedTagList => <String>[
+    t('createSpecialist.tagFast'),
+    t('createSpecialist.tagQuality'),
+    t('createSpecialist.tagAffordable'),
+    t('createSpecialist.tagExperienced'),
+    t('createSpecialist.tagWarranty'),
+    t('createSpecialist.tag247'),
+    t('createSpecialist.tagFreeConsult'),
+    t('createSpecialist.tagMobile'),
   ];
 }

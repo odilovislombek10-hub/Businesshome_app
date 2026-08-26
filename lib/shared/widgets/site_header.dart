@@ -1,3 +1,5 @@
+import '../../core/i18n/translate.dart';
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -230,7 +232,7 @@ class HeaderBackButton extends StatelessWidget {
             SiteIcon(SiteIcons.arrowLeft, size: 22, color: onBar),
             const SizedBox(width: 8),
             Text(
-              LanguageService.instance.back,
+              t('header.back'),
               style: theme.textTheme.titleMedium?.copyWith(
                 fontSize: 17,
                 fontWeight: FontWeight.w600,
@@ -262,7 +264,7 @@ class _IconButton extends StatelessWidget {
   }
 }
 
-class _SearchBar extends StatelessWidget {
+class _SearchBar extends StatefulWidget {
   const _SearchBar({
     required this.controller,
     required this.translucent,
@@ -278,16 +280,83 @@ class _SearchBar extends StatelessWidget {
   final VoidCallback? onFilters;
 
   @override
+  State<_SearchBar> createState() => _SearchBarState();
+}
+
+/// Saytdagi "typewriter" — `hero.searchExamples` misollari harfma-harf yozilib, keyin
+/// o'chiriladi (`startTypewriter`: 95 ms yozish, 45 ms o'chirish, oxirida 1700 ms kutish,
+/// misollar orasida 450 ms). Fokusda statik hint qoladi.
+class _SearchBarState extends State<_SearchBar> {
+  final _focus = FocusNode();
+  Timer? _timer;
+  String _typed = '';
+  int _example = 0;
+  int _chars = 0;
+  bool _deleting = false;
+
+  List<String> get _examples => [
+    for (final part in t('hero.searchExamples').split('|'))
+      if (part.trim().isNotEmpty) part.trim(),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _focus.addListener(() => setState(() {}));
+    _tick();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _focus.dispose();
+    super.dispose();
+  }
+
+  void _tick() {
+    final list = _examples;
+    if (list.isEmpty) {
+      _timer = Timer(const Duration(milliseconds: 600), _tick);
+      return;
+    }
+    final word = list[_example % list.length];
+    var delay = 95;
+    if (!_deleting) {
+      _chars++;
+      if (_chars >= word.length) {
+        _deleting = true;
+        delay = 1700;
+      }
+    } else {
+      _chars--;
+      delay = 45;
+      if (_chars <= 0) {
+        _deleting = false;
+        _example++;
+        delay = 450;
+      }
+    }
+    final next = word.substring(0, _chars.clamp(0, word.length));
+    if (mounted) setState(() => _typed = next);
+    _timer = Timer(Duration(milliseconds: delay), _tick);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final controller = widget.controller;
+    final translucent = widget.translucent;
+    final onSubmit = widget.onSubmit;
+    final onFilters = widget.onFilters;
     return TextField(
       controller: controller,
+      focusNode: _focus,
       textInputAction: TextInputAction.search,
       onSubmitted: onSubmit,
       style: TextStyle(color: translucent ? Colors.white : theme.colorScheme.onSurface),
       decoration: InputDecoration(
         isDense: true,
-        hintText: 'Qidiruv: kvartira, loyiha, tuman…',
+        hintText: _focus.hasFocus || _typed.isEmpty ? t('hero.searchPlaceholder') : _typed,
         hintStyle: TextStyle(
           color: translucent ? Colors.white70 : theme.colorScheme.onSurfaceVariant,
         ),
@@ -396,7 +465,7 @@ class _MobileMenuPanelState extends State<MobileMenuPanel> {
                         icon: const Icon(Icons.arrow_back),
                         onPressed: () => setState(() => _view = _MenuView.main),
                       ),
-                      Text('Tilni tanlang', style: theme.textTheme.titleMedium),
+                      Text(t('header.selectLang'), style: theme.textTheme.titleMedium),
                     ],
                   ),
                   for (final (code, label, flag) in _languages)
@@ -460,27 +529,27 @@ class _MobileMenuPanelState extends State<MobileMenuPanel> {
 
                   _MenuItem(
                     icon: SiteIcons.globe,
-                    label: 'Til',
+                    label: t('header.language'),
                     trailing: Text(_lang.toUpperCase(), style: theme.textTheme.labelSmall),
                     onTap: () => setState(() => _view = _MenuView.language),
                   ),
                   if (auth.isLoggedIn) ...[
                     _MenuItem(
                       icon: SiteIcons.dashboard,
-                      label: 'Mening kabinetim',
+                      label: t('header.myCabinet'),
                       tint: AppColors.olive,
                       onTap: () => _go(context, '/cabinet'),
                     ),
                     _MenuItem(
                       icon: SiteIcons.heart,
-                      label: 'Sevimlilar',
+                      label: t('header.favorites'),
                       tint: AppColors.danger,
                       onTap: () => _go(context, '/cabinet/favorites'),
                     ),
                   ],
                   _MenuItem(
                     icon: SiteIcons.reel,
-                    label: 'Reels',
+                    label: t('cabinet.tab.reels'),
                     tint: const Color(0xFFF43F5E), // rose-500
                     onTap: () => _go(context, '/reels'),
                   ),
@@ -489,24 +558,24 @@ class _MobileMenuPanelState extends State<MobileMenuPanel> {
                   // ("Rejim" + hozirgi holat + kalit). Ikkalasi ham shu yerda.
                   _MenuItem(
                     icon: themeController.isDark ? SiteIcons.sun : SiteIcons.moon,
-                    label: themeController.isDark ? 'Kunduzgi' : 'Tungi',
+                    label: themeController.isDark ? t('header.themeLight') : t('header.themeDark'),
                     tint: const Color(0xFFF59E0B), // amber-500
                     onTap: themeController.toggle,
                   ),
                   _MenuItem(
                     icon: SiteIcons.house,
-                    label: 'Mening uyim',
+                    label: t('header.myHome'),
                     tint: AppColors.bronze,
                     onTap: () => _go(context, '/my-home'),
                   ),
                   _MenuItem(
                     icon: themeController.isDark ? SiteIcons.sun : SiteIcons.moon,
-                    label: 'Rejim',
+                    label: t('header.theme'),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          themeController.isDark ? 'Tungi' : 'Kunduzgi',
+                          themeController.isDark ? t('header.themeDark') : t('header.themeLight'),
                           style: theme.textTheme.labelSmall,
                         ),
                         const SizedBox(width: 8),
@@ -546,7 +615,7 @@ class _MobileMenuPanelState extends State<MobileMenuPanel> {
                       FilledButton.icon(
                         onPressed: () => _go(context, '/ads/create'),
                         icon: const Icon(Icons.add),
-                        label: const Text("E'lon berish"),
+                        label: Text(t('header.createAd')),
                       ),
                     const SizedBox(height: 8),
                     OutlinedButton.icon(
@@ -555,13 +624,13 @@ class _MobileMenuPanelState extends State<MobileMenuPanel> {
                         widget.onClose();
                       },
                       icon: const Icon(Icons.logout),
-                      label: const Text('Chiqish'),
+                      label: Text(t('header.logout')),
                     ),
                   ] else
                     FilledButton.icon(
                       onPressed: () => _go(context, '/login'),
                       icon: const Icon(Icons.person_outline),
-                      label: const Text('Kirish'),
+                      label: Text(t('header.login')),
                     ),
                 ],
               ),

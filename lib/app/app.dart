@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../core/services/auth_service.dart';
+import '../core/services/language_service.dart';
 import '../core/services/theme_controller.dart';
 import '../shared/widgets/ai_assistant.dart';
 import 'router.dart';
@@ -20,17 +21,21 @@ class BusinessHomeApp extends StatelessWidget {
         ChangeNotifierProvider.value(value: themeController),
         ChangeNotifierProvider.value(value: authService),
       ],
-      child: Consumer<ThemeController>(
-        builder: (context, theme, _) => MaterialApp.router(
-          title: 'BusinessHome',
-          debugShowCheckedModeBanner: false,
-          theme: AppTheme.light,
-          darkTheme: AppTheme.dark,
-          themeMode: theme.mode,
-          routerConfig: appRouter,
-          // Saytda `app.component.ts` shabloni `<app-ai-assistant />` ni router'dan tashqarida
-          // chizadi — ya'ni suzuvchi tugma **har bir sahifada** turadi, faqat bosh sahifada emas.
-          builder: (context, child) => Stack(children: [?child, const AiAssistant()]),
+      // Til o'zgarganda butun daraxt qayta chiziladi — matnlar `t()` orqali o'qiladi.
+      child: ListenableBuilder(
+        listenable: LanguageService.instance,
+        builder: (context, _) => Consumer<ThemeController>(
+          builder: (context, theme, _) => MaterialApp.router(
+            title: 'BusinessHome',
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.light,
+            darkTheme: AppTheme.dark,
+            themeMode: theme.mode,
+            routerConfig: appRouter,
+            // Saytda `app.component.ts` shabloni `<app-ai-assistant />` ni router'dan tashqarida
+            // chizadi — ya'ni suzuvchi tugma **har bir sahifada** turadi, faqat bosh sahifada emas.
+            builder: (context, child) => Stack(children: [?child, const AiAssistant()]),
+          ),
         ),
       ),
     );

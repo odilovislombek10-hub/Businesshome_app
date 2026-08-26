@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -38,7 +39,7 @@ class NotFoundScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       Text(
-                        'Sahifa topilmadi',
+                        t('notFound.title'),
                         textAlign: TextAlign.center,
                         style: theme.textTheme.displaySmall?.copyWith(
                           // `text-2xl md:text-3xl`
@@ -74,7 +75,7 @@ class NotFoundScreen extends StatelessWidget {
                               const SiteIcon(SiteIcons.arrowLeft, size: 18, color: AppColors.cream),
                               const SizedBox(width: 8), // gap-2
                               Text(
-                                'Bosh sahifaga qaytish',
+                                t('notFound.goHome'),
                                 style: theme.textTheme.bodyMedium?.copyWith(
                                   fontWeight: FontWeight.w600,
                                   color: AppColors.cream,

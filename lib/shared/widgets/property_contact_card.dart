@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -79,7 +80,7 @@ class PropertyContactCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final phone = owner.phone ?? '';
-    final name = (owner.name?.isNotEmpty ?? false) ? owner.name! : 'Egasi';
+    final name = (owner.name?.isNotEmpty ?? false) ? owner.name! : t('contact.owner');
     final avatar = absoluteMediaUrl(owner.avatar);
 
     return Container(
@@ -181,13 +182,13 @@ class PropertyContactCard extends StatelessWidget {
             ),
             child: Row(
               children: [
-                Expanded(child: _stat(theme, 'Javob vaqti', '1 soat ichida')),
+                Expanded(child: _stat(theme, t('contact.responseTime'), t('contact.within1Hour'))),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Mavjudligi',
+                        t('contact.availability'),
                         style: theme.textTheme.labelSmall?.copyWith(
                           fontSize: 12,
                           color: AppColors.dark.withValues(alpha: 0.4),
@@ -206,7 +207,7 @@ class PropertyContactCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            'Onlayn',
+                            t('contact.online'),
                             style: theme.textTheme.bodyMedium?.copyWith(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
@@ -225,7 +226,7 @@ class PropertyContactCard extends StatelessWidget {
           if (phone.isNotEmpty)
             _button(
               theme,
-              "Qo'ng'iroq qilish",
+              t('contact.call'),
               background: AppColors.olive,
               foreground: Colors.white,
               onTap: () => _open('tel:$phone'),
@@ -234,7 +235,7 @@ class PropertyContactCard extends StatelessWidget {
             const SizedBox(height: 10), // space-y-2.5
             _button(
               theme,
-              'Yozish',
+              t('chat.write'),
               background: Colors.white,
               foreground: AppColors.olive,
               border: AppColors.olive,
@@ -261,7 +262,7 @@ class PropertyContactCard extends StatelessWidget {
               child: Column(
                 children: [
                   Text(
-                    'Telefon raqami',
+                    t('contact.phoneNumber'),
                     style: theme.textTheme.labelSmall?.copyWith(
                       fontSize: 12,
                       color: AppColors.dark.withValues(alpha: 0.4),
@@ -295,7 +296,7 @@ class PropertyContactCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppRadius.pill),
       ),
       child: Text(
-        owner ? 'Egasi' : 'Agent',
+        owner ? t('contact.owner') : t('contact.agent'),
         style: theme.textTheme.labelSmall?.copyWith(
           fontSize: 10,
           fontWeight: FontWeight.w700,

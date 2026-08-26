@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -141,7 +142,7 @@ class _ViewedCard extends StatelessWidget {
                     ),
                     const Spacer(),
                     Text(
-                      "${formatNumber(item.price)} so'm",
+                      "${formatNumber(item.price)} ${t('hero.currency')}",
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.titleMedium?.copyWith(

@@ -106,19 +106,16 @@ class _CabinetSettingsState extends State<CabinetSettings> {
     final agreed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text(CabinetTexts.deleteAccount),
-        content: const Text(CabinetTexts.deleteAccountConfirm),
+        title: Text(CabinetTexts.deleteAccount),
+        content: Text(CabinetTexts.deleteAccountConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text(CabinetTexts.cancel),
+            child: Text(CabinetTexts.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text(
-              CabinetTexts.deleteAccount,
-              style: TextStyle(color: AppColors.danger),
-            ),
+            child: Text(CabinetTexts.deleteAccount, style: TextStyle(color: AppColors.danger)),
           ),
         ],
       ),

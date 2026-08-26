@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -159,7 +160,7 @@ class CabinetDashboard extends StatelessWidget {
         ];
       case MarketRole.user:
         return [
-          _listingsCard(context, theme, "Mening e'lonlarim"),
+          _listingsCard(context, theme, t('cabinet.tab.listings')),
           const SizedBox(height: 16),
           _oliveCard(
             theme,

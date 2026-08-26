@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -752,7 +753,7 @@ class _CreateSpecialistScreenState extends State<CreateSpecialistScreen> {
       if (!mounted) return;
       setState(() {
         _submitting = false;
-        _error = 'Saqlashda xatolik';
+        _error = t('completeProfile.errorSave');
       });
     }
   }

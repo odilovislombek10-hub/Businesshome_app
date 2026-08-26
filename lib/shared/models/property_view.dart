@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import '../../core/api/media_url.dart';
 import '../../core/models/project.dart';
 import '../../core/models/property_listing.dart';
@@ -104,10 +105,10 @@ class PropertyView {
 
   /// Uzbek labels for `segment`, from `rent.segment*` in the site's translations.
   String? get segmentLabel => switch (segment) {
-    'elite' => 'Elite',
-    'business' => 'Biznes',
-    'standart' => 'Standart',
-    'economy' => 'Ekonom',
+    'elite' => t('rent.segmentElite'),
+    'business' => t('rent.segmentBusiness'),
+    'standart' => t('designerDetail.standardPkg'),
+    'economy' => t('rent.segmentEconomy'),
     _ => null,
   };
 

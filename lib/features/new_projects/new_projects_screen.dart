@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import '../../shared/widgets/app_image.dart';
 import 'dart:async';
 
@@ -283,7 +284,7 @@ class _NewProjectsScreenState extends State<NewProjectsScreen> {
                 icon: const SiteIcon(SiteIcons.chevronDown, size: 16),
                 style: theme.textTheme.bodyMedium?.copyWith(fontSize: 14, color: AppColors.dark),
                 items: [
-                  const DropdownMenuItem(value: '', child: Text(NewProjectsTexts.allCities)),
+                  DropdownMenuItem(value: '', child: Text(NewProjectsTexts.allCities)),
                   for (final (value, label) in CityLabels.options)
                     DropdownMenuItem(value: value, child: Text(label)),
                 ],
@@ -711,7 +712,7 @@ class _ProjectCard extends StatelessWidget {
                           _badge(theme, '${images.length}', AppColors.dark.withValues(alpha: 0.7)),
                         if (project.isTop) ...[
                           const SizedBox(width: 4),
-                          _badge(theme, 'TOP', const Color(0xE6F59E0B)),
+                          _badge(theme, t('ads.top'), const Color(0xE6F59E0B)),
                         ],
                       ],
                     ),
@@ -836,9 +837,9 @@ class _ProjectCard extends StatelessWidget {
 
     return Row(
       children: [
-        cell(formatNumber(project.totalApartments ?? 0), 'Kvartira'),
+        cell(formatNumber(project.totalApartments ?? 0), t('newProjects.typeApartment')),
         separator,
-        cell(formatNumber(project.totalBlocks ?? 0), 'Blok'),
+        cell(formatNumber(project.totalBlocks ?? 0), t('newProjects.blocks')),
         separator,
         cell(formatNumber(project.totalArea ?? 0), 'm²'),
       ],

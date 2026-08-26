@@ -82,11 +82,11 @@ class _CabinetReelsState extends State<CabinetReels> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text(CabinetTexts.cancel),
+            child: Text(CabinetTexts.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(controller.text),
-            child: const Text(CabinetTexts.reelUpload),
+            child: Text(CabinetTexts.reelUpload),
           ),
         ],
       ),
@@ -102,14 +102,11 @@ class _CabinetReelsState extends State<CabinetReels> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text(CabinetTexts.cancel),
+            child: Text(CabinetTexts.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text(
-              CabinetTexts.deleteConfirmYes,
-              style: TextStyle(color: AppColors.danger),
-            ),
+            child: Text(CabinetTexts.deleteConfirmYes, style: TextStyle(color: AppColors.danger)),
           ),
         ],
       ),

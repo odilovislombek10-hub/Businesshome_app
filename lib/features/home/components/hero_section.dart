@@ -1,3 +1,4 @@
+import '../../../core/i18n/translate.dart';
 import '../../../shared/widgets/app_image.dart';
 import 'dart:async';
 
@@ -41,66 +42,66 @@ class _HeroSectionState extends State<HeroSection> {
 
   /// `sectors` from `hero-section.component.ts`, with the Uzbek strings from `i18n/uz.ts` and the
   /// two gradient stops each tile falls back to before its image loads.
-  static const _sectors = <_Sector>[
+  static List<_Sector> get _sectors => <_Sector>[
     _Sector(
-      'Novostroykalar',
-      'Yangi qurilish loyihalari',
+      t('home.sector.newProjects.title'),
+      t('home.sector.newProjects.desc'),
       '/new-projects',
       'new-projects',
       Color(0xFF999966),
       Color(0xFF7A7A52),
     ),
     _Sector(
-      'Ikkilamchi bozor',
-      'Tayyor uy va kvartiralar',
+      t('home.sector.secondary.title'),
+      t('home.sector.secondary.desc'),
       '/secondary',
       'secondary',
       Color(0xFF0E9F6E),
       Color(0xFF057A55),
     ),
     _Sector(
-      'Ijara',
-      "Uy, ofis va do'konlar ijarasi",
+      t('home.sector.rent.title'),
+      t('home.sector.rent.desc'),
       '/rent',
       'rent',
       Color(0xFF0EA5E9),
       Color(0xFF0369A1),
     ),
     _Sector(
-      'Xarita',
-      'Mulklarni xaritada toping',
+      t('home.sector.map.title'),
+      t('home.sector.map.desc'),
       '/map',
       'map',
       Color(0xFFF472A6),
       Color(0xFFDB2777),
     ),
     _Sector(
-      'Dizaynerlar',
-      'Interyer dizayni ustalari',
+      t('home.sector.designers.title'),
+      t('home.sector.designers.desc'),
       '/designers',
       'designers',
       Color(0xFF8B5CF6),
       Color(0xFF6D28D9),
     ),
     _Sector(
-      'Ustalar',
-      "Ta'mir va qurilish ustalari",
+      t('home.sector.masters.title'),
+      t('home.sector.masters.desc'),
       '/masters',
       'masters',
       Color(0xFFF59E0B),
       Color(0xFFD97706),
     ),
     _Sector(
-      'Birja',
-      "Buyurtmalar va ish e'lonlari",
+      t('home.sector.birja.title'),
+      t('home.sector.birja.desc'),
       '/birja',
       'birja',
       Color(0xFF475569),
       Color(0xFF1E293B),
     ),
     _Sector(
-      'Jurnal',
-      'Yangiliklar va tahlillar',
+      t('home.sector.news.title'),
+      t('home.sector.news.desc'),
       '/news',
       'news',
       Color(0xFF06B6D4),
@@ -132,10 +133,10 @@ class _HeroSectionState extends State<HeroSection> {
 
     final stats = content?.stats.isNotEmpty == true
         ? content!.stats
-        : const [
-            PageStat(value: '150+', label: 'Yangi loyihalar'),
-            PageStat(value: '50+', label: 'Quruvchilar'),
-            PageStat(value: '10K+', label: 'Baxtli oilalar'),
+        : [
+            PageStat(value: '150+', label: t('hero.stat.projects')),
+            PageStat(value: '50+', label: t('hero.stat.builders')),
+            PageStat(value: '10K+', label: t('hero.stat.families')),
           ];
 
     // The site's hero is `min-h-screen`, but with the tiles packed into a mosaic that leaves a
@@ -186,7 +187,7 @@ class _HeroSectionState extends State<HeroSection> {
                 // `animate-slide-up` on the title block and on the sector grid.
                 Entrance.slideUp(
                   child: Text(
-                    content?.heroTitle ?? 'Orzuingizdagi uyingizda yashang',
+                    content?.heroTitle ?? t('hero.title'),
                     textAlign: TextAlign.center,
                     style: theme.textTheme.displayLarge?.copyWith(
                       color: AppColors.cream,
@@ -195,7 +196,7 @@ class _HeroSectionState extends State<HeroSection> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                Entrance.slideUp(child: const _SectorBento(sectors: _sectors)),
+                Entrance.slideUp(child: _SectorBento(sectors: _sectors)),
                 const SizedBox(height: 20),
                 Entrance.fadeIn(
                   delay: const Duration(milliseconds: 300), // animate-delay-300

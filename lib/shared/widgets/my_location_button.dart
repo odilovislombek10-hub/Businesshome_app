@@ -1,3 +1,4 @@
+import '../../core/i18n/translate.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -123,7 +124,7 @@ class _MyLocationButtonState extends State<MyLocationButton> {
                   if (widget.showLabel) ...[
                     const SizedBox(width: 8), // ml-2
                     Text(
-                      'Mening joylashuvim',
+                      t('map.myLocation'),
                       style: theme.textTheme.bodyMedium?.copyWith(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,

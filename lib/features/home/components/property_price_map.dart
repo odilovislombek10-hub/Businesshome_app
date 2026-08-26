@@ -1,3 +1,4 @@
+import '../../../core/i18n/translate.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:path_drawing/path_drawing.dart';
@@ -58,20 +59,20 @@ class RegionPrice {
 
 /// The `map.*` strings from the site's `i18n/uz.ts`, kept together so they stay comparable.
 abstract final class MapTexts {
-  static const title = "O'zbekiston bo'ylab ko'chmas mulk narxlari";
-  static const rent = 'Ijara';
-  static const buy = 'Sotib olish';
-  static const rentPrices = 'Ijara narxlari';
-  static const buyPrices = 'Sotib olish narxlari';
-  static const highest = 'Eng yuqori:';
-  static const average = "O'rtacha:";
-  static const lowest = 'Eng past:';
-  static const dataNote = "* Ma'lumotlar so'nggi 3 oy asosida";
-  static const backToList = "Narxlar ro'yxatiga qaytish";
-  static const fullMap = "To'liq xarita";
-  static const viewRentListings = "Bu hududdagi ijara variantlari";
-  static const viewBuyListings = "Bu hududdagi sotuvdagi uylar";
-  static const viewListings = "ta e'lonni ko'rish";
+  static String get title => t('map.title');
+  static String get rent => t('map.rent');
+  static String get buy => t('map.buy');
+  static String get rentPrices => t('map.rentPrices');
+  static String get buyPrices => t('map.buyPrices');
+  static String get highest => t('map.highest');
+  static String get average => t('map.average');
+  static String get lowest => t('map.lowest');
+  static String get dataNote => t('map.dataNote');
+  static String get backToList => t('map.backToList');
+  static String get fullMap => t('map.fullMap');
+  static String get viewRentListings => t('map.viewRentListings');
+  static String get viewBuyListings => t('map.viewBuyListings');
+  static String get viewListings => t('map.viewListings');
 }
 
 /// The site's `property-price-map`: a tinted map of Uzbekistan where each region's shade comes
@@ -120,12 +121,12 @@ class _PropertyPriceMapState extends State<PropertyPriceMap> {
   /// undan kichigi esa birliksiz sonning o'zi bilan.
   String _format(num value) {
     if (value <= 0) return '—';
-    final unit = _rentTab ? "mln so'm/oy" : "mln so'm/m²";
+    final unit = _rentTab ? t('map.rentUnit') : t('map.buyUnit');
     if (value >= 1000000) {
       return '${(value / 1000000).toStringAsFixed(1)} $unit';
     }
     if (value >= 1000) {
-      final kUnit = _rentTab ? "ming so'm/oy" : "ming so'm/m²";
+      final kUnit = _rentTab ? t('map.rentUnitK') : t('map.buyUnitK');
       return '${(value / 1000).round()} $kUnit';
     }
     return '${value.round()} $unit';
