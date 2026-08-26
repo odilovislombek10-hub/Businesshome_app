@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -13,6 +15,7 @@ import '../../shared/widgets/app_image.dart';
 import '../../shared/widgets/entrance.dart';
 import '../../shared/widgets/site_header.dart';
 import '../../shared/widgets/site_icon.dart';
+import '../../shared/widgets/site_toast.dart';
 
 /// Saytning `/cabinet/orders/:id` sahifasi — `order-detail.component.ts`.
 ///
@@ -54,6 +57,12 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
   /// Saytda alohida "bitta buyurtma" endpointi yo'q — ro'yxat olinib, ichidan `id` topiladi.
   /// Rol ikkalasi ham sinaladi, chunki foydalanuvchi mijoz ham, mutaxassis ham bo'lishi mumkin.
+  /// Buyurtma qaysi rol ro'yxatidan topildi — hujjat yuklash faqat mijozda.
+  bool _isClient = false;
+  bool _uploading = false;
+  bool _editingDeadline = false;
+  String? _newDeadline;
+
   Future<void> _load() async {
     OrderDetail? found;
     for (final role in ['client', 'provider']) {
@@ -68,6 +77,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         for (final row in data) {
           if (row is Map<String, dynamic> && row['id'] == widget.id) {
             found = OrderDetail.fromJson(row);
+            _isClient = role == 'client';
             break;
           }
         }
@@ -320,10 +330,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           ],
           _row(OrderTexts.amount, "${formatNumber(o.price)} so'm"),
           const SizedBox(height: 4),
-          _row(
-            OrderTexts.deadline,
-            o.deadlineAt == null ? OrderTexts.deadlineNotSet : _date(o.deadlineAt!),
-          ),
+          _deadlineRow(o),
           const SizedBox(height: 12),
           // Saytdagi `cabinet.progress` chizig'i.
           Row(
@@ -390,6 +397,169 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
   // ── hujjatlar ──────────────────────────────────────────────────────────────
 
+  /// Saytdagi muddat qatori — yonida "Muddatni belgilash" yoki "O'zgartirish".
+  Widget _deadlineRow(OrderDetail o) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: _row(
+                OrderTexts.deadline,
+                o.deadlineAt == null ? OrderTexts.deadlineNotSet : _date(o.deadlineAt!),
+              ),
+            ),
+            if (!_editingDeadline)
+              Pressable(
+                onTap: () => setState(() {
+                  _editingDeadline = true;
+                  _newDeadline = o.deadlineAt?.toIso8601String().substring(0, 10);
+                }),
+                child: Text(
+                  o.deadlineAt == null
+                      ? OrderTexts.deadlineSetLabel
+                      : OrderTexts.deadlineChangeLabel,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.olive,
+                  ),
+                ),
+              ),
+          ],
+        ),
+        if (_editingDeadline) ...[
+          const SizedBox(height: 12), // mt-3
+          Row(
+            children: [
+              Expanded(
+                child: Pressable(
+                  scale: 0.99,
+                  onTap: _pickDeadline,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
+                      border: Border.all(color: AppColors.borderLight),
+                    ),
+                    child: Text(
+                      _newDeadline ?? 'kk.oo.yyyy',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontSize: 14,
+                        color: _newDeadline == null
+                            ? AppColors.dark.withValues(alpha: 0.4)
+                            : AppColors.dark,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8), // gap-2
+              Pressable(
+                onTap: () => _saveDeadline(o),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: AppColors.olive,
+                    borderRadius: BorderRadius.circular(AppRadius.sm),
+                  ),
+                  child: Text(
+                    OrderTexts.save,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Pressable(
+                onTap: () => setState(() => _editingDeadline = false),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceAltLight,
+                    borderRadius: BorderRadius.circular(AppRadius.sm),
+                  ),
+                  child: Text(
+                    OrderTexts.cancel,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.dark,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ],
+    );
+  }
+
+  Future<void> _pickDeadline() async {
+    final now = DateTime.now();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: now,
+      firstDate: now,
+      lastDate: DateTime(now.year + 3),
+    );
+    if (picked == null) return;
+    setState(() {
+      _newDeadline =
+          '${picked.year}-${picked.month.toString().padLeft(2, '0')}-'
+          '${picked.day.toString().padLeft(2, '0')}';
+    });
+  }
+
+  Future<void> _saveDeadline(OrderDetail o) async {
+    try {
+      await ApiClient.instance.put<dynamic>(
+        '/market/cabinet/orders/${o.id}/deadline',
+        data: {'deadline_at': _newDeadline},
+      );
+      if (!mounted) return;
+      setState(() => _editingDeadline = false);
+      _load();
+    } catch (_) {
+      if (!mounted) return;
+      showSiteToast(context, 'Muddatni saqlab bo\'lmadi', kind: ToastKind.error);
+    }
+  }
+
+  /// Saytdagi chegaralar: 10 ta fayl, bittasi 25 MB, jami 100 MB.
+  Future<void> _pickDocuments(OrderDetail o) async {
+    final picked = await FilePicker.platform.pickFiles(allowMultiple: true);
+    if (picked == null || picked.files.isEmpty) return;
+    setState(() => _uploading = true);
+    try {
+      final form = FormData();
+      for (final file in picked.files) {
+        if (file.path == null) continue;
+        form.files.add(
+          MapEntry('files', await MultipartFile.fromFile(file.path!, filename: file.name)),
+        );
+      }
+      await ApiClient.instance.post<dynamic>(
+        '/market/cabinet/orders/${o.id}/attachments',
+        data: form,
+      );
+      if (!mounted) return;
+      setState(() => _uploading = false);
+      _load();
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _uploading = false);
+      showSiteToast(context, "Fayllarni yuklab bo'lmadi", kind: ToastKind.error);
+    }
+  }
+
   Widget _documents(OrderDetail o) {
     final theme = Theme.of(context);
     return _card(
@@ -454,6 +624,75 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               ),
               const SizedBox(height: 8),
             ],
+          // Saytda hujjatlarni faqat mijoz yuklaydi va 10 tadan oshmaydi.
+          if (_isClient && o.attachments.length < 10) ...[
+            const SizedBox(height: 4),
+            Pressable(
+              scale: 0.99,
+              onTap: _uploading ? () {} : () => _pickDocuments(o),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12), // py-3 px-4
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: _uploading ? AppColors.olive.withValues(alpha: 0.05) : null,
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                  border: Border.all(
+                    color: _uploading ? AppColors.olive : const Color(0xFFD1D5DB),
+                    width: 2,
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (_uploading) ...[
+                      const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.olive),
+                      ),
+                      const SizedBox(width: 8), // gap-2
+                    ],
+                    Text(
+                      _uploading ? OrderTexts.uploading : OrderTexts.uploadDocument,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: _uploading ? AppColors.olive : AppColors.dark.withValues(alpha: 0.6),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 8), // mt-2
+            Text(
+              'Max 10 · 25 MB / 100 MB\n'
+              'PDF, DOC, XLS, PPT, TXT, JPG, PNG, WEBP, DWG, DXF, ZIP, RAR',
+              style: theme.textTheme.labelSmall?.copyWith(
+                fontSize: 10,
+                height: 1.25,
+                color: AppColors.dark.withValues(alpha: 0.4),
+              ),
+            ),
+          ] else if (!_isClient)
+            Text(
+              OrderTexts.clientUploads,
+              style: theme.textTheme.labelSmall?.copyWith(
+                fontSize: 11,
+                fontStyle: FontStyle.italic,
+                color: AppColors.dark.withValues(alpha: 0.4),
+              ),
+            )
+          else
+            Text(
+              OrderTexts.maxFilesReached,
+              style: theme.textTheme.labelSmall?.copyWith(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFFB45309), // amber-700
+              ),
+            ),
         ],
       ),
     );
@@ -687,6 +926,14 @@ abstract final class OrderTexts {
   static const complete = 'Tugatish';
   static const confirm = 'Tasdiqlash';
   static const documents = 'Hujjatlar';
+  static const uploadDocument = 'Hujjat yuklash';
+  static const uploading = 'Yuklanmoqda...';
+  static const clientUploads = 'Hujjatlarni mijoz yuklaydi';
+  static const maxFilesReached = 'Maksimal fayl chegarasiga yetdingiz';
+  static const deadlineSetLabel = 'Muddatni belgilash';
+  static const deadlineChangeLabel = "O'zgartirish";
+  static const save = 'Saqlash';
+  static const cancel = 'Bekor qilish';
   static const noDocuments = "Hujjat yo'q";
   static const docDownload = 'Yuklab olish';
   static const timeline = 'Tarix';
