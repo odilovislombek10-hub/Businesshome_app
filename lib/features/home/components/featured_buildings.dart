@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../app/theme.dart';
 import '../../../core/models/project.dart';
 import '../../../shared/models/property_view.dart';
+import '../../../shared/utils/breakpoints.dart';
 import '../../../shared/widgets/entrance.dart';
 import '../../../shared/widgets/property_card.dart';
 
@@ -22,44 +23,73 @@ class FeaturedBuildings extends StatelessWidget {
     return ColoredBox(
       color: AppColors.cream,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
+        // `pt-8 sm:pt-10 lg:pt-16 pb-6 sm:pb-8`
+        padding: EdgeInsets.fromLTRB(
+          16,
+          Bp.pick(context, base: 32.0, sm: 40.0, lg: 64.0),
+          16,
+          Bp.pick(context, base: 24.0, sm: 32.0),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               "O'zbekistondagi yangi loyihalar bilan tanishing",
               style: theme.textTheme.displaySmall?.copyWith(
-                fontSize: 20, // text-xl
+                // `text-xl sm:text-2xl md:text-3xl lg:text-4xl`
+                fontSize: Bp.pick(context, base: 20.0, sm: 24.0, md: 30.0, lg: 36.0),
                 color: AppColors.dark,
               ),
             ),
-            const SizedBox(height: 6),
+            SizedBox(height: Bp.pick(context, base: 8.0, sm: 12.0)), // mb-2 sm:mb-3
             Text(
               "Yangi qurilayotgan loyihalarni kashf eting va doimo xabarda bo'ling.",
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: AppColors.dark.withValues(alpha: 0.6),
               ),
             ),
-            const SizedBox(height: 8),
-            // Two per row so four cards fit one screen — the app's own choice, not the site's
-            // single column. `animation-delay: (i * 100)ms` staggering is kept.
-            GridView.count(
-              // Explicit zero: a nested GridView otherwise inherits the ambient padding.
-              padding: EdgeInsets.zero,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: 2,
-              mainAxisSpacing: 16, // gap-4
-              crossAxisSpacing: 16,
-              childAspectRatio: PropertyCard.compactAspectRatio,
-              children: [
-                for (final (i, project) in projects.indexed)
-                  Entrance.fadeIn(
-                    delay: Duration(milliseconds: i * 100),
-                    child: PropertyCard(property: PropertyView.fromProject(project), compact: true),
+            SizedBox(height: Bp.pick(context, base: 20.0, sm: 32.0)), // mb-5 sm:mb-8
+            if (projects.isEmpty)
+              // `featured.noResults` — saytda bo'lim yashirilmaydi, matn chiqadi.
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 64), // py-16
+                child: Center(
+                  child: Text(
+                    'Bu shaharda hozircha loyihalar mavjud emas',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontSize: 18, // text-lg
+                      color: AppColors.dark.withValues(alpha: 0.4),
+                    ),
                   ),
-              ],
-            ),
+                ),
+              )
+            else
+              // `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8`
+              GridView.count(
+                // Explicit zero: a nested GridView otherwise inherits the ambient padding.
+                padding: EdgeInsets.zero,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                crossAxisCount: Bp.pick(context, base: 1, sm: 2, lg: 3),
+                mainAxisSpacing: Bp.pick(context, base: 16.0, sm: 24.0, lg: 32.0),
+                crossAxisSpacing: Bp.pick(context, base: 16.0, sm: 24.0, lg: 32.0),
+                childAspectRatio: Bp.pick(
+                  context,
+                  base: 3 / 4,
+                  sm: PropertyCard.compactAspectRatio,
+                ),
+                children: [
+                  for (final (i, project) in projects.indexed)
+                    Entrance.fadeIn(
+                      delay: Duration(milliseconds: i * 100),
+                      child: PropertyCard(
+                        property: PropertyView.fromProject(project),
+                        compact: Bp.isSm(context),
+                      ),
+                    ),
+                ],
+              ),
             const SizedBox(height: 32),
             Center(
               child: FilledButton(

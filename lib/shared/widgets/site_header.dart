@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import '../../app/theme.dart';
 import 'entrance.dart';
 import 'site_icon.dart';
+import '../../core/models/market_user.dart';
 import '../../core/services/auth_service.dart';
 import '../../core/services/theme_controller.dart';
 
@@ -438,28 +439,70 @@ class _MobileMenuPanelState extends State<MobileMenuPanel> {
                     tint: const Color(0xFFF43F5E), // rose-500
                     onTap: () => _go(context, '/reels'),
                   ),
+                  // Saytda rejim qatori ikki marta chizilgan: biri "Mening uyim" dan
+                  // oldin (qaysi rejimga o'tishini yozadi), ikkinchisi undan keyin
+                  // ("Rejim" + hozirgi holat + kalit). Ikkalasi ham shu yerda.
+                  _MenuItem(
+                    icon: themeController.isDark ? SiteIcons.sun : SiteIcons.moon,
+                    label: themeController.isDark ? 'Kunduzgi' : 'Tungi',
+                    tint: const Color(0xFFF59E0B), // amber-500
+                    onTap: themeController.toggle,
+                  ),
                   _MenuItem(
                     icon: SiteIcons.house,
                     label: 'Mening uyim',
+                    tint: AppColors.bronze,
                     onTap: () => _go(context, '/my-home'),
                   ),
                   _MenuItem(
-                    icon: SiteIcons.moon,
-                    label: 'Tema',
-                    trailing: Text(
-                      themeController.isDark ? 'Tungi' : 'Yorug‘',
-                      style: theme.textTheme.labelSmall,
+                    icon: themeController.isDark ? SiteIcons.sun : SiteIcons.moon,
+                    label: 'Rejim',
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          themeController.isDark ? 'Tungi' : 'Kunduzgi',
+                          style: theme.textTheme.labelSmall,
+                        ),
+                        const SizedBox(width: 8),
+                        // `w-10 h-6 rounded-full` kalit.
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          width: 40,
+                          height: 24,
+                          padding: const EdgeInsets.all(2),
+                          alignment: themeController.isDark
+                              ? Alignment.centerRight
+                              : Alignment.centerLeft,
+                          decoration: BoxDecoration(
+                            color: themeController.isDark
+                                ? AppColors.olive
+                                : const Color(0xFFE2E8F0), // slate-200
+                            borderRadius: BorderRadius.circular(AppRadius.pill),
+                          ),
+                          child: Container(
+                            width: 20,
+                            height: 20,
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     onTap: themeController.toggle,
                   ),
 
                   const Divider(height: 20),
                   if (auth.isLoggedIn) ...[
-                    FilledButton.icon(
-                      onPressed: () => _go(context, '/ads/create'),
-                      icon: const Icon(Icons.add),
-                      label: const Text("E'lon yaratish"),
-                    ),
+                    // `canCreateListing()` — saytda tugma faqat shu ikki rol uchun.
+                    if (auth.user?.role == MarketRole.user || auth.user?.role == MarketRole.agent)
+                      FilledButton.icon(
+                        onPressed: () => _go(context, '/ads/create'),
+                        icon: const Icon(Icons.add),
+                        label: const Text("E'lon berish"),
+                      ),
                     const SizedBox(height: 8),
                     OutlinedButton.icon(
                       onPressed: () {

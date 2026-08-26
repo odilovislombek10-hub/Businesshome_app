@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../shared/widgets/app_image.dart';
 import '../../../app/theme.dart';
+import '../../../shared/utils/breakpoints.dart';
 import '../../../shared/widgets/entrance.dart';
 import '../../../core/api/media_url.dart';
 import '../../../core/models/homepage.dart';
@@ -27,7 +28,11 @@ class PropertyCategories extends StatelessWidget {
     return ColoredBox(
       color: AppColors.cream,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 32, 16, 32),
+        // `py-10 lg:py-12`
+        padding: EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: Bp.pick(context, base: 40.0, lg: 48.0),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

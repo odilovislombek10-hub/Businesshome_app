@@ -158,6 +158,19 @@ abstract final class SiteIcons {
     'M12 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0',
   ]);
   static const moon = SiteIconData(['M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z']);
+
+  /// Kunduzgi rejim (lucide `sun`).
+  static const sun = SiteIconData([
+    'M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0',
+    'M12 2v2',
+    'M12 20v2',
+    'm4.93 4.93 1.41 1.41',
+    'm17.66 17.66 1.41 1.41',
+    'M2 12h2',
+    'M20 12h2',
+    'm6.34 17.66-1.41 1.41',
+    'm19.07 4.93-1.41 1.41',
+  ]);
   static const globe = SiteIconData([
     'M12 12m-10 0a10 10 0 1 0 20 0a10 10 0 1 0 -20 0',
     'M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20',

@@ -116,17 +116,19 @@ class _PropertyPriceMapState extends State<PropertyPriceMap> {
       ? 0
       : _prices.values.map((p) => p.average).reduce((a, b) => a + b) / _prices.length;
 
-  /// Rent is printed per month in thousands, sale as a price per m².
+  /// `formatPrice()` — millionli qiymat "mln", mingli "ming" bilan yoziladi,
+  /// undan kichigi esa birliksiz sonning o'zi bilan.
   String _format(num value) {
-    if (value == 0) return '—';
-    if (_rentTab) {
-      return value >= 1000000
-          ? '${(value / 1000000).toStringAsFixed(1)} mln/oy'
-          : '${(value / 1000).round()} ming/oy';
+    if (value <= 0) return '—';
+    final unit = _rentTab ? "mln so'm/oy" : "mln so'm/m²";
+    if (value >= 1000000) {
+      return '${(value / 1000000).toStringAsFixed(1)} $unit';
     }
-    return value >= 1000000
-        ? '${(value / 1000000).toStringAsFixed(1)} mln/m²'
-        : '${(value / 1000).round()} ming/m²';
+    if (value >= 1000) {
+      final kUnit = _rentTab ? "ming so'm/oy" : "ming so'm/m²";
+      return '${(value / 1000).round()} $kUnit';
+    }
+    return '${value.round()} $unit';
   }
 
   @override
