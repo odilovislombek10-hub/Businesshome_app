@@ -490,10 +490,48 @@ class _AgentPublicScreenState extends State<AgentPublicScreen> {
                 mode: LaunchMode.externalApplication,
               );
             }),
+          // Saytda bog'lanish blokining pastida uchta raqam turadi.
+          const SizedBox(height: 16), // mt-4 pt-4
+          Container(
+            padding: const EdgeInsets.only(top: 16),
+            decoration: BoxDecoration(
+              border: Border(top: BorderSide(color: AppColors.surfaceMutedLight)),
+            ),
+            child: Column(
+              children: [
+                _statRow(theme, "E'lonlar:", '${a.listingsTotal}'),
+                const SizedBox(height: 8), // space-y-2
+                _statRow(theme, 'Sotilgan:', '${a.dealsClosed}'),
+                const SizedBox(height: 8),
+                _statRow(theme, "Ko'rishlar:", '${a.viewsCount}'),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
+
+  Widget _statRow(ThemeData theme, String label, String value) => Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+      Text(
+        label,
+        style: theme.textTheme.labelSmall?.copyWith(
+          fontSize: 12,
+          color: AppColors.dark.withValues(alpha: 0.5),
+        ),
+      ),
+      Text(
+        value,
+        style: theme.textTheme.labelSmall?.copyWith(
+          fontSize: 12,
+          fontWeight: FontWeight.w700,
+          color: AppColors.dark,
+        ),
+      ),
+    ],
+  );
 
   /// Saytdagi `specLabel`.
   static String _specLabel(String code) => switch (code) {
@@ -522,6 +560,8 @@ class AgentPublic {
     this.rating = 0,
     this.reviewsCount = 0,
     this.listingsTotal = 0,
+    this.dealsClosed = 0,
+    this.viewsCount = 0,
     this.sampleListings = const [],
   });
 
@@ -540,6 +580,8 @@ class AgentPublic {
   final double rating;
   final int reviewsCount;
   final int listingsTotal;
+  final int dealsClosed;
+  final int viewsCount;
   final List<AgentListing> sampleListings;
 
   static String? _text(Object? value) {
@@ -566,6 +608,8 @@ class AgentPublic {
     instagram: _text(json['instagram']),
     rating: (json['rating'] as num?)?.toDouble() ?? 0,
     reviewsCount: (json['reviews_count'] as num?)?.toInt() ?? 0,
+    dealsClosed: (json['deals_closed'] as num?)?.toInt() ?? 0,
+    viewsCount: (json['views_count'] as num?)?.toInt() ?? 0,
     listingsTotal: (json['listings_total'] as num?)?.toInt() ?? 0,
     sampleListings: [
       for (final row in (json['sample_listings'] as List? ?? const []))

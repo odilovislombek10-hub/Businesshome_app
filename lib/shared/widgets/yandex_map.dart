@@ -101,10 +101,10 @@ class YandexMapView extends StatefulWidget {
   final bool pickMode;
 
   @override
-  State<YandexMapView> createState() => _YandexMapViewState();
+  YandexMapViewState createState() => YandexMapViewState();
 }
 
-class _YandexMapViewState extends State<YandexMapView> {
+class YandexMapViewState extends State<YandexMapView> {
   /// Saytning `index.html` dagi kaliti — boshqa kalit olinsa xarita boshqacha hisoblanadi.
   static const _apiKey = '57cd694b-cb63-4a8c-943a-0c03b146bb63';
 
@@ -147,23 +147,29 @@ class _YandexMapViewState extends State<YandexMapView> {
   }
 
   @override
-  void didUpdateWidget(YandexMapView old) {
-    super.didUpdateWidget(old);
+  void didUpdateWidget(covariant YandexMapView oldWidget) {
+    super.didUpdateWidget(oldWidget);
     if (!_ready) return;
-    if (widget.pickedLat != old.pickedLat || widget.pickedLng != old.pickedLng) {
+    if (widget.pickedLat != oldWidget.pickedLat || widget.pickedLng != oldWidget.pickedLng) {
       final lat = widget.pickedLat;
       final lng = widget.pickedLng;
       _controller.runJavaScript(
         lat == null || lng == null ? 'bhClear()' : 'bhSetPoint($lat, $lng)',
       );
     }
-    if (widget.markers != old.markers || widget.clusters != old.clusters) {
+    if (widget.markers != oldWidget.markers || widget.clusters != oldWidget.clusters) {
       _controller.runJavaScript(
         'bhSetMarkers(${jsonEncode([for (final m in widget.markers) m.toJson()])}, '
         '${jsonEncode([for (final c in widget.clusters) c.toJson()])})',
       );
     }
   }
+
+  /// Saytdagi xarita boshqaruvlari (`zoomIn`, `zoomOut`, `resetMap`, `toggleMapType`).
+  void zoomIn() => _controller.runJavaScript('bhZoomIn()');
+  void zoomOut() => _controller.runJavaScript('bhZoomOut()');
+  void resetMap() => _controller.runJavaScript('bhResetMap()');
+  void setMapType(String type) => _controller.runJavaScript("bhSetMapType('$type')");
 
   @override
   Widget build(BuildContext context) => WebViewWidget(controller: _controller);
@@ -255,7 +261,14 @@ class _YandexMapViewState extends State<YandexMapView> {
     if (point && map) { map.geoObjects.remove(point); point = null; }
   }
 
-  function bhSetMarkers(list, clusters) {
+  function bhZoomIn() { if (map) map.setZoom(map.getZoom() + 1, { duration: 200 }); }
+function bhZoomOut() { if (map) map.setZoom(map.getZoom() - 1, { duration: 200 }); }
+function bhResetMap() { if (map) map.setCenter(BH_CENTER, BH_ZOOM, { duration: 300 }); }
+function bhSetMapType(type) {
+  if (map) map.setType(type === 'satellite' ? 'yandex#satellite' : 'yandex#map');
+}
+
+function bhSetMarkers(list, clusters) {
     if (!map) return;
     if (clusterer) { map.geoObjects.remove(clusterer); clusterer = null; }
     clusterPins.forEach(function (pm) { try { map.geoObjects.remove(pm); } catch (e) {} });
@@ -324,11 +337,15 @@ class _YandexMapViewState extends State<YandexMapView> {
   }
 
   function init() {
-    map = new ymaps.Map('map', {
+    window.BH_CENTER = [$lat, $lng];
+  window.BH_ZOOM = ${widget.zoom};
+  map = new ymaps.Map('map', {
       center: [$lat, $lng],
       zoom: ${widget.zoom},
-      controls: ['zoomControl', 'geolocationControl']
-    }, { suppressMapOpenBlock: true });
+      // Saytda `/map` sahifasi o'z tugmalarini chizadi (`controls: []`), e'lon
+      // yaratishda esa Yandex'ning masshtab va joylashuv tugmalari turadi.
+      controls: ${widget.pickMode ? "['zoomControl', 'geolocationControl']" : '[]'}
+    }, { suppressMapOpenBlock: true, yandexMapDisablePoiInteractivity: true });
 
     if (PICK) {
       map.events.add('click', function (e) {

@@ -22,6 +22,7 @@ import '../features/map_search/map_search_screen.dart';
 import '../features/my_home/my_home_screen.dart';
 import '../features/news/news_detail_screen.dart';
 import '../features/news/news_screen.dart';
+import '../features/not_found/not_found_screen.dart';
 import '../features/order_detail/order_detail_screen.dart';
 import '../features/project_detail/project_detail_screen.dart';
 import '../features/reels/reels_screen.dart';
@@ -188,6 +189,5 @@ final appRouter = GoRouter(
       ),
     ),
   ],
-  errorBuilder: (_, state) =>
-      PlaceholderScreen(title: 'Sahifa topilmadi', note: state.uri.toString()),
+  errorBuilder: (_, _) => const NotFoundScreen(),
 );

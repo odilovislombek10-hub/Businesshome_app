@@ -114,6 +114,20 @@ class _MapSearchScreenState extends State<MapSearchScreen> {
         }
       }
 
+      // Saytda xaritada yangi qurilish loyihalari ham belgi bo'lib turadi.
+      for (final project in await _repo.projects()) {
+        markers.add(
+          MapMarker(
+            id: 'project-${project.id}',
+            lat: project.lat,
+            lng: project.lng,
+            label: project.price > 0 ? _shortPrice(project.price) : project.title,
+            hint: project.title,
+            selected: _selectedId == 'project-${project.id}',
+          ),
+        );
+      }
+
       // Saytda "Barchasi" tanlansa ikkala ro'yxat parallel so'raladi va aralashtiriladi.
       // Sahifa hajmi `SecondaryRepository.perPage` — ilovadagi boshqa ro'yxatlar bilan bir xil.
       final listFilter = SecondaryFilter(
@@ -150,6 +164,12 @@ class _MapSearchScreenState extends State<MapSearchScreen> {
   }
 
   /// Saytdagi `formatPriceLabel` — so'mda sotuv "mln/mlrd", ijara to'liq raqam.
+  /// Loyiha belgisidagi narx — "N mlrd" / "N mln".
+  String _shortPrice(num value) {
+    if (value >= 1000000000) return '${(value / 1000000000).toStringAsFixed(1)} mlrd';
+    return '${(value / 1000000).toStringAsFixed(0)} mln';
+  }
+
   String _priceLabel(MapPoint point) {
     final value = point.price;
     if (point.rent) return formatNumber(value);
@@ -413,12 +433,37 @@ class _MapSearchScreenState extends State<MapSearchScreen> {
     );
   }
 
+  /// `w-10 h-10 bg-white rounded-xl shadow-lg` — xarita ustidagi tugma.
+  Widget _mapControl(SiteIconData icon, VoidCallback onTap, {bool rotate = false}) => Pressable(
+    onTap: onTap,
+    child: Container(
+      width: 40,
+      height: 40,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        border: Border.all(color: AppColors.surfaceMutedLight),
+        boxShadow: const [BoxShadow(color: Color(0x1A000000), blurRadius: 10)],
+      ),
+      child: Center(
+        child: rotate
+            // Kichraytirish belgisi — chiziq (saytda `minus`).
+            ? Container(width: 16, height: 2, color: AppColors.dark)
+            : SiteIcon(icon, size: 18, color: AppColors.dark),
+      ),
+    ),
+  );
+
   // ── xarita ─────────────────────────────────────────────────────────────────
+
+  final _mapKey = GlobalKey<YandexMapViewState>();
+  bool _satellite = false;
 
   Widget _map() => Stack(
     children: [
       Positioned.fill(
         child: YandexMapView(
+          key: _mapKey,
           markers: _markers,
           clusters: _clusters,
           onMarkerTap: (id) => setState(() {
@@ -439,6 +484,25 @@ class _MapSearchScreenState extends State<MapSearchScreen> {
               _load();
             });
           },
+        ),
+      ),
+      // Saytdagi "Map Controls" — o'ng yuqorida to'rtta tugma.
+      Positioned(
+        top: 16, // top-4 right-4
+        right: 16,
+        child: Column(
+          children: [
+            _mapControl(SiteIcons.plus, () => _mapKey.currentState?.zoomIn()),
+            const SizedBox(height: 8), // gap-2
+            _mapControl(SiteIcons.close, () => _mapKey.currentState?.zoomOut(), rotate: true),
+            const SizedBox(height: 8),
+            _mapControl(SiteIcons.map, () => _mapKey.currentState?.resetMap()),
+            const SizedBox(height: 8),
+            _mapControl(SiteIcons.globe, () {
+              setState(() => _satellite = !_satellite);
+              _mapKey.currentState?.setMapType(_satellite ? 'satellite' : 'map');
+            }),
+          ],
         ),
       ),
       if (_loading)

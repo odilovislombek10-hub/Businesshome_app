@@ -103,6 +103,38 @@ class MapSearchRepository {
     }
   }
 
+  /// Saytda xaritada yangi qurilish loyihalari ham ko'rsatiladi
+  /// (`/market/projects` dagi `latitude`/`longitude` bo'lganlari).
+  Future<List<ProjectPoint>> projects() async {
+    try {
+      final res = await ApiClient.instance.get<dynamic>(
+        '/market/projects',
+        query: {'per_page': 100},
+      );
+      final data = res.data;
+      final items = data is Map ? data['items'] : data;
+      if (items is! List) return const [];
+      return [
+        for (final row in items)
+          if (row is Map && row['latitude'] is num && row['longitude'] is num)
+            ProjectPoint(
+              id: (row['id'] as num?)?.toInt() ?? 0,
+              lat: (row['latitude'] as num).toDouble(),
+              lng: (row['longitude'] as num).toDouble(),
+              title: row['name']?.toString() ?? '',
+              price: row['min_price'] is num ? row['min_price'] as num : 0,
+              apartments: (row['total_apartments'] as num?)?.toInt() ?? 0,
+              developerCode: (row['developer'] is Map)
+                  ? row['developer']['code']?.toString()
+                  : null,
+              slug: row['slug']?.toString(),
+            ),
+      ];
+    } catch (_) {
+      return const [];
+    }
+  }
+
   static List<MapPoint> _points(Object? raw, {required bool rent}) {
     if (raw is! List) return const [];
     return [for (final row in raw) ?MapPoint.fromJson(row, rent: rent)];
@@ -120,4 +152,27 @@ class MapSearchRepository {
           ),
     ];
   }
+}
+
+/// Xaritadagi yangi qurilish loyihasi.
+class ProjectPoint {
+  const ProjectPoint({
+    required this.id,
+    required this.lat,
+    required this.lng,
+    required this.title,
+    required this.price,
+    required this.apartments,
+    this.developerCode,
+    this.slug,
+  });
+
+  final int id;
+  final double lat;
+  final double lng;
+  final String title;
+  final num price;
+  final int apartments;
+  final String? developerCode;
+  final String? slug;
 }

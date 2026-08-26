@@ -1021,6 +1021,40 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                 ),
               ),
             ),
+            const SizedBox(height: 8),
+            // Saytda qo'ng'iroqdan keyin WhatsApp tugmasi turadi.
+            Pressable(
+              scale: 0.98,
+              onTap: () {
+                final digits = phone.replaceAll(RegExp(r'\D'), '');
+                final message = Uri.encodeComponent(
+                  widget.kind.isDesigner
+                      ? 'Salom ${s.fullName}, sizning xizmatlaringiz haqida gaplashmoqchi edim'
+                      : 'Salom ${s.fullName}, ustachilik xizmatlari kerak edi',
+                );
+                launchUrl(
+                  Uri.parse('https://wa.me/$digits?text=$message'),
+                  mode: LaunchMode.externalApplication,
+                );
+              },
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 12), // py-3
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF10B981), // bg-emerald-500
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                ),
+                child: Text(
+                  'WhatsApp',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
           ],
         ],
       ),
