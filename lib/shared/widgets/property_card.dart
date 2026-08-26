@@ -87,7 +87,7 @@ class _PropertyCardState extends State<PropertyCard> {
     final images = property.images;
 
     return GestureDetector(
-      onTap: () => context.go(property.detailPath),
+      onTap: () => context.push(property.detailPath),
       child: AspectRatio(
         aspectRatio: widget.compact ? PropertyCard.compactAspectRatio : 3 / 4,
         child: ClipRRect(

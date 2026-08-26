@@ -293,7 +293,7 @@ class _NewsDetailScreenState extends State<NewsDetailScreen> {
     final cover = absoluteMediaUrl(project.coverImage);
     final logo = absoluteMediaUrl(project.developerLogo);
     return Pressable.builder(
-      onTap: () => context.go('/${project.developerCode}/${project.slug}'),
+      onTap: () => context.push('/${project.developerCode}/${project.slug}'),
       builder: (context, pressed) => Container(
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(

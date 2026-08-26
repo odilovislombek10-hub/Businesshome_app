@@ -360,7 +360,13 @@ class _AgentPublicScreenState extends State<AgentPublicScreen> {
     final image = absoluteMediaUrl(listing.coverImage);
     return Pressable(
       scale: 0.99,
-      onTap: () => context.go('/property/${listing.kind}/${listing.id}'),
+      onTap: () => context.push(
+        // Backend `kind` da 'rent' yoki 'secondary' yuboradi; boshqasi kelsa
+        // ikkilamchi deb qaraladi — aks holda yo'l router'da topilmay 404 chiqadi.
+        listing.kind == 'rent'
+            ? '/property/rent/${listing.id}'
+            : '/property/secondary/${listing.id}',
+      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

@@ -72,7 +72,7 @@ class _NewsCard extends StatelessWidget {
     final image = absoluteMediaUrl(item.image) ?? NewsItem.fallbackImage;
 
     return Pressable.builder(
-      onTap: () => context.go('/news/${item.id}'),
+      onTap: () => context.push('/news/${item.id}'),
       builder: (context, pressed) => Container(
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(

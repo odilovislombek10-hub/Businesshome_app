@@ -238,7 +238,7 @@ class _CabinetScreenState extends State<CabinetScreen> {
       case 'orders':
         return CabinetOrders(
           future: _providerOrders ??= _repo.providerOrders(),
-          onOpen: (order) => context.go('/cabinet/orders/${order.id}'),
+          onOpen: (order) => context.push('/cabinet/orders/${order.id}'),
           onRetry: () => setState(() => _providerOrders = _repo.providerOrders()),
         );
       case 'portfolio':
@@ -282,7 +282,7 @@ class _CabinetScreenState extends State<CabinetScreen> {
       case 'messages':
         return CabinetMessages(
           future: _conversations ??= _repo.conversations(),
-          onOpen: (conv) => context.go('/chat/${conv.id}'),
+          onOpen: (conv) => context.push('/chat/${conv.id}'),
           onRetry: () => setState(() => _conversations = _repo.conversations()),
         );
       case 'profile':

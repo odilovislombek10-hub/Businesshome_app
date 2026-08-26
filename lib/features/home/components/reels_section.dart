@@ -163,7 +163,7 @@ class _ReelCard extends StatelessWidget {
     final avatar = absoluteMediaUrl(reel.authorAvatar);
 
     return Pressable.builder(
-      onTap: () => context.go('/reels/${reel.id}'),
+      onTap: () => context.push('/reels/${reel.id}'),
       builder: (context, pressed) => SizedBox(
         width: width,
         child: ClipRRect(

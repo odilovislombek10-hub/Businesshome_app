@@ -219,7 +219,7 @@ class _ListingTile extends StatelessWidget {
         : (listing.city?.trim() ?? '');
 
     return _SmallCard(
-      onTap: () => context.go('/property/${isRent ? 'rent' : 'secondary'}/${listing.id}'),
+      onTap: () => context.push('/property/${isRent ? 'rent' : 'secondary'}/${listing.id}'),
       image: absoluteMediaUrl(listing.thumbnail),
       aspectRatio: 4 / 3,
       // Sale chips are white on the site, rentals olive.
@@ -292,7 +292,7 @@ class _SpecialistTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return _SmallCard(
-      onTap: () => context.go(specialist.pathIn(section)),
+      onTap: () => context.push(specialist.pathIn(section)),
       image: absoluteMediaUrl(specialist.image),
       aspectRatio: 1,
       zoom: 1.10, // group-hover:scale-110

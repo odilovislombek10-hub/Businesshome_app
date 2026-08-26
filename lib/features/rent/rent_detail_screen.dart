@@ -689,7 +689,7 @@ class _RentDetailScreenState extends State<RentDetailScreen> {
     final image = absoluteMediaUrl(item.images.firstOrNull);
     return Pressable(
       scale: 0.99,
-      onTap: () => context.go('/property/rent/${item.id}'),
+      onTap: () => context.push('/property/rent/${item.id}'),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

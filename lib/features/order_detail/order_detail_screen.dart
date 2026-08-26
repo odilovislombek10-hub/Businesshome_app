@@ -817,7 +817,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           if (o.conversationId case final conversationId?)
             Pressable(
               scale: 0.98,
-              onTap: () => context.go('/chat/$conversationId'),
+              onTap: () => context.push('/chat/$conversationId'),
               child: Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(vertical: 14),

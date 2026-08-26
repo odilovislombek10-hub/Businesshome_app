@@ -565,7 +565,7 @@ class _MapSearchScreenState extends State<MapSearchScreen> {
     final image = absoluteMediaUrl(item.images.firstOrNull);
     return Pressable(
       scale: 0.99,
-      onTap: () => context.go('/property/${rent ? 'rent' : 'secondary'}/${item.id}'),
+      onTap: () => context.push('/property/${rent ? 'rent' : 'secondary'}/${item.id}'),
       child: Container(
         padding: const EdgeInsets.all(12), // p-3
         decoration: BoxDecoration(

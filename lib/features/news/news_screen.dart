@@ -298,7 +298,7 @@ class _NewsScreenState extends State<NewsScreen> {
   Widget _featuredCard(NewsItem item) {
     final theme = Theme.of(context);
     return Pressable.builder(
-      onTap: () => context.go('/news/${item.id}'),
+      onTap: () => context.push('/news/${item.id}'),
       builder: (context, pressed) => Container(
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
@@ -399,7 +399,7 @@ class _NewsScreenState extends State<NewsScreen> {
   Widget _card(NewsItem item) {
     final theme = Theme.of(context);
     return Pressable.builder(
-      onTap: () => context.go('/news/${item.id}'),
+      onTap: () => context.push('/news/${item.id}'),
       builder: (context, pressed) => Container(
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(

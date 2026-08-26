@@ -375,7 +375,7 @@ class CabinetDashboard extends StatelessWidget {
   Widget _orderRow(BuildContext context, ThemeData theme, ProviderOrder order) {
     return Pressable(
       scale: 0.99,
-      onTap: () => context.go('/cabinet/orders/${order.id}'),
+      onTap: () => context.push('/cabinet/orders/${order.id}'),
       child: Container(
         padding: const EdgeInsets.all(16), // p-4
         decoration: BoxDecoration(

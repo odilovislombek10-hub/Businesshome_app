@@ -26,8 +26,9 @@ class ProjectDetailRepository {
   Future<ProjectDetail?> byId(int id) async {
     try {
       final res = await ApiClient.instance.get<dynamic>(
+        // `/market/projects` sahifalamaydi — barcha faol loyihalarni qaytaradi
+        // (backendda `per_page` degan parametr yo'q).
         '/market/projects',
-        query: {'per_page': 100},
       );
       final data = res.data;
       final items = data is Map ? data['items'] : data;

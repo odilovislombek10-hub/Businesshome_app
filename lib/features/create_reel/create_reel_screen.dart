@@ -102,7 +102,9 @@ class _CreateReelScreenState extends State<CreateReelScreen> {
 
   Future<void> _loadOwnProfile(String kind) async {
     try {
-      final res = await ApiClient.instance.get<dynamic>('/market/cabinet/specialist-profile');
+      // Saytda o'qish uchun `cabinet/my-profile` ishlatiladi; `specialist-profile` faqat
+      // yozish uchun (POST/PUT) — GET u yerda umuman yo'q (405).
+      final res = await ApiClient.instance.get<dynamic>('/market/cabinet/my-profile');
       final data = res.data;
       if (!mounted) return;
       setState(() {

@@ -1,7 +1,9 @@
+import '../../core/i18n/translate.dart';
 import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -245,7 +247,17 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                 onTap: () => _toggleFavorite(project),
               ),
               const SizedBox(width: 8),
-              _headerButton(SiteIcons.share, onTap: () {}),
+              // Saytda bu tugmaga hech narsa ulanmagan (bosilsa hech nima bo'lmaydi).
+              // Ilovada boshqa tafsilot sahifalaridagidek havolani nusxalaydi.
+              _headerButton(
+                SiteIcons.share,
+                onTap: () async {
+                  final link = 'https://businesshome.uz/${project.developerCode}/${project.slug}';
+                  await Clipboard.setData(ClipboardData(text: link));
+                  if (!mounted) return;
+                  showSiteToast(context, t('share.linkCopied'));
+                },
+              ),
             ],
           ),
         ),
