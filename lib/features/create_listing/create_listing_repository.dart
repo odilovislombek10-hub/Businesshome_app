@@ -37,6 +37,24 @@ class CreateListingRepository {
   }
 
   /// Rasmlar bitta so'rovda, `files` maydoni bilan ketadi — saytdagi kabi.
+  /// Saytdagi `POST {base}/{kind}/{id}/video` — rasm bilan bir vaqtda ketadi.
+  Future<void> uploadVideo({required String kind, required int id, required File file}) async {
+    final form = FormData();
+    form.files.add(
+      MapEntry(
+        'file',
+        await MultipartFile.fromFile(file.path, filename: file.uri.pathSegments.last),
+      ),
+    );
+    final res = await ApiClient.instance.post<dynamic>('$_base/$kind/$id/video', data: form);
+    if (res.statusCode != 200 && res.statusCode != 201) {
+      throw ListingException(
+        _detail(res.data) ?? "Videoni yuklab bo'lmadi",
+        status: res.statusCode,
+      );
+    }
+  }
+
   Future<void> uploadImages({
     required String kind,
     required int id,

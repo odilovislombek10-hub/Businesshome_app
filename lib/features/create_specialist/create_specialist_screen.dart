@@ -14,6 +14,7 @@ import '../../shared/widgets/entrance.dart';
 import '../../shared/widgets/site_footer_section.dart';
 import '../../shared/widgets/site_header.dart';
 import '../../shared/widgets/site_icon.dart';
+import '../../shared/widgets/video_upload_box.dart';
 import 'create_specialist_repository.dart';
 import 'create_specialist_texts.dart';
 
@@ -514,6 +515,11 @@ class _CreateSpecialistScreenState extends State<CreateSpecialistScreen> {
         const SizedBox(height: 8),
         _hint('${_images.length} ${CreateSpecialistTexts.imagesCount}'),
       ],
+      const SizedBox(height: 24), // mt-6
+      // Saytda bu blok bor, lekin tanlangan video hech qayerga yuborilmaydi —
+      // `videoUrl` signali payload'ga qo'shilmagan. Shu sababli bu yerda ham
+      // faqat ko'rinishi bor.
+      VideoUploadBox(onChanged: (_) {}),
     ];
   }
 

@@ -4,9 +4,14 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+import 'package:video_player/video_player.dart';
+import 'package:video_thumbnail_plus/video_thumbnail_plus.dart';
 
 import '../../app/theme.dart';
 import '../../core/api/api_client.dart';
+import '../../core/models/market_user.dart';
+import '../../core/services/auth_service.dart';
 import '../../core/api/media_url.dart';
 import '../../shared/widgets/app_image.dart';
 import '../../shared/widgets/entrance.dart';
@@ -35,6 +40,12 @@ class _CreateReelScreenState extends State<CreateReelScreen> {
   final _subtitle = TextEditingController();
 
   File? _video;
+  VideoPlayerController? _player;
+  int _videoDuration = 0;
+  int _videoSize = 0;
+
+  /// Videodan olingan kadr — saytda `thumbFile`, `POST` da `thumbnail` maydoni.
+  File? _thumb;
   String? _videoName;
   List<_MyListing> _listings = const [];
   _MyListing? _attached;
@@ -63,8 +74,14 @@ class _CreateReelScreenState extends State<CreateReelScreen> {
     super.dispose();
   }
 
-  /// Biriktirish uchun foydalanuvchining o'z e'lonlari.
+  /// Biriktirish uchun ro'yxat: dizayner va ustada — o'z profili, qolganlarda
+  /// e'lonlari (saytdagi `loadAttachables`).
   Future<void> _loadListings() async {
+    final role = context.read<AuthService>().user?.role;
+    if (role == MarketRole.designer || role == MarketRole.master) {
+      await _loadOwnProfile(role == MarketRole.designer ? 'designer' : 'master');
+      return;
+    }
     try {
       final res = await ApiClient.instance.get<dynamic>('/market/my-listings/me');
       final data = res.data;
@@ -75,6 +92,36 @@ class _CreateReelScreenState extends State<CreateReelScreen> {
           for (final row in (items is List ? items : const []))
             if (row is Map) _MyListing.fromJson(row),
         ];
+        _listingsLoading = false;
+      });
+    } catch (_) {
+      if (mounted) setState(() => _listingsLoading = false);
+    }
+  }
+
+  Future<void> _loadOwnProfile(String kind) async {
+    try {
+      final res = await ApiClient.instance.get<dynamic>('/market/cabinet/specialist-profile');
+      final data = res.data;
+      if (!mounted) return;
+      setState(() {
+        _listings = data is Map
+            ? [
+                _MyListing(
+                  id: (data['id'] as num?)?.toInt() ?? 0,
+                  title:
+                      (data['fullName'] ?? data['full_name'] ?? data['name'])?.toString() ??
+                      CreateReelTexts.attachProfile,
+                  kind: kind,
+                  coverImage:
+                      (data['avatar'] ??
+                              (data['portfolio'] is List && (data['portfolio'] as List).isNotEmpty
+                                  ? (data['portfolio'] as List).first
+                                  : null))
+                          ?.toString(),
+                ),
+              ]
+            : const [];
         _listingsLoading = false;
       });
     } catch (_) {
@@ -231,6 +278,8 @@ class _CreateReelScreenState extends State<CreateReelScreen> {
               padding: const EdgeInsets.all(24),
               child: Column(
                 children: [
+                  _preview(),
+                  const SizedBox(height: 16),
                   _hint(CreateReelTexts.moderationNote),
                   const SizedBox(height: 16),
                   _primaryButton(
@@ -297,65 +346,405 @@ class _CreateReelScreenState extends State<CreateReelScreen> {
 
   List<Widget> _videoSection() {
     final theme = Theme.of(context);
-    return [
-      GestureDetector(
-        onTap: _pickVideo,
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(32),
-          decoration: BoxDecoration(
-            color: AppColors.surfaceAltLight,
-            borderRadius: BorderRadius.circular(AppRadius.lg),
-            border: Border.all(color: AppColors.borderLight),
+    if (_video == null || _player?.value.isInitialized != true) {
+      return [
+        // `border-2 border-dashed rounded-2xl p-10`
+        Pressable(
+          scale: 0.99,
+          onTap: _pickVideo,
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(40), // p-10
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(AppRadius.lg),
+              border: Border.all(color: AppColors.borderLight, width: 2),
+            ),
+            child: Column(
+              children: [
+                Container(
+                  width: 64, // w-16
+                  height: 64,
+                  decoration: BoxDecoration(
+                    color: AppColors.olive.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Center(
+                    child: SiteIcon(SiteIcons.video, size: 28, color: AppColors.olive),
+                  ),
+                ),
+                const SizedBox(height: 12), // gap-3
+                Text(
+                  CreateReelTexts.videoDropHere,
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.dark,
+                  ),
+                ),
+                const SizedBox(height: 4), // mb-1
+                Text(
+                  '${CreateReelTexts.videoMaxDuration} · ${CreateReelTexts.videoFormat}',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    fontSize: 12,
+                    color: AppColors.dark.withValues(alpha: 0.4),
+                  ),
+                ),
+                const SizedBox(height: 16), // mt-1 + gap-3
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: AppColors.olive,
+                    borderRadius: BorderRadius.circular(AppRadius.md),
+                  ),
+                  child: Text(
+                    CreateReelTexts.videoSelectFile,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-          child: Column(
-            children: [
-              Container(
-                width: 56,
-                height: 56,
-                decoration: BoxDecoration(
-                  color: AppColors.olive.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
+        ),
+      ];
+    }
+
+    return [
+      ClipRRect(
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        child: AspectRatio(
+          aspectRatio: 16 / 9,
+          child: ColoredBox(
+            color: Colors.black,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Center(
+                  child: AspectRatio(
+                    aspectRatio: _player!.value.aspectRatio,
+                    child: VideoPlayer(_player!),
+                  ),
                 ),
-                child: const Center(
-                  child: SiteIcon(SiteIcons.video, size: 24, color: AppColors.olive),
+                Positioned(
+                  top: 12, // top-3 left-3
+                  left: 12,
+                  child: Row(
+                    children: [
+                      _videoChip(theme, _formatDuration(_videoDuration)),
+                      const SizedBox(width: 8),
+                      _videoChip(theme, _formatSize(_videoSize)),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                _videoName ?? CreateReelTexts.previewEmpty,
-                textAlign: TextAlign.center,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.dark,
+                Positioned(
+                  top: 12,
+                  right: 12,
+                  child: Pressable(
+                    onTap: _removeVideo,
+                    child: Container(
+                      width: 32,
+                      height: 32,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFDC2626),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Center(
+                        child: SiteIcon(SiteIcons.close, size: 16, color: Colors.white),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                // Saytdagi cheklovlar: MP4, vertikal 9:16, 60 soniyagacha, 100 MB.
-                'MP4 · vertikal (9:16) · maksimal 60 soniya',
-                textAlign: TextAlign.center,
-                style: theme.textTheme.labelSmall?.copyWith(
-                  fontSize: 12,
-                  color: AppColors.dark.withValues(alpha: 0.4),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
+      const SizedBox(height: 12), // space-y-3
+      // Muqova kadri
+      Row(
+        children: [
+          if (_thumb case final thumb?) ...[
+            ClipRRect(
+              borderRadius: BorderRadius.circular(AppRadius.sm),
+              child: Image.file(thumb, width: 48, height: 64, fit: BoxFit.cover),
+            ),
+            const SizedBox(width: 12), // gap-3
+          ],
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  CreateReelTexts.coverTitle,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.dark.withValues(alpha: 0.8),
+                  ),
+                ),
+                Text(
+                  CreateReelTexts.coverHint,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    fontSize: 11,
+                    color: AppColors.dark.withValues(alpha: 0.4),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          Pressable(
+            onTap: _captureCover,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: AppColors.olive.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(AppRadius.sm),
+              ),
+              child: Text(
+                CreateReelTexts.captureCover,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.olive,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     ];
+  }
+
+  /// Saytdagi "LIVE PREVIEW" — 9:16 telefon ramkasi, ustida reels lentasidagi
+  /// kabi qatlamlar. Mobilda formadan keyin turadi (`grid-cols-1`).
+  Widget _preview() {
+    final theme = Theme.of(context);
+    final title = _title.text.trim();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          CreateReelTexts.previewTitle,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: AppColors.dark.withValues(alpha: 0.7),
+          ),
+        ),
+        const SizedBox(height: 12), // mb-3
+        Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 260), // max-w-[260px]
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(32), // rounded-[2rem]
+              child: AspectRatio(
+                aspectRatio: 9 / 16,
+                child: ColoredBox(
+                  color: Colors.black,
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      if (_player?.value.isInitialized == true)
+                        FittedBox(
+                          fit: BoxFit.cover,
+                          child: SizedBox(
+                            width: _player!.value.size.width,
+                            height: _player!.value.size.height,
+                            child: VideoPlayer(_player!),
+                          ),
+                        )
+                      else
+                        Center(
+                          child: Text(
+                            CreateReelTexts.previewEmpty,
+                            textAlign: TextAlign.center,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              fontSize: 11,
+                              color: Colors.white.withValues(alpha: 0.4),
+                            ),
+                          ),
+                        ),
+                      // `bg-gradient-to-t from-black via-black/50 to-transparent`
+                      Positioned(
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        height: 200,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.bottomCenter,
+                              end: Alignment.topCenter,
+                              colors: [
+                                Colors.black,
+                                Colors.black.withValues(alpha: 0.5),
+                                Colors.transparent,
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        left: 12,
+                        right: 12,
+                        bottom: 12, // p-3
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (_attached?.kindBadge case final badge?) ...[
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: AppColors.olive.withValues(alpha: 0.9),
+                                  borderRadius: BorderRadius.circular(AppRadius.pill),
+                                ),
+                                child: Text(
+                                  badge,
+                                  style: theme.textTheme.labelSmall?.copyWith(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 6), // mb-1.5
+                            ],
+                            Text(
+                              title.isEmpty ? CreateReelTexts.previewTitlePlaceholder : title,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                height: 1.25,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 8), // mt-2
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(AppRadius.sm),
+                              ),
+                              child: Text(
+                                'Batafsil',
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.dark,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _videoChip(ThemeData theme, String text) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+    decoration: BoxDecoration(
+      color: Colors.black.withValues(alpha: 0.7),
+      borderRadius: BorderRadius.circular(AppRadius.sm),
+    ),
+    child: Text(
+      text,
+      style: theme.textTheme.labelSmall?.copyWith(fontSize: 11, color: Colors.white),
+    ),
+  );
+
+  static String _formatDuration(int seconds) {
+    final m = seconds ~/ 60;
+    final s = seconds % 60;
+    return '$m:${s.toString().padLeft(2, '0')}';
+  }
+
+  static String _formatSize(int bytes) => '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+
+  void _removeVideo() {
+    setState(() {
+      _player?.dispose();
+      _player = null;
+      _video = null;
+      _videoName = null;
+      _thumb = null;
+    });
+  }
+
+  /// `captureCover()` — joriy kadrni muqova qilib oladi. Saytda kadr `canvas`
+  /// ga chiziladi, bu yerda esa videodan kadr ajratuvchi paket bilan.
+  Future<void> _captureCover() async {
+    final video = _video;
+    if (video == null) return;
+    final position = _player?.value.position.inMilliseconds ?? 0;
+    final path = await VideoThumbnailPlus.thumbnailFile(
+      video: video.path,
+      imageFormat: ImageFormat.JPEG,
+      timeMs: position,
+      quality: 80,
+    );
+    if (path == null || !mounted) return;
+    setState(() => _thumb = File(path));
   }
 
   Future<void> _pickVideo() async {
     final picked = await ImagePicker().pickVideo(source: ImageSource.gallery);
     if (picked == null) return;
+    final file = File(picked.path);
+    final size = await file.length();
+    if (size > 100 * 1024 * 1024) {
+      setState(() => _error = CreateReelTexts.videoErrorSize);
+      return;
+    }
+    final controller = VideoPlayerController.file(file);
+    try {
+      await controller.initialize();
+    } catch (_) {
+      await controller.dispose();
+      if (!mounted) return;
+      setState(() => _error = CreateReelTexts.videoErrorRead);
+      return;
+    }
+    final duration = controller.value.duration.inSeconds;
+    if (duration > 60) {
+      await controller.dispose();
+      if (!mounted) return;
+      setState(() => _error = CreateReelTexts.videoErrorDuration(duration));
+      return;
+    }
+    if (!mounted) {
+      await controller.dispose();
+      return;
+    }
     setState(() {
-      _video = File(picked.path);
+      _player?.dispose();
+      _player = controller
+        ..setLooping(true)
+        ..setVolume(0)
+        ..play();
+      _video = file;
       _videoName = picked.name;
+      _videoDuration = duration;
+      _videoSize = size;
       _error = null;
     });
+    // Saytda video yuklangach muqova o'zi olinadi (`if (!thumbFile()) captureCover()`).
+    await _captureCover();
   }
 
   List<Widget> _attachSection() {
@@ -417,19 +806,18 @@ class _CreateReelScreenState extends State<CreateReelScreen> {
                       ),
                     ),
                   ),
-                  if (listing != null)
+                  // Nishoncha faqat e'londa bo'ladi; mutaxassis profilida yo'q.
+                  if (listing?.kindBadge case final badge?)
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
-                        color: listing.kind == 'rent'
+                        color: listing!.kind == 'rent'
                             ? const Color(0xFFDBEAFE)
                             : AppColors.olive.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(AppRadius.pill),
                       ),
                       child: Text(
-                        listing.kind == 'rent'
-                            ? CreateReelTexts.badgeRent
-                            : CreateReelTexts.badgeSale,
+                        badge,
                         style: theme.textTheme.labelSmall?.copyWith(
                           fontSize: 11,
                           fontWeight: FontWeight.w500,
@@ -482,6 +870,12 @@ class _CreateReelScreenState extends State<CreateReelScreen> {
           await MultipartFile.fromFile(_video!.path, filename: _videoName ?? 'reel.mp4'),
         ),
       );
+      // Saytda muqova kadri ham shu so'rovda ketadi (`thumbnail`).
+      if (_thumb case final thumb?) {
+        form.files.add(
+          MapEntry('thumbnail', await MultipartFile.fromFile(thumb.path, filename: 'cover.jpg')),
+        );
+      }
 
       final res = await ApiClient.instance.post<dynamic>('/market/cabinet/reels', data: form);
       if (!mounted) return;
@@ -630,6 +1024,20 @@ abstract final class CreateReelTexts {
   static const badgeSale = 'Sotuv';
   static const previewEmpty = 'Video yuklang';
   static const moderationNote = "Reel admin tekshiruvidan so'ng e'lon qilinadi";
+  static const coverTitle = 'Muqova rasmi';
+  static const coverHint = 'Videodan kadr oling yoki avtomatik tanlanadi';
+  static const captureCover = 'Kadr olish';
+  static const previewTitle = "Ko'rinishi";
+  static const previewTitlePlaceholder = 'Reel sarlavhasi';
+  static const attachProfile = 'Mening profilim';
+  static const videoDropHere = 'Videoni bu yerga tashlang yoki bosing';
+  static const videoSelectFile = 'Kompyuterdan tanlash';
+  static const videoMaxDuration = 'Maksimal davomiylik: 60 sekund';
+  static const videoFormat = 'Format: MP4, vertikal (9:16)';
+  static const videoErrorSize = "Video hajmi 100 MB dan kam bo'lishi kerak";
+  static const videoErrorRead = "Videoni o'qib bo'lmadi. Boshqa fayl sinab ko'ring";
+  static String videoErrorDuration(int seconds) =>
+      "Video $seconds sekund — 60 sekunddan ko'p bo'lmasligi kerak";
   static const needVideo = 'Avval video yuklang';
   static const needTitle = "Sarlavha kamida 3 ta belgi bo'lishi kerak";
   static const publish = "E'lon qilish";
@@ -650,6 +1058,13 @@ class _MyListing {
   final String kind;
   final String title;
   final String? coverImage;
+
+  /// Ko'rinishdagi nishoncha — saytdagi `badge()`.
+  String? get kindBadge => switch (kind) {
+    'rent' => CreateReelTexts.badgeRent,
+    'secondary' => CreateReelTexts.badgeSale,
+    _ => null,
+  };
 
   factory _MyListing.fromJson(Map row) => _MyListing(
     id: (row['id'] as num?)?.toInt() ?? 0,

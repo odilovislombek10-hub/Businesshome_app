@@ -58,6 +58,8 @@ dependencies:
   open_filex: ^4.7.0
   # Reels — saytda oddiy <video>, ilovada shu paket
   video_player: ^2.10.0
+  # Reel muqovasi — saytda kadr `canvas` ga chiziladi, ilovada shu paket bilan.
+  video_thumbnail_plus: ^0.0.2
 
   # Xarita saytdagidek Yandex JS API 2.1 — mobil MapKit SDK uchun boshqa kalit kerak
   # bo'lardi, WebView esa saytning o'z kalitini va o'z xatti-harakatini saqlab qoladi.

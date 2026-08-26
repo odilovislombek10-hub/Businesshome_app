@@ -15,6 +15,7 @@ import '../../shared/widgets/entrance.dart';
 import '../../shared/widgets/site_footer_section.dart';
 import '../../shared/widgets/site_header.dart';
 import '../../shared/widgets/site_icon.dart';
+import '../../shared/widgets/video_upload_box.dart';
 import '../../shared/widgets/yandex_map.dart';
 import 'create_listing_data.dart';
 import 'create_listing_draft.dart';
@@ -61,6 +62,9 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
   final _pricePerM2 = TextEditingController();
 
   final _images = <File>[];
+
+  /// Ixtiyoriy Reels videosi — e'lon yaratilgach alohida so'rov bilan ketadi.
+  File? _video;
   Map<String, String> _errors = const {};
   bool _scrolled = false;
   bool _submitting = false;
@@ -1349,6 +1353,8 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
       const SizedBox(height: 12), // mt-3
       _hint(CreateListingTexts.maxImages),
       const SizedBox(height: 24), // mt-6
+      VideoUploadBox(onChanged: (file) => _video = file),
+      const SizedBox(height: 24),
       _tourBox(),
     ];
   }
@@ -1841,6 +1847,9 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
       final id = _isEdit ? widget.editId! : await _repo.create(kind: kind, payload: payload);
       if (_isEdit) await _repo.update(kind: kind, id: id, payload: payload);
       await _repo.uploadImages(kind: kind, id: id, files: _images);
+      if (_video case final video?) {
+        await _repo.uploadVideo(kind: kind, id: id, file: video);
+      }
       if (!mounted) return;
       setState(() => _submitting = false);
       await _showSuccess();
