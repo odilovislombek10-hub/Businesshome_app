@@ -1,5 +1,6 @@
 import 'package:go_router/go_router.dart';
 
+import '../features/ads/ads_screen.dart';
 import '../features/auth/forgot_password_screen.dart';
 import '../features/auth/login_screen.dart';
 import '../features/auth/register_screen.dart';
@@ -127,7 +128,7 @@ final appRouter = GoRouter(
 
     // ── Listings & specialists ────────────────────────────────────────────────
     // Saytda `/ads` `redirectTo: 'secondary'` — alohida sahifasi yo'q.
-    GoRoute(path: '/ads', redirect: (_, _) => '/secondary'),
+    GoRoute(path: '/ads', builder: (_, _) => const AdsScreen()),
     GoRoute(path: '/ads/create', builder: (_, _) => const CreateListingScreen()),
     GoRoute(
       path: '/ads/:id/edit',
