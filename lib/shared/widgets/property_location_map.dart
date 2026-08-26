@@ -3,6 +3,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../app/theme.dart';
 import 'entrance.dart';
+import 'my_location_button.dart';
 
 /// `property-map.component.ts` — mulk joylashuvi va "Yaqin atrofda" qidiruvi.
 ///
@@ -107,7 +108,20 @@ class _PropertyLocationMapState extends State<PropertyLocationMap> {
           ),
           SizedBox(
             height: 400, // h-[400px]
-            child: WebViewWidget(controller: _controller),
+            child: Stack(
+              children: [
+                Positioned.fill(child: WebViewWidget(controller: _controller)),
+                // Saytdagi `absolute top-3 right-3` — mulk joyi o'zgarmaydi, faqat
+                // ko'rinish siljiydi (`onMyLocation`).
+                Positioned(
+                  top: 12,
+                  right: 12,
+                  child: MyLocationButton(
+                    onLocated: (lat, lng) => _controller.runJavaScript('bhCenter($lat, $lng)'),
+                  ),
+                ),
+              ],
+            ),
           ),
           Container(
             width: double.infinity,
@@ -187,6 +201,10 @@ class _PropertyLocationMapState extends State<PropertyLocationMap> {
 <div id="map"></div>
 <script>
 var map, searchControl;
+
+function bhCenter(lat, lng) {
+  if (map) map.setCenter([lat, lng], 14, { duration: 400 });
+}
 
 ymaps.ready(function () {
   map = new ymaps.Map('map', {

@@ -15,6 +15,7 @@ import '../../shared/widgets/entrance.dart';
 import '../../shared/widgets/site_footer_section.dart';
 import '../../shared/widgets/site_header.dart';
 import '../../shared/widgets/site_icon.dart';
+import '../../shared/widgets/my_location_button.dart';
 import '../../shared/widgets/video_upload_box.dart';
 import '../../shared/widgets/yandex_map.dart';
 import 'create_listing_data.dart';
@@ -29,8 +30,7 @@ import 'create_listing_texts.dart';
 /// butunlay o'zgaradi: omborxonada xonalar kalit bilan yoqiladi, yerda "vremenka" so'raladi,
 /// faqat sotish + kvartirada qo'shimcha xonalar, uchlik maydon va ikkita narx maydoni chiqadi.
 ///
-/// Xaritadan joylashuv tanlash hozircha yo'q (Flutter uchun xarita SDK'si kerak) — saytda ham
-/// bu ixtiyoriy, `lat/lng` bo'sh bo'lsa 0 yuboriladi.
+/// Xaritadan joylashuv saytdagidek ixtiyoriy: `lat/lng` bo'sh bo'lsa 0 yuboriladi.
 class CreateListingScreen extends StatefulWidget {
   const CreateListingScreen({super.key, this.editId, this.editKind});
 
@@ -1201,21 +1201,36 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
         ],
       ),
       const SizedBox(height: 12), // mb-3
-      ClipRRect(
-        borderRadius: BorderRadius.circular(AppRadius.lg), // rounded-2xl
-        child: Container(
-          height: 360, // h-[360px]
-          decoration: BoxDecoration(border: Border.all(color: AppColors.borderLight)),
-          child: YandexMapView(
-            pickMode: true,
-            pickedLat: _form.locationLat,
-            pickedLng: _form.locationLng,
-            onPicked: (lat, lng) => setState(() {
-              _form.locationLat = lat;
-              _form.locationLng = lng;
-            }),
+      Stack(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(AppRadius.lg), // rounded-2xl
+            child: Container(
+              height: 360, // h-[360px]
+              decoration: BoxDecoration(border: Border.all(color: AppColors.borderLight)),
+              child: YandexMapView(
+                pickMode: true,
+                pickedLat: _form.locationLat,
+                pickedLng: _form.locationLng,
+                onPicked: (lat, lng) => setState(() {
+                  _form.locationLat = lat;
+                  _form.locationLng = lng;
+                }),
+              ),
+            ),
           ),
-        ),
+          // Saytdagi `absolute top-3 right-3` — belgini o'z joylashuvingga qo'yadi.
+          Positioned(
+            top: 12,
+            right: 12,
+            child: MyLocationButton(
+              onLocated: (lat, lng) => setState(() {
+                _form.locationLat = lat;
+                _form.locationLng = lng;
+              }),
+            ),
+          ),
+        ],
       ),
       const SizedBox(height: 8), // mt-2
       if (_form.locationLat case final lat? when _form.locationLng != null)

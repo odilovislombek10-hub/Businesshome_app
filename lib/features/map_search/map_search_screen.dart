@@ -8,6 +8,7 @@ import '../../core/api/media_url.dart';
 import '../../core/constants/city_labels.dart';
 import '../../core/models/property_listing.dart';
 import '../../core/utils/format.dart';
+import '../../shared/widgets/my_location_button.dart';
 import '../../shared/widgets/app_image.dart';
 import '../../shared/widgets/entrance.dart';
 import '../../shared/widgets/site_header.dart';
@@ -504,6 +505,12 @@ class _MapSearchScreenState extends State<MapSearchScreen> {
             }),
           ],
         ),
+      ),
+      // Saytda `absolute bottom-52 left-4` — xarita faqat ko'rinishni siljitadi.
+      Positioned(
+        bottom: 208,
+        left: 16,
+        child: MyLocationButton(onLocated: (lat, lng) => _mapKey.currentState?.centerOn(lat, lng)),
       ),
       if (_loading)
         Positioned(

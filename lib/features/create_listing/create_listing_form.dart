@@ -312,7 +312,7 @@ class ListingForm {
     'description': description.trim(),
     'amenities': amenities,
     'images': <String>[],
-    // Video hozircha yuklanmaydi — saytda ham faqat tashqi `http(s)` havola yuboriladi.
+    // Video e'lon yaratilgach alohida yuboriladi (`{kind}/{id}/video`), saytdagidek.
     'video_url': null,
     'owner_name': ownerName,
     'owner_phone': ownerPhone,

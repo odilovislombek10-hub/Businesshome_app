@@ -171,6 +171,10 @@ class YandexMapViewState extends State<YandexMapView> {
   void resetMap() => _controller.runJavaScript('bhResetMap()');
   void setMapType(String type) => _controller.runJavaScript("bhSetMapType('$type')");
 
+  /// "Mening joylashuvim" — saytda `map.setCenter([lat, lng], 14, { duration: 400 })`.
+  void centerOn(double lat, double lng, {double zoom = 14}) =>
+      _controller.runJavaScript('bhCenter($lat, $lng, $zoom)');
+
   @override
   Widget build(BuildContext context) => WebViewWidget(controller: _controller);
 
@@ -264,6 +268,7 @@ class YandexMapViewState extends State<YandexMapView> {
   function bhZoomIn() { if (map) map.setZoom(map.getZoom() + 1, { duration: 200 }); }
 function bhZoomOut() { if (map) map.setZoom(map.getZoom() - 1, { duration: 200 }); }
 function bhResetMap() { if (map) map.setCenter(BH_CENTER, BH_ZOOM, { duration: 300 }); }
+function bhCenter(lat, lng, zoom) { if (map) map.setCenter([lat, lng], zoom, { duration: 400 }); }
 function bhSetMapType(type) {
   if (map) map.setType(type === 'satellite' ? 'yandex#satellite' : 'yandex#map');
 }
