@@ -96,11 +96,20 @@ class PropertyView {
   /// ("so'm/oy") to the symbol.
   bool get isMonthly => dealType == 'rent';
 
-  /// Where tapping the card goes, matching the site's `detailLink` getter: a project with both
-  /// codes uses its vanity URL, everything else the id route.
+  /// Karta bosilganda qayerga o'tadi.
+  ///
+  /// Saytdagi `detailLink` faqat loyiha va ijara uchun yozilgan (`/property/:id` — loyiha
+  /// sahifasi), chunki ikkilamchi ro'yxati umumiy kartadan foydalanmaydi: u o'z havolasini
+  /// chizadi (`[routerLink]="['/property/secondary', property.id]"`). Ilovada karta bitta,
+  /// shuning uchun yo'l mulk turiga qarab tanlanadi — aks holda ikkilamchi e'lon loyiha
+  /// sahifasiga tushib "Loyiha topilmadi" chiqadi.
   String get detailPath {
     if (developerCode != null && projectCode != null) return '/$developerCode/$projectCode';
-    return dealType == 'rent' ? '/property/rent/$id' : '/property/$id';
+    return switch (propertyType) {
+      'rent' => '/property/rent/$id',
+      'secondary' => '/property/secondary/$id',
+      _ => '/property/$id',
+    };
   }
 
   /// Uzbek labels for `segment`, from `rent.segment*` in the site's translations.
