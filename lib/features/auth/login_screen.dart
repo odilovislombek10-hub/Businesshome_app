@@ -7,8 +7,10 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../app/theme.dart';
 import '../../core/services/auth_service.dart';
+import '../../core/services/language_service.dart';
 import '../../shared/widgets/entrance.dart';
 import '../../shared/widgets/site_icon.dart';
+import '../../shared/widgets/site_header.dart';
 import 'auth_texts.dart';
 import 'phone_field.dart';
 import 'social_button.dart';
@@ -41,7 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
   String? _passwordError;
 
   /// Saytdagi til tanlagichi. Ilova hozircha faqat o'zbekcha, tanlov faqat ko'rinishda qoladi.
-  String _lang = 'uz';
+  String get _lang => LanguageService.instance.code;
 
   @override
   void dispose() {
@@ -135,6 +137,10 @@ class _LoginScreenState extends State<LoginScreen> {
   List<Widget> _form() {
     final theme = Theme.of(context);
     return [
+      // Saytda bu sahifada orqaga tugmasi yo'q (brauzerniki bor), ilovada har bir
+      // sahifada bo'lishi kerak.
+      const HeaderBackButton(onBar: AppColors.dark),
+      const SizedBox(height: 20),
       _logo(theme),
       const SizedBox(height: 48), // mb-12
       Text(
@@ -384,7 +390,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _languageButton(BuildContext context) {
     final theme = Theme.of(context);
     return PopupMenuButton<String>(
-      onSelected: (code) => setState(() => _lang = code),
+      onSelected: (code) => setState(() => LanguageService.instance.set(code)),
       offset: const Offset(0, 40),
       color: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.sm)),

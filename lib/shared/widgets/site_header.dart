@@ -9,6 +9,7 @@ import 'entrance.dart';
 import 'site_icon.dart';
 import '../../core/models/market_user.dart';
 import '../../core/services/auth_service.dart';
+import '../../core/services/language_service.dart';
 import '../../core/services/theme_controller.dart';
 
 /// Port of the site's `app-header` at mobile width.
@@ -74,7 +75,10 @@ class _SiteHeaderState extends State<SiteHeader> {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
-                _Logo(onBar: onBar, onTap: () => context.go('/')),
+                if (GoRouterState.of(context).matchedLocation == '/')
+                  _Logo(onBar: onBar, onTap: () => context.go('/'))
+                else
+                  HeaderBackButton(onBar: onBar),
                 const Spacer(),
                 // AI assistant — `sm:hidden`, so mobile-only on the site too.
                 _IconButton(
@@ -194,6 +198,47 @@ class _Logo extends StatelessWidget {
             style: theme.textTheme.headlineMedium?.copyWith(fontSize: 18),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Ilovada har bir sahifada logotip o'rniga orqaga qaytish turadi — saytda bunday tugma yo'q,
+/// chunki u brauzerning o'z tugmasiga tayanadi. Matn tanlangan tilga qarab
+/// (`header.back`: Orqaga / Назад / Артка).
+class HeaderBackButton extends StatelessWidget {
+  const HeaderBackButton({super.key, required this.onBar});
+
+  final Color onBar;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Pressable(
+      onTap: () {
+        if (context.canPop()) {
+          context.pop();
+        } else {
+          context.go('/');
+        }
+      },
+      child: ListenableBuilder(
+        listenable: LanguageService.instance,
+        builder: (context, _) => Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SiteIcon(SiteIcons.arrowLeft, size: 22, color: onBar),
+            const SizedBox(width: 8),
+            Text(
+              LanguageService.instance.back,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontSize: 17,
+                fontWeight: FontWeight.w600,
+                color: onBar,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -328,7 +373,7 @@ class _MobileMenuPanelState extends State<MobileMenuPanel> {
     ('ky', 'Кыргызча', '🇰🇬'),
   ];
 
-  String _lang = 'uz';
+  String get _lang => LanguageService.instance.code;
 
   @override
   Widget build(BuildContext context) {
@@ -361,10 +406,10 @@ class _MobileMenuPanelState extends State<MobileMenuPanel> {
                       trailing: _lang == code
                           ? const Icon(Icons.check, color: AppColors.olive)
                           : null,
-                      onTap: () => setState(() {
-                        _lang = code;
-                        _view = _MenuView.main;
-                      }),
+                      onTap: () {
+                        LanguageService.instance.set(code);
+                        setState(() => _view = _MenuView.main);
+                      },
                     ),
                 ],
               )

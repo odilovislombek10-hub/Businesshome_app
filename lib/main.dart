@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'app/app.dart';
 import 'core/services/auth_service.dart';
 import 'core/services/currency_service.dart';
+import 'core/services/language_service.dart';
 import 'core/services/theme_controller.dart';
 
 Future<void> main() async {
@@ -22,6 +23,9 @@ Future<void> main() async {
   // wrong theme on launch.
   final themeController = ThemeController();
   await themeController.load();
+
+  // Til tanlovi — birinchi kadrdayoq to'g'ri so'z chiqishi uchun kutiladi.
+  await LanguageService.instance.load();
 
   // Restoring the session is deliberately not awaited: it needs a network round trip, and the
   // catalogue is browsable signed-out. Screens that care listen to AuthService instead.

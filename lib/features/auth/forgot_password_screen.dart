@@ -8,6 +8,7 @@ import '../../app/theme.dart';
 import '../../core/services/auth_service.dart';
 import '../../shared/widgets/entrance.dart';
 import '../../shared/widgets/site_icon.dart';
+import '../../shared/widgets/site_header.dart';
 import 'auth_field.dart';
 import 'auth_texts.dart';
 import 'phone_field.dart';
@@ -163,6 +164,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Saytda brauzerning orqaga tugmasi ishlatiladi, ilovada o'zimiznikini
+                    // qo'yamiz.
+                    const HeaderBackButton(onBar: AppColors.dark),
+                    const SizedBox(height: 20),
                     _logo(theme),
                     const SizedBox(height: 40), // mb-10
                     if (!_success) ...[
