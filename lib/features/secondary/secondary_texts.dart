@@ -19,6 +19,9 @@ abstract final class SecondaryTexts {
   static const noResultsDesc = 'Boshqa filterlarni tanlang';
   static const allOption = 'Barchasi';
 
+  /// `rent.any` — tuman tanlashdagi "hammasi" varianti.
+  static const anyDistrict = "Farqi yo'q";
+
   // Sorting, in the order the site lists the options.
   static const sortOptions = <(String, String)>[
     ('newest', 'Eng yangi'),

@@ -8,6 +8,7 @@ import '../../app/theme.dart';
 import '../../core/constants/city_labels.dart';
 import '../../core/models/project.dart';
 import '../../core/utils/format.dart';
+import '../../shared/utils/breakpoints.dart';
 import '../../shared/widgets/entrance.dart';
 import '../../shared/widgets/site_footer_section.dart';
 import '../../shared/widgets/site_header.dart';
@@ -111,7 +112,7 @@ class _NewProjectsScreenState extends State<NewProjectsScreen> {
                     SliverPadding(
                       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
                       sliver: SliverGrid.count(
-                        crossAxisCount: 2,
+                        crossAxisCount: Bp.pick(context, base: 1, sm: 2, xl: 3),
                         mainAxisSpacing: 20,
                         crossAxisSpacing: 20,
                         childAspectRatio: 172 / _ProjectCard.extent,
@@ -129,8 +130,9 @@ class _NewProjectsScreenState extends State<NewProjectsScreen> {
                     SliverPadding(
                       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
                       sliver: SliverGrid.builder(
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
+                        // Saytda `grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5`.
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: Bp.pick(context, base: 1, sm: 2, xl: 3),
                           mainAxisSpacing: 20, // gap-5
                           crossAxisSpacing: 20,
                           mainAxisExtent: _ProjectCard.extent,

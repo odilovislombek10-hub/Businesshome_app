@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../app/theme.dart';
+import '../../core/services/favorites_service.dart';
 import '../../core/constants/city_labels.dart';
 import '../../core/models/designer.dart';
 import '../../core/models/property_listing.dart';
@@ -14,6 +15,7 @@ import '../../shared/widgets/entrance.dart';
 import '../../shared/widgets/site_header.dart';
 import '../../shared/widgets/site_footer_section.dart';
 import '../../shared/widgets/site_icon.dart';
+import '../../shared/widgets/site_toast.dart';
 import '../../shared/widgets/skeleton.dart';
 import '../../shared/widgets/specialist_bits.dart';
 import 'designers_filter_sheet.dart';
@@ -55,7 +57,21 @@ class _DesignersScreenState extends State<DesignersScreen> {
 
   /// Saytda bu `FavoritesService` orqali saqlanadi; ilovada hali sevimlilar xizmati yo'q, shuning
   /// uchun tugma faqat shu sahifa ichida holatini eslab qoladi.
-  final _favorites = <int>{};
+  /// Saytda sevimlilar serverda saqlanadi.
+  Future<void> _toggleFavorite(int id) async {
+    final result = await FavoritesService.instance.toggle(id, 'designer');
+    if (!mounted) return;
+    if (result == null) {
+      context.push('/login');
+      return;
+    }
+    setState(() {});
+    showSiteToast(
+      context,
+      result ? "❤ Sevimlilarga qo'shildi" : 'Sevimlilardan olib tashlandi',
+      kind: result ? ToastKind.success : ToastKind.info,
+    );
+  }
 
   Timer? _debounce;
   bool _scrolled = false;
@@ -612,10 +628,8 @@ class _DesignersScreenState extends State<DesignersScreen> {
                     delay: Duration(milliseconds: i * 100),
                     child: _DesignerCard(
                       designer: designer,
-                      isFavorite: _favorites.contains(designer.id),
-                      onFavorite: () => setState(() {
-                        if (!_favorites.remove(designer.id)) _favorites.add(designer.id);
-                      }),
+                      isFavorite: FavoritesService.instance.isFavorite(designer.id, 'designer'),
+                      onFavorite: () => _toggleFavorite(designer.id),
                     ),
                   );
                 },

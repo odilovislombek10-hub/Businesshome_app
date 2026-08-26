@@ -10,6 +10,7 @@ import '../../core/models/region.dart';
 import '../../core/services/currency_service.dart';
 import '../../core/services/regions_service.dart';
 import '../../shared/models/property_view.dart';
+import '../../shared/utils/breakpoints.dart';
 import '../../shared/widgets/entrance.dart';
 import '../../shared/widgets/property_card.dart';
 import '../../shared/widgets/site_header.dart';
@@ -548,20 +549,20 @@ class _SecondaryScreenState extends State<SecondaryScreen> {
           return SliverToBoxAdapter(child: _empty(context));
         }
         return SliverPadding(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 0), // mt-6, tightened for the phone
-          // Two per row so four cards fit one screen.
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 0), // mt-6
+          // Saytda `grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5`.
           sliver: SliverGrid.builder(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: 16,
-              crossAxisSpacing: 16,
-              childAspectRatio: PropertyCard.compactAspectRatio,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: Bp.pick(context, base: 1, sm: 2, xl: 3),
+              mainAxisSpacing: 20,
+              crossAxisSpacing: 20,
+              childAspectRatio: Bp.pick(context, base: 3 / 4, sm: PropertyCard.compactAspectRatio),
             ),
             itemCount: page.items.length,
             itemBuilder: (context, i) => Entrance.fadeIn(
               delay: Duration(milliseconds: i * 100),
               child: PropertyCard(
-                compact: true,
+                compact: Bp.isSm(context),
                 property: PropertyView.fromListing(
                   page.items[i],
                   // Was hard-coded to 'secondary', so rent cards linked to the wrong detail page.
@@ -821,9 +822,9 @@ class _CitySelect extends StatelessWidget {
           const SizedBox(height: 8),
           dropdown<String>(
             value: district.isEmpty ? null : district,
-            hint: SecondaryTexts.allOption,
+            hint: SecondaryTexts.anyDistrict,
             items: [
-              DropdownMenuItem(value: '', child: Text(SecondaryTexts.allOption)),
+              DropdownMenuItem(value: '', child: Text(SecondaryTexts.anyDistrict)),
               for (final d in selected.districts)
                 DropdownMenuItem(value: d.value, child: Text(d.label)),
             ],
