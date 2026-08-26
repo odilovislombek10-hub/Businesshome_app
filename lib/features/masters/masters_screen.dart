@@ -575,11 +575,12 @@ class _MastersScreenState extends State<MastersScreen> {
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
           child: Column(
             children: [
-              // Saytda `repeat(auto-fill, minmax(280px, 1fr))` — kenglikka nechta
-              // 280px to'liq sig'sa, shuncha ustun. Telefonda bitta.
+              // Telefonda ikki ustun — foydalanuvchi so'rovi (bir ekranda ko'proq karta).
+              // Saytda `repeat(auto-fill, minmax(280px, 1fr))`, ya'ni telefonda bitta
+              // bo'lardi; kattaroq ekranda kenglikka qarab hisoblanadi.
               LayoutBuilder(
                 builder: (context, constraints) {
-                  final columns = ((constraints.maxWidth + 18) / (280 + 18)).floor().clamp(1, 6);
+                  final columns = ((constraints.maxWidth + 18) / (280 + 18)).floor().clamp(2, 6);
                   return GridView.builder(
                     // Ichma-ich GridView atrofdagi paddingni meros qiladi.
                     padding: EdgeInsets.zero,
@@ -630,7 +631,7 @@ class _MastersScreenState extends State<MastersScreen> {
         padding: EdgeInsets.zero,
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        crossAxisCount: 1,
+        crossAxisCount: 2,
         mainAxisSpacing: 18,
         crossAxisSpacing: 18,
         mainAxisExtent: _MasterCard.extent,

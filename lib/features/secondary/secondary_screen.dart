@@ -547,19 +547,20 @@ class _SecondaryScreenState extends State<SecondaryScreen> {
         }
         return SliverPadding(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 0), // mt-6
-          // Saytda `grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5`.
+          // Telefonda ikki ustun (bir ekranda 4 ta karta) — foydalanuvchi so'rovi.
+          // Saytda mobilda `grid-cols-1`, bu ataylab chekinish.
           sliver: SliverGrid.builder(
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: Bp.pick(context, base: 1, sm: 2, xl: 3),
-              mainAxisSpacing: 20,
-              crossAxisSpacing: 20,
-              childAspectRatio: Bp.pick(context, base: 3 / 4, sm: PropertyCard.compactAspectRatio),
+              crossAxisCount: Bp.pick(context, base: 2, xl: 3),
+              mainAxisSpacing: Bp.pick(context, base: 16.0, sm: 20.0),
+              crossAxisSpacing: Bp.pick(context, base: 16.0, sm: 20.0),
+              childAspectRatio: PropertyCard.compactAspectRatio,
             ),
             itemCount: page.items.length,
             itemBuilder: (context, i) => Entrance.fadeIn(
               delay: Duration(milliseconds: i * 100),
               child: PropertyCard(
-                compact: Bp.isSm(context),
+                compact: true,
                 property: PropertyView.fromListing(
                   page.items[i],
                   // Was hard-coded to 'secondary', so rent cards linked to the wrong detail page.

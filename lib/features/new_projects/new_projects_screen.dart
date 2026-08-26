@@ -113,9 +113,9 @@ class _NewProjectsScreenState extends State<NewProjectsScreen> {
                     SliverPadding(
                       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
                       sliver: SliverGrid.count(
-                        crossAxisCount: Bp.pick(context, base: 1, sm: 2, xl: 3),
-                        mainAxisSpacing: 20,
-                        crossAxisSpacing: 20,
+                        crossAxisCount: Bp.pick(context, base: 2, xl: 3),
+                        mainAxisSpacing: 16,
+                        crossAxisSpacing: 16,
                         childAspectRatio: 172 / _ProjectCard.extent,
                         children: [
                           for (var i = 0; i < 4; i++)
@@ -131,11 +131,12 @@ class _NewProjectsScreenState extends State<NewProjectsScreen> {
                     SliverPadding(
                       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
                       sliver: SliverGrid.builder(
-                        // Saytda `grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5`.
+                        // Telefonda ikki ustun (bir ekranda 4 ta karta) — foydalanuvchi
+                        // so'rovi; saytda mobilda `grid-cols-1`.
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: Bp.pick(context, base: 1, sm: 2, xl: 3),
-                          mainAxisSpacing: 20, // gap-5
-                          crossAxisSpacing: 20,
+                          crossAxisCount: Bp.pick(context, base: 2, xl: 3),
+                          mainAxisSpacing: 16,
+                          crossAxisSpacing: 16,
                           mainAxisExtent: _ProjectCard.extent,
                         ),
                         itemCount: page.length,

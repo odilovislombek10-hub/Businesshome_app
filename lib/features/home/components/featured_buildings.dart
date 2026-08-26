@@ -66,27 +66,24 @@ class FeaturedBuildings extends StatelessWidget {
                 ),
               )
             else
-              // `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8`
+              // Telefonda ikki ustun — foydalanuvchi so'rovi bo'yicha bitta ekranda 4 ta
+              // karta ko'rinadi. Saytda mobilda `grid-cols-1`, bu ataylab chekinish.
               GridView.count(
                 // Explicit zero: a nested GridView otherwise inherits the ambient padding.
                 padding: EdgeInsets.zero,
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                crossAxisCount: Bp.pick(context, base: 1, sm: 2, lg: 3),
+                crossAxisCount: Bp.pick(context, base: 2, lg: 3),
                 mainAxisSpacing: Bp.pick(context, base: 16.0, sm: 24.0, lg: 32.0),
                 crossAxisSpacing: Bp.pick(context, base: 16.0, sm: 24.0, lg: 32.0),
-                childAspectRatio: Bp.pick(
-                  context,
-                  base: 3 / 4,
-                  sm: PropertyCard.compactAspectRatio,
-                ),
+                childAspectRatio: PropertyCard.compactAspectRatio,
                 children: [
                   for (final (i, project) in projects.indexed)
                     Entrance.fadeIn(
                       delay: Duration(milliseconds: i * 100),
                       child: PropertyCard(
                         property: PropertyView.fromProject(project),
-                        compact: Bp.isSm(context),
+                        compact: true,
                       ),
                     ),
                 ],
