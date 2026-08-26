@@ -63,6 +63,16 @@ class _CabinetOrdersState extends State<CabinetOrders> {
     return list;
   }
 
+  /// Saytdagi `order.startDate` — qabul qilingan yoki yaratilgan sana.
+  static String? _startDate(ProviderOrder order) {
+    final iso = order.acceptedAt ?? order.createdAt;
+    if (iso == null || iso.length < 10) return null;
+    final at = DateTime.tryParse(iso);
+    if (at == null) return null;
+    String two(int n) => n.toString().padLeft(2, '0');
+    return '${two(at.day)}.${two(at.month)}.${at.year}';
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -248,6 +258,27 @@ class _CabinetOrdersState extends State<CabinetOrders> {
                       color: AppColors.olive,
                     ),
                   ),
+                  // Saytda o'ng tomonda buyurtma boshlangan sana turadi.
+                  if (_startDate(order) case final started?)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          CabinetTexts.startDate,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            fontSize: 12,
+                            color: AppColors.dark.withValues(alpha: 0.4),
+                          ),
+                        ),
+                        Text(
+                          started,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            fontSize: 14,
+                            color: AppColors.dark.withValues(alpha: 0.7),
+                          ),
+                        ),
+                      ],
+                    ),
                 ],
               ),
             ),

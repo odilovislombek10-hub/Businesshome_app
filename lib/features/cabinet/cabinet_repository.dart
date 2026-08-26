@@ -215,6 +215,8 @@ class ClientOrder {
     this.deadlineAt,
     this.conversationId,
     this.hasReview = false,
+    this.serviceType,
+    this.providerId,
   });
 
   final int id;
@@ -229,6 +231,10 @@ class ClientOrder {
   final String? deadlineAt;
   final int? conversationId;
   final bool hasReview;
+
+  /// `design` | `master_work` | boshqa — sharh kimga yozilishini shu belgilaydi.
+  final String? serviceType;
+  final int? providerId;
 
   /// Yopilgan buyurtmada muddat rangi neytral bo'ladi — saytdagi `isOrderClosed`.
   bool get isClosed => status == 'completed' || status == 'cancelled' || status == 'rejected';
@@ -253,6 +259,8 @@ class ClientOrder {
     providerName: _text(json['providerName']),
     deadlineAt: _text(json['deadline_at']),
     conversationId: (json['conversation_id'] as num?)?.toInt(),
+    serviceType: _text(json['service_type']),
+    providerId: (json['providerId'] as num?)?.toInt() ?? (json['provider_id'] as num?)?.toInt(),
     hasReview: json['hasReview'] == true,
   );
 }

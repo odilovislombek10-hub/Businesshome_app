@@ -196,6 +196,18 @@ class _CabinetScreenState extends State<CabinetScreen> {
         return CabinetDashboard(
           user: user,
           stats: _stats,
+          // Saytda panelning pastida rolga qarab blok chiziladi: agentga eng
+          // yaxshi e'lonlari, dizayner/ustaga faol buyurtmalari va so'nggi
+          // sharhi, oddiy foydalanuvchiga e'lonlari va "Xush kelibsiz".
+          listings: user.role == MarketRole.agent || user.role == MarketRole.user
+              ? (_listings ??= _repo.myListings())
+              : null,
+          providerOrders: user.role == MarketRole.designer || user.role == MarketRole.master
+              ? (_providerOrders ??= _repo.providerOrders())
+              : null,
+          reviews: user.role == MarketRole.designer || user.role == MarketRole.master
+              ? (_reviews ??= _repo.reviews())
+              : null,
           onOpenTab: (id) => context.go('/cabinet/$id'),
           onRetry: () => setState(() => _stats = _repo.roleStats()),
         );
@@ -303,17 +315,17 @@ class _CabinetScreenState extends State<CabinetScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text(CabinetTexts.logout),
-        content: const Text('Hisobingizdan chiqmoqchimisiz?'),
+        title: const Text(CabinetTexts.logoutConfirmTitle),
+        content: const Text(CabinetTexts.logoutConfirmMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Bekor qilish'),
+            child: const Text(CabinetTexts.logoutConfirmCancel),
           ),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: const Color(0xFFDC2626)),
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text(CabinetTexts.logout),
+            child: const Text(CabinetTexts.logoutConfirmYes),
           ),
         ],
       ),

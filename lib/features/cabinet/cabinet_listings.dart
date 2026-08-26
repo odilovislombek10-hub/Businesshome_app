@@ -374,7 +374,12 @@ class _ListingCard extends StatelessWidget {
   /// Saytdagi `getCurrencyLabel` — e'lonning o'z valyutasi.
   String _currencyLabel() => listing.currency?.toLowerCase() == 'usd' ? '\$' : "so'm";
 
+  /// `formatListingDate()` — bugun, kecha, N kun oldin, keyin esa sana.
   static String _date(DateTime value) {
+    final days = DateTime.now().difference(value).inDays;
+    if (days == 0) return CabinetTexts.today;
+    if (days == 1) return CabinetTexts.yesterday;
+    if (days < 30) return '$days ${CabinetTexts.daysAgo}';
     String two(int n) => n.toString().padLeft(2, '0');
     return '${two(value.day)}.${two(value.month)}.${value.year}';
   }

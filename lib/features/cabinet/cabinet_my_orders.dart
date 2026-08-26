@@ -5,6 +5,7 @@ import '../../app/theme.dart';
 import '../../core/utils/format.dart';
 import '../../shared/widgets/entrance.dart';
 import 'cabinet_repository.dart';
+import 'cabinet_review_sheet.dart';
 import 'cabinet_texts.dart';
 
 /// Kabinetning `my-orders` bo'limi — `/market/cabinet/orders?role=client`.
@@ -52,7 +53,7 @@ class CabinetMyOrders extends StatelessWidget {
                   border: Border.all(color: AppColors.borderLight),
                 ),
                 child: Text(
-                  CabinetTexts.noOrders,
+                  CabinetTexts.myOrdersEmpty,
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: AppColors.dark.withValues(alpha: 0.5),
@@ -163,12 +164,39 @@ class _OrderCard extends StatelessWidget {
             const SizedBox(height: 8), // pt-2
             const Divider(height: 1, color: AppColors.borderLight),
             const SizedBox(height: 8),
-            Text(
-              "${formatNumber(order.price)} so'm",
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: AppColors.olive,
-              ),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    "${formatNumber(order.price)} so'm",
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.olive,
+                    ),
+                  ),
+                ),
+                // Saytda tugma faqat tugagan va hali sharh yozilmagan buyurtmada.
+                if (order.status == 'completed' && !order.hasReview)
+                  Pressable(
+                    scale: 0.98,
+                    onTap: () => ReviewSheet.show(context, order: order),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: AppColors.olive,
+                        borderRadius: BorderRadius.circular(AppRadius.md),
+                      ),
+                      child: Text(
+                        CabinetTexts.writeReview,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ],
         ),

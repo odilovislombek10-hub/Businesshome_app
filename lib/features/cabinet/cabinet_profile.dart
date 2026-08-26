@@ -1,4 +1,6 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
@@ -12,6 +14,10 @@ import '../../shared/widgets/entrance.dart';
 import '../../shared/widgets/site_icon.dart';
 import '../../shared/widgets/specialist_bits.dart';
 import 'cabinet_screen.dart' show roleGradient, roleWatermark;
+import '../../core/api/api_client.dart';
+import '../../core/api/media_url.dart';
+import '../../shared/widgets/site_toast.dart';
+import 'cabinet_availability.dart';
 import 'cabinet_texts.dart';
 
 /// Kabinetning `profile` bo'limi — saytdagi `profileTpl`.
@@ -20,8 +26,8 @@ import 'cabinet_texts.dart';
 /// almashtiriladi), xabar satri, va "Asosiy ma'lumotlar" formasi — ism, telefon (o'zgarmas),
 /// viloyat/tuman va rol (o'zgarmas), pastida saqlash tugmasi.
 ///
-/// **Bu yerda yo'q:** muqova rasmini yuklash va bandlik holati bloki — ikkalasi ham faqat
-/// dizayner/usta/agent uchun va mutaxassis profili bo'limlari bilan birga keladi.
+/// Dizayner/usta/agent uchun muqovaga "Cover yuklash" tugmasi qo'shiladi, dizayner va
+/// ustaga esa "Mavjudligim" bloki hamda "Mutaxassis profilini tahrirlash" tugmasi.
 class CabinetProfile extends StatefulWidget {
   const CabinetProfile({super.key, required this.user});
 
@@ -34,6 +40,8 @@ class CabinetProfile extends StatefulWidget {
 class _CabinetProfileState extends State<CabinetProfile> {
   late final _fullName = TextEditingController(text: widget.user.fullName);
   late String _region = widget.user.region ?? '';
+  bool _coverUploading = false;
+  String? _coverImage;
   late String _district = widget.user.district ?? '';
 
   List<Region> _regions = const [];
@@ -149,10 +157,51 @@ class _CabinetProfileState extends State<CabinetProfile> {
             ),
           ),
         ],
+        if (user.role == MarketRole.designer || user.role == MarketRole.master) ...[
+          const SizedBox(height: 16),
+          const CabinetAvailability(),
+        ],
         const SizedBox(height: 16),
         _basicInfo(context, user),
       ],
     );
+  }
+
+  /// `onCoverSelected()` — 5 MB chegarasi va rolga qarab boshqa manzil.
+  Future<void> _pickCover(MarketUser user) async {
+    final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (picked == null) return;
+    final bytes = await picked.length();
+    if (bytes > 5 * 1024 * 1024) {
+      if (mounted) {
+        showSiteToast(context, CabinetTexts.coverTooLarge, kind: ToastKind.error);
+      }
+      return;
+    }
+    setState(() => _coverUploading = true);
+    try {
+      final form = FormData.fromMap({
+        'file': await MultipartFile.fromFile(picked.path, filename: picked.name),
+      });
+      final path = user.role == MarketRole.agent
+          ? '/market/agent/me/cover'
+          : '/market/cabinet/specialist-profile/cover';
+      final res = await ApiClient.instance.post<dynamic>(path, data: form);
+      final data = res.data;
+      final url = data is Map
+          ? (data['cover_image'] ?? data['url'] ?? data['cover'])?.toString()
+          : null;
+      if (!mounted) return;
+      setState(() {
+        _coverUploading = false;
+        if (url != null && url.isNotEmpty) _coverImage = absoluteMediaUrl(url);
+      });
+      showSiteToast(context, CabinetTexts.profileSaved);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _coverUploading = false);
+      showSiteToast(context, CabinetTexts.profileError, kind: ToastKind.error);
+    }
   }
 
   /// Muqova (rolga xos gradient + nuqtali naqsh) va ustiga chiqib turgan avatar.
@@ -186,6 +235,52 @@ class _CabinetProfileState extends State<CabinetProfile> {
                     color: Colors.white.withValues(alpha: 0.10),
                   ),
                 ),
+                if (_coverImage case final cover?)
+                  Positioned.fill(
+                    child: AppImage(imageUrl: cover, fit: BoxFit.cover),
+                  ),
+                if (user.role == MarketRole.designer ||
+                    user.role == MarketRole.master ||
+                    user.role == MarketRole.agent)
+                  Positioned(
+                    top: 12, // top-3
+                    right: 12,
+                    child: Pressable(
+                      onTap: _coverUploading ? () {} : () => _pickCover(user),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.9),
+                          borderRadius: BorderRadius.circular(AppRadius.sm),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (_coverUploading)
+                              const SizedBox(
+                                width: 14,
+                                height: 14,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: AppColors.dark,
+                                ),
+                              )
+                            else
+                              const SiteIcon(SiteIcons.camera, size: 14, color: AppColors.dark),
+                            const SizedBox(width: 8), // gap-2
+                            Text(
+                              CabinetTexts.uploadCover,
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.dark,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),
@@ -408,6 +503,31 @@ class _CabinetProfileState extends State<CabinetProfile> {
               ),
             ),
           ),
+          // Saytda saqlash tugmasi yonida — faqat dizayner va usta uchun.
+          if (user.role == MarketRole.designer || user.role == MarketRole.master) ...[
+            const SizedBox(height: 12), // gap-3
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Pressable(
+                onTap: () => context.go('/specialists/create'),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(AppRadius.md),
+                    border: Border.all(color: AppColors.olive.withValues(alpha: 0.3)),
+                  ),
+                  child: Text(
+                    CabinetTexts.editSpecialistProfile,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.olive,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );

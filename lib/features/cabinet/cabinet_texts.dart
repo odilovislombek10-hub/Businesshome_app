@@ -5,6 +5,54 @@ import 'cabinet_repository.dart';
 
 /// Kabinet matnlari — `cabinet.*` kalitlari `core/i18n/translations/uz.ts` dan aynan olingan.
 abstract final class CabinetTexts {
+  // Boshqaruv panelidagi rolga qarab chiziladigan bloklar (`cabinet.component.ts`).
+  static const topListings = "Eng yaxshi e'lonlaringiz";
+  static const marketInsight = "Bozor ma'lumoti";
+  static const marketDesc = "Sizning e'lonlaringiz bozor o'rtacha narxidan yuqori";
+  static const aboveMarket = "O'rtacha bozordan yuqori";
+  static const activeOrdersTitle = 'Faol buyurtmalar';
+  static const progress = 'Bajarildi';
+  static const latestReview = "So'nggi sharh";
+  static const allReviews = 'Barcha sharhlar';
+  static const welcomeUser = 'Xush kelibsiz!';
+  static const welcomeUserDesc = "BusinessHome'da o'zingizga mos uy yoki mutaxassisni toping";
+
+  // Profil bo'limi
+  static const uploadCover = 'Cover yuklash';
+  static const availability = 'Mavjudligim';
+  static const editSpecialistProfile = 'Mutaxassis profilini tahrirlash';
+  static const availableFromLabel = 'Qachondan boshlab yana qabul qila boshlaysiz?';
+  static const coverTooLarge = "Fayl hajmi 5MB dan oshmasligi kerak";
+
+  /// Bandlik holatlari — saytdagi `availabilityOptions`.
+  static const availabilityOptions = <({String value, String label, String emoji, Color color})>[
+    (value: 'available', label: 'Mavjud', emoji: '🟢', color: Color(0xFF10B981)),
+    (value: 'busy', label: 'Band', emoji: '🟡', color: Color(0xFFF59E0B)),
+    (value: 'full', label: 'To\u02bcliq', emoji: '🔴', color: Color(0xFFEF4444)),
+    (value: 'vacation', label: 'Ta\u02bctilda', emoji: '🏖️', color: Color(0xFF0EA5E9)),
+    (value: 'offline', label: 'Oflayn', emoji: '⚪', color: Color(0xFF64748B)),
+  ];
+
+  // Buyurtma kartasi
+  static const startDate = 'Boshlangan';
+  static const yesterday = 'Kecha';
+  static const today = 'Bugun';
+  static const daysAgo = 'kun oldin';
+
+  // Buyurtmalarim
+  static const myOrdersEmpty = "Hech qanday buyurtma yo'q";
+  static const writeReview = 'Sharh yozish';
+  static const reviewPlaceholder = 'Tajribangiz haqida yozing...';
+
+  // Xizmat paketlari
+  static const servicesConfirmDelete = "Paketni o'chirishni tasdiqlaysizmi?";
+
+  // Chiqishni tasdiqlash oynasi
+  static const logoutConfirmTitle = 'Tizimdan chiqish';
+  static const logoutConfirmMessage = 'Haqiqatan ham tizimdan chiqmoqchimisiz?';
+  static const logoutConfirmYes = 'Ha, chiqish';
+  static const logoutConfirmCancel = 'Bekor qilish';
+
   static const logout = 'Chiqish';
   static const viewAll = "Barchasini ko'rish";
   static const marketplace = 'Marketplace';
@@ -128,7 +176,7 @@ abstract final class CabinetTexts {
   };
 
   // ── mening buyurtmalarim ──────────────────────────────────────────────────
-  static const noOrders = "Hech qanday buyurtma yo'q";
+  static const noOrders = "Hozircha buyurtmalar yo'q";
 
   /// `cabinet.orderStatus.*`
   static String orderStatusLabel(String status) => switch (status) {

@@ -276,7 +276,7 @@ class _CabinetServicesState extends State<CabinetServices> {
     final agreed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        content: Text('"${pkg.title}" — paketni o\'chirmoqchimisiz?'),
+        content: const Text(CabinetTexts.servicesConfirmDelete),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
