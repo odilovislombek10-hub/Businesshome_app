@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -155,6 +156,10 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
   Widget _body(ProjectDetail project) {
     final settings = project.settings;
     return ListView(
+      // 3D viewer must preload in the background as soon as the page opens, like the site.
+      // A ListView does not paint children outside the viewport, and Chromium then treats the
+      // WebView as invisible and throttles it — so the cache extent is widened.
+      scrollCacheExtent: const ScrollCacheExtent.pixels(4000),
       controller: _scroll,
       padding: EdgeInsets.zero,
       children: [
@@ -1133,7 +1138,21 @@ class _Viewer3dSectionState extends State<_Viewer3dSection> {
 
     if (_controller.platform case final AndroidWebViewController android) {
       android.setMediaPlaybackRequiresUserGesture(false);
+      // Saytdagi iframe `allow="... microphone ..."` bilan ochiladi; WebView'da ruxsat
+      // so'rovi qo'lda javob berilmasa rad etiladi.
+      android.setOnPlatformPermissionRequest((request) => request.grant());
     }
+
+    // Saytda token o'zgarsa (kirish/chiqish) iframe'ga yangi auth yuboriladi.
+    _auth = context.read<AuthService>()..addListener(_sendAuth);
+  }
+
+  AuthService? _auth;
+
+  @override
+  void dispose() {
+    _auth?.removeListener(_sendAuth);
+    super.dispose();
   }
 
   /// Saytda 3D ko'ruvchi ota oynaga `postMessage` yuboradi. WebView ichida
@@ -1147,6 +1166,10 @@ class _Viewer3dSectionState extends State<_Viewer3dSection> {
           window.addEventListener('message', function (e) {
             var d = e && e.data;
             if (!d || typeof d !== 'object' || !d.type) return;
+            // Saytdagidek: auth xabarlari faqat ko'ruvchining o'z origin'idan qabul
+            // qilinadi. `bh.exit3d` esa ko'ruvchining o'zidan keladi (origin bo'sh
+            // bo'lishi mumkin), shuning uchun undan oldin tekshiriladi.
+            if (d.type !== 'bh.exit3d' && e.origin && e.origin !== location.origin) return;
             try { BHViewer.postMessage(JSON.stringify(d)); } catch (err) {}
           });
         }
@@ -1230,9 +1253,12 @@ class _Viewer3dSectionState extends State<_Viewer3dSection> {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              // Yuklanayotgan ko'ruvchi poster ostida turadi.
-              if (!_movedToFullscreen)
-                Opacity(opacity: 0, child: WebViewWidget(controller: _controller)),
+              // Ko'ruvchi poster **ostida** turadi. Diqqat: `Opacity(0)` bilan o'ralsa
+              // Flutter platforma ko'rinishini umuman chizmaydi, Chromium esa uni
+              // "ko'rinmayapti" deb hisoblab `requestAnimationFrame` ni to'xtatadi —
+              // natijada 3D fon rejimida yuklanmay, 0% da qotib turadi. Saytda iframe
+              // `opacity-0` bo'lsa ham brauzer uni chizadi, shuning uchun preload ketadi.
+              if (!_movedToFullscreen) WebViewWidget(controller: _controller),
               IgnorePointer(
                 child: poster == null || poster.isEmpty
                     ? const ColoredBox(color: AppColors.dark)

@@ -46,3 +46,10 @@ app.*.map.json
 
 # Gradle hisobotlari
 android/build/
+
+# Vaqtinchalik yuklab olingan fayllar va boshqa asboblarning holati
+/.claude-flow/
+/.claude/proven-config.json
+/.claude/.proven-config-version
+*.js
+!tool/*.js
