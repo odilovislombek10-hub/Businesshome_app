@@ -72,6 +72,7 @@ dependencies:
   # Saytdagi "Mening joylashuvim" tugmasi brauzer geolokatsiyasini so'raydi —
   # ilovada shu paket (ruxsat + koordinata).
   geolocator: ^14.0.2
+  webview_flutter_wkwebview: ^3.26.1
 
 dev_dependencies:
   flutter_test:

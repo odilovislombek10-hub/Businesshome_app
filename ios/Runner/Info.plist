@@ -2,6 +2,23 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<!-- Ruxsat matnlari. Apple izohsiz ruxsat so'rashni rad etadi (Guideline 5.1.1),
+	     izohsiz so'ralsa ilova yiqiladi. -->
+	<key>NSCameraUsageDescription</key>
+	<string>E'lon uchun rasm va video suratga olish, hujjatlarni skanerlash hamda sotuvchi bilan video aloqa uchun kamera kerak.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>3D ko'ruvchida sotuvchi bilan jonli suhbatlashish va videoli e'lon yozish uchun mikrofon kerak.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>E'lon va profilga rasm hamda video qo'shish uchun galereyaga ruxsat kerak.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Yuklab olingan chek va shartnomalarni galereyaga saqlash uchun ruxsat kerak.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Xaritada o'zingizni ko'rsatish va yaqin atrofdagi mulklarni topish uchun joylashuv kerak.</string>
+	<key>NSDocumentsFolderUsageDescription</key>
+	<string>Buyurtmaga hujjat biriktirish uchun fayllarga ruxsat kerak.</string>
+	<!-- Shifrlash bo'yicha savol har yuklashda so'ralmasligi uchun (faqat standart HTTPS). -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>

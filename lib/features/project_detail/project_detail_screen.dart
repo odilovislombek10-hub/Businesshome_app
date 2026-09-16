@@ -11,6 +11,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
+import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 
 import '../../app/theme.dart';
 import '../../core/api/api_client.dart';
@@ -1119,7 +1120,18 @@ class _Viewer3dSectionState extends State<_Viewer3dSection> {
   @override
   void initState() {
     super.initState();
-    _controller = WebViewController()
+    // iOS'da WKWebView video'ni sukut bo'yicha **tizim pleyerida** to'liq ekranda ochadi —
+    // sahifadagi `playsinline` atributi `allowsInlineMediaPlayback` yoqilmasa e'tiborga
+    // olinmaydi. 3D ichidagi o'tish videolari shu sababli pleyerga sakrab chiqardi.
+    // `mediaTypesRequiringUserAction` bo'sh — Android'dagi
+    // `setMediaPlaybackRequiresUserGesture(false)` ning o'rni.
+    final params = WebViewPlatform.instance is WebKitWebViewPlatform
+        ? WebKitWebViewControllerCreationParams(
+            allowsInlineMediaPlayback: true,
+            mediaTypesRequiringUserAction: const <PlaybackMediaTypes>{},
+          )
+        : const PlatformWebViewControllerCreationParams();
+    _controller = WebViewController.fromPlatformCreationParams(params)
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(AppColors.dark)
       // 3D ichidagi o'tish videolari brauzerdagi kabi o'zi o'ynashi kerak.
