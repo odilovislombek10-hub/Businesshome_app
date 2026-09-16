@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/ads/ads_screen.dart';
@@ -40,7 +41,12 @@ import '../shared/widgets/placeholder_screen.dart';
 /// page draws the header itself (see `SiteHeader`). There is no persistent shell to nest into.
 /// Order matters — `/:developerCode/:projectCode` is two bare segments, so it goes last or it
 /// swallows every other two-segment path.
+/// Suzuvchi "Aziza" tugmasi `MaterialApp.builder` ichida — ya'ni Navigator'dan **yuqorida**
+/// turadi. Modal oyna ochish uchun unga pastdagi navigator kerak.
+final rootNavigatorKey = GlobalKey<NavigatorState>();
+
 final appRouter = GoRouter(
+  navigatorKey: rootNavigatorKey,
   initialLocation: '/',
   routes: [
     GoRoute(path: '/', builder: (_, _) => const HomeScreen()),

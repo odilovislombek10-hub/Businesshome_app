@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../api/api_client.dart';
+import 'language_service.dart';
 
 /// One turn of the conversation with Aziza.
 class ChatMessage {
@@ -13,7 +14,9 @@ class ChatMessage {
 
   bool get isUser => role == 'user';
 
-  Map<String, dynamic> toJson() => {'role': role, 'content': text};
+  /// Backend `ChatMessage(role, text)` kutadi — `content` emas
+  /// (`market_ai_router.py`: `messages[].text` majburiy).
+  Map<String, dynamic> toJson() => {'role': role, 'text': text};
 }
 
 /// Port of the site's `AiChatService` — the assistant behind the floating button.
@@ -62,7 +65,8 @@ class AiChatService extends ChangeNotifier {
         '/market/ai/chat',
         data: {
           'messages': [for (final m in _messages) m.toJson()],
-          'lang': 'uz',
+          // Til tanlovi bo'yicha javob bersin.
+          'lang': LanguageService.instance.code,
         },
         headers: {'X-Anon-Key': await _anonKey()},
       );

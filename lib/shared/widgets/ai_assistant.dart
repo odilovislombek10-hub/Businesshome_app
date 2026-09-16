@@ -1,6 +1,7 @@
 import '../../core/i18n/translate.dart';
 import 'package:flutter/material.dart';
 
+import '../../app/router.dart';
 import '../../app/theme.dart';
 import '../../core/services/ai_chat_service.dart';
 import 'entrance.dart';
@@ -39,12 +40,20 @@ class _AiAssistantState extends State<AiAssistant> {
 
   void _open() {
     setState(() => _showHint = false);
+    // Tugma `MaterialApp.builder` ichida, ya'ni Navigator'dan yuqorida chiziladi — o'z
+    // konteksti bilan modal oyna ochilmaydi (Navigator topilmaydi, oyna jim ochilmay qoladi).
+    // Shuning uchun router'ning navigatoridan foydalanamiz.
+    final navigator = rootNavigatorKey.currentContext;
+    if (navigator == null) return;
+    // Saytda suhbat ochilganda tugma yashiriladi (`@if (!ai.open())`), aks holda u
+    // oynaning kirish maydonini to'sib qoladi.
+    AiAssistant.hidden.value++;
     showModalBottomSheet<void>(
-      context: context,
+      context: navigator,
       isScrollControlled: true,
       useSafeArea: true,
       builder: (_) => const _ChatSheet(),
-    );
+    ).whenComplete(() => AiAssistant.hidden.value--);
   }
 
   @override
