@@ -1232,10 +1232,119 @@ class _Viewer3dSectionState extends State<_Viewer3dSection> {
 
   Future<void> _open() async {
     setState(() => _movedToFullscreen = true);
+    await _applySafeArea(true);
+    if (!mounted) return;
     await Navigator.of(
       context,
     ).push(MaterialPageRoute<void>(builder: (_) => _Viewer3dPage(controller: _controller)));
+    await _applySafeArea(false);
     if (mounted) setState(() => _movedToFullscreen = false);
+  }
+
+  /// Ko'ruvchi notch/Dynamic Island dan qochish uchun `env(safe-area-inset-*)` ga tayanadi
+  /// (`3d/src/styles.css` dagi `.notch-safe-*` klasslari va shablonlardagi inline uslublar).
+  /// Brauzerda bu qiymatlarni tizim beradi, WebView ichida esa **nol** bo'lib qoladi —
+  /// natijada yuqoridagi tugmalar holat qatorining ustiga chiqib ketadi.
+  ///
+  /// Shuning uchun Flutter'dan olingan haqiqiy o'lchamlar ko'ruvchiga uzatiladi:
+  /// 1. `env(...)` ishlatadigan barcha qoidalar piksel qiymati bilan qayta yoziladi;
+  /// 2. o'ng yuqoridagi boshqaruv guruhi (`data-tour="zoom-controls"`) alohida — u to'liq
+  ///    ekran rejimida bo'lmaganda umuman `env()` ishlatmaydi, `top-4` (16px) bilan turadi;
+  /// 3. inline uslublardagi `env(...)` ham almashtiriladi (Angular ularni qayta qo'ysa,
+  ///    `MutationObserver` yana tuzatadi).
+  Future<void> _applySafeArea(bool fullscreen) async {
+    if (!mounted) return;
+    final padding = MediaQuery.viewPaddingOf(context);
+    final top = fullscreen ? padding.top.round() : 0;
+    final bottom = fullscreen ? padding.bottom.round() : 0;
+    final left = fullscreen ? padding.left.round() : 0;
+    final right = fullscreen ? padding.right.round() : 0;
+    final args = jsonEncode({'t': top, 'b': bottom, 'l': left, 'r': right});
+    try {
+      await _controller.runJavaScript('''
+        (function (i) {
+          var STATE = window.__bhSafe || (window.__bhSafe = {});
+          STATE.i = i;
+
+          function px(text) {
+            return String(text)
+              .replace(/env\\(\\s*safe-area-inset-top[^)]*\\)/g, i.t + 'px')
+              .replace(/env\\(\\s*safe-area-inset-bottom[^)]*\\)/g, i.b + 'px')
+              .replace(/env\\(\\s*safe-area-inset-left[^)]*\\)/g, i.l + 'px')
+              .replace(/env\\(\\s*safe-area-inset-right[^)]*\\)/g, i.r + 'px');
+          }
+
+          // 1-2. Uslublar jadvalidagi qoidalar.
+          function collect(rules, media, out) {
+            for (var k = 0; k < rules.length; k++) {
+              var rule = rules[k];
+              if (rule.cssRules && rule.conditionText !== undefined) {
+                collect(rule.cssRules, media ? media + ' and ' + rule.conditionText
+                                             : rule.conditionText, out);
+                continue;
+              }
+              if (!rule.selectorText || !rule.cssText) continue;
+              if (rule.cssText.indexOf('safe-area-inset') < 0) continue;
+              var decls = '';
+              for (var d = 0; d < rule.style.length; d++) {
+                var name = rule.style[d];
+                var value = rule.style.getPropertyValue(name);
+                if (value.indexOf('safe-area-inset') < 0) continue;
+                decls += name + ':' + px(value) + ' !important;';
+              }
+              if (!decls) continue;
+              var text = rule.selectorText + '{' + decls + '}';
+              out.push(media ? '@media ' + media + '{' + text + '}' : text);
+            }
+          }
+
+          var css = [];
+          for (var n = 0; n < document.styleSheets.length; n++) {
+            var sheet = document.styleSheets[n], rules;
+            try { rules = sheet.cssRules; } catch (e) { continue; }
+            if (rules) collect(rules, '', css);
+          }
+          // O'ng yuqoridagi guruh: to'liq ekran rejimida bo'lmagani uchun `top-4` bilan
+          // turadi va `env()` ni umuman o'qimaydi.
+          if (i.t > 0) {
+            css.push('[data-tour="zoom-controls"]{top:calc(1rem + ' + i.t + 'px)!important;}');
+            css.push('@media (orientation: landscape){[data-tour="zoom-controls"]' +
+                     '{top:calc(6px + ' + i.t + 'px)!important;}}');
+          }
+
+          var el = document.getElementById('bh-safe-area');
+          if (!el) {
+            el = document.createElement('style');
+            el.id = 'bh-safe-area';
+            document.head.appendChild(el);
+          }
+          el.textContent = i.t || i.b || i.l || i.r ? css.join('\\n') : '';
+
+          // 3. Inline uslublar.
+          function fixInline() {
+            var nodes = document.querySelectorAll('[style*="safe-area-inset"]');
+            for (var m = 0; m < nodes.length; m++) {
+              var node = nodes[m];
+              var raw = node.getAttribute('style');
+              if (!raw) continue;
+              if (!node.__bhRaw) node.__bhRaw = raw;
+              node.setAttribute('style', px(node.__bhRaw));
+            }
+          }
+          fixInline();
+          if (!STATE.observer) {
+            STATE.observer = new MutationObserver(function () {
+              if (STATE.timer) return;
+              STATE.timer = setTimeout(function () { STATE.timer = null; fixInline(); }, 150);
+            });
+            STATE.observer.observe(document.documentElement,
+              { subtree: true, childList: true, attributes: true, attributeFilter: ['style'] });
+          }
+        })($args);
+      ''');
+    } catch (_) {
+      // Sahifa hali tayyor bo'lmasa — keyingi ochilishda qayta qo'yiladi.
+    }
   }
 
   @override
