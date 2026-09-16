@@ -51,5 +51,8 @@ android/build/
 /.claude-flow/
 /.claude/proven-config.json
 /.claude/.proven-config-version
-*.js
-!tool/*.js
+# 3D ko'ruvchini tekshirishda yuklab olingan nusxalar
+/c1.js
+/c2.js
+/v3d.html
+/v3dmain.js
