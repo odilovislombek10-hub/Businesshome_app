@@ -122,6 +122,23 @@ class Viewer3dSectionState extends State<Viewer3dSection> {
     if (_controller.platform case final AndroidWebViewController android) {
       android.setMediaPlaybackRequiresUserGesture(false);
       android.setOnPlatformPermissionRequest(_onPermissionRequest);
+      // 2026-09-17 dan beri ko'ruvchi iframe'siz ochilganda joylashuvni o'zi so'raydi
+      // (`viewer.component.ts`: `navigator.geolocation.getCurrentPosition`). Android
+      // WebView'da bu so'rov ilova javob bermasa rad etiladi — shuning uchun tizim
+      // ruxsatini tekshirib, bor bo'lsa ruxsat beramiz.
+      android.setGeolocationPermissionsPromptCallbacks(
+        onShowPrompt: (request) async {
+          // Ko'ruvchi joylashuvni ishga tushishida so'raydi — bu fon rejimida ham
+          // bo'lishi mumkin. Fon rejimida tizim oynasini chiqarmaymiz: ruxsat
+          // allaqachon berilgan bo'lsa beramiz, aks holda rad etamiz. To'liq ekranda
+          // esa so'raymiz.
+          var status = await Permission.locationWhenInUse.status;
+          if (!status.isGranted && _movedToFullscreen) {
+            status = await Permission.locationWhenInUse.request();
+          }
+          return GeolocationPermissionsResponse(allow: status.isGranted, retain: true);
+        },
+      );
     }
 
     if (_controller.platform case final WebKitWebViewController webkit) {

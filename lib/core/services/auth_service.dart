@@ -1,3 +1,5 @@
+import 'package:permission_handler/permission_handler.dart';
+import 'package:geolocator/geolocator.dart';
 import 'dart:async';
 import 'dart:convert';
 
@@ -191,9 +193,46 @@ class AuthService extends ChangeNotifier {
         // Quruvchi rolida kompaniya yuridik ma'lumoti ham ketadi — backend uni
         // `developers` jadvaliga `is_approved=false` bilan yozadi.
         if (role == MarketRole.developer && developer != null) 'developer': developer,
+        // 2026-09-17: saytda ro'yxatdan o'tishda brauzerdan GPS va mikrofon ruxsati
+        // so'raladi va profilga saqlanadi — keyin 3D ko'ruvchi qayta so'ramaydi
+        // (`market_auth_schema.py`: `gps_lat`, `gps_lng`, `mic_permission_granted`).
+        ...await _permissionFields(),
       },
     );
     return _acceptAuth(res);
+  }
+
+  /// Ro'yxatdan o'tishda yuboriladigan GPS va mikrofon ruxsati.
+  ///
+  /// Saytda bu brauzer oynalari orqali so'raladi; ilovada tizim oynalari. Rad etilsa yoki
+  /// vaqt o'tsa — maydonlar umuman yuborilmaydi (backendda hammasi ixtiyoriy).
+  Future<Map<String, dynamic>> _permissionFields() async {
+    final fields = <String, dynamic>{};
+    try {
+      final mic = await Permission.microphone.request();
+      fields['mic_permission_granted'] = mic.isGranted;
+    } catch (_) {
+      // Ruxsat so'rab bo'lmasa — jim o'tamiz.
+    }
+    try {
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.always || permission == LocationPermission.whileInUse) {
+        final position = await Geolocator.getCurrentPosition(
+          locationSettings: const LocationSettings(
+            accuracy: LocationAccuracy.low,
+            timeLimit: Duration(seconds: 10),
+          ),
+        );
+        fields['gps_lat'] = position.latitude;
+        fields['gps_lng'] = position.longitude;
+      }
+    } catch (_) {
+      // Joylashuv olinmasa ham ro'yxatdan o'tish davom etadi.
+    }
+    return fields;
   }
 
   /// Set a new password after a `purpose: 'reset'` code has been issued.
