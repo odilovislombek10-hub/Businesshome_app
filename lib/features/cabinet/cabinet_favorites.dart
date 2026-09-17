@@ -6,6 +6,7 @@ import '../../shared/widgets/app_image.dart';
 import '../../app/theme.dart';
 import '../../core/utils/format.dart';
 import '../../shared/widgets/entrance.dart';
+import '../../shared/widgets/viewer_3d.dart';
 import '../../shared/widgets/site_icon.dart';
 import 'cabinet_repository.dart';
 import 'cabinet_texts.dart';
@@ -207,6 +208,25 @@ class _FavoriteCard extends StatelessWidget {
     return Pressable(
       scale: 0.99,
       onTap: () {
+        // Saytdagi `onFavoriteCardClick()`: 3D kvartira bosilganda loyiha sahifasiga emas,
+        // to'g'ridan-to'g'ri ko'ruvchiga o'tiladi — u o'sha kvartira turgan nuqtaga boradi
+        // va kvartirani tanlangan holatda ochadi (`?apartment=<id>`).
+        final meta = item.metadata;
+        if (item.source == 'viewer-apartment' && meta != null) {
+          final developer = meta['dev_code']?.toString();
+          final project = meta['project_code']?.toString();
+          if (developer != null && project != null) {
+            openViewer3d(
+              context,
+              viewer3dUrl(
+                developerCode: developer,
+                projectCode: project,
+                apartmentId: item.propertyId,
+              ),
+            );
+            return;
+          }
+        }
         final route = item.detailRoute;
         if (route != null) context.push(route);
       },
