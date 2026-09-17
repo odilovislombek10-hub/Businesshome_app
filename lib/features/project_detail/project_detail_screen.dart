@@ -1143,6 +1143,7 @@ class _Viewer3dSectionState extends State<_Viewer3dSection> {
           onPageFinished: (_) {
             if (mounted) setState(() => _ready = true);
             _installBridge();
+            _installVideoPosterFix();
             _sendAuth();
           },
         ),
@@ -1217,6 +1218,40 @@ class _Viewer3dSectionState extends State<_Viewer3dSection> {
         }
       ''');
     } catch (_) {}
+  }
+
+  /// Android WebView `<video>` da kadr ham, `poster` ham bo'lmasa **o'z o'rinbosarini**
+  /// chizadi — kulrang fon va katta "play" uchburchagi. 3D ichida video manzili bir zumga
+  /// keyin qo'yilgani uchun har bir 360 o'tishida va loop videoda o'sha o'rinbosar yonib
+  /// o'tadi. Brauzerda ham shunday bo'ladi, faqat u yerda ko'zga tashlanmaydi.
+  ///
+  /// Yechim: har bir videoga 1×1 shaffof `poster` beriladi — bunda WebView o'z o'rinbosarini
+  /// chizmaydi, ortidagi qatlam (kadr surati) ko'rinib turaveradi.
+  Future<void> _installVideoPosterFix() async {
+    try {
+      await _controller.runJavaScript('''
+        (function () {
+          if (window.__bhVideoPoster) return;
+          window.__bhVideoPoster = true;
+          var BLANK = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAAB'
+                    + 'AAEAAAIBRAA7';
+          function fix() {
+            var list = document.getElementsByTagName('video');
+            for (var i = 0; i < list.length; i++) {
+              if (!list[i].getAttribute('poster')) list[i].setAttribute('poster', BLANK);
+            }
+          }
+          fix();
+          var timer = null;
+          new MutationObserver(function () {
+            if (timer) return;
+            timer = setTimeout(function () { timer = null; fix(); }, 100);
+          }).observe(document.documentElement, { subtree: true, childList: true });
+        })();
+      ''');
+    } catch (_) {
+      // Sahifa tayyor bo'lmasa — keyingi yuklanishda qayta qo'yiladi.
+    }
   }
 
   void _onViewerMessage(JavaScriptMessage message) {
