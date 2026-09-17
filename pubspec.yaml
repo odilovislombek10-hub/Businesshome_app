@@ -75,6 +75,7 @@ dependencies:
   webview_flutter_wkwebview: ^3.26.1
   # 13.x compileSdk 37 ni talab qiladi; loyiha 36 da (Play uchun yetarli).
   permission_handler: ^12.0.0
+  package_info_plus: ^9.0.1
 
 dev_dependencies:
   flutter_test:

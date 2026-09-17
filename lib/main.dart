@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'app/app.dart';
+import 'core/services/app_usage_service.dart';
 import 'core/services/auth_service.dart';
 import 'core/services/currency_service.dart';
 import 'core/services/language_service.dart';
@@ -31,6 +32,10 @@ Future<void> main() async {
   // catalogue is browsable signed-out. Screens that care listen to AuthService instead.
   final authService = AuthService();
   unawaited(authService.restore());
+
+  // Ilovadan foydalanish belgisi (admin paneldagi "nechta odam ishlatyapti" uchun).
+  // Kutilmaydi va xatosi yutiladi — ko'rsatkich ilovaning ishiga ta'sir qilmaydi.
+  unawaited(AppUsageService.instance.ping());
 
   // Currency preference and the USD rate — prices render in UZS until the rate arrives.
   unawaited(CurrencyService.instance.load());
