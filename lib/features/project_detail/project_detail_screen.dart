@@ -1144,6 +1144,16 @@ class _Viewer3dSectionState extends State<_Viewer3dSection> {
             if (mounted) setState(() => _ready = true);
             _installBridge();
             _installVideoPosterFix();
+            // Ko'ruvchi o'zini qayta yuklashi mumkin (uning `version.json` ni kuzatuvchi
+            // skripti yangi versiyada keshni tozalab `location.reload()` qiladi). Bunda
+            // sahifaga qo'yilgan uslub yo'qoladi — shuning uchun har yuklanishda qayta
+            // qo'yiladi, aks holda tugmalar yana holat qatori ostiga tushib qoladi.
+            _applySafeArea(_movedToFullscreen);
+            // Uslublar jadvali `onPageFinished` paytida hali to'liq o'qilmagan bo'lishi
+            // mumkin — bir oz keyin yana bir marta qo'yiladi.
+            Future.delayed(const Duration(milliseconds: 1500), () {
+              if (mounted) _applySafeArea(_movedToFullscreen);
+            });
             _sendAuth();
           },
         ),
