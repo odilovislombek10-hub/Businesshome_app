@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
@@ -1150,9 +1151,11 @@ class _Viewer3dSectionState extends State<_Viewer3dSection> {
 
     if (_controller.platform case final AndroidWebViewController android) {
       android.setMediaPlaybackRequiresUserGesture(false);
-      // Saytdagi iframe `allow="... microphone ..."` bilan ochiladi; WebView'da ruxsat
-      // so'rovi qo'lda javob berilmasa rad etiladi.
-      android.setOnPlatformPermissionRequest((request) => request.grant());
+      android.setOnPlatformPermissionRequest(_onPermissionRequest);
+    }
+
+    if (_controller.platform case final WebKitWebViewController webkit) {
+      webkit.setOnPlatformPermissionRequest(_onPermissionRequest);
     }
 
     // Saytda token o'zgarsa (kirish/chiqish) iframe'ga yangi auth yuboriladi.
@@ -1165,6 +1168,33 @@ class _Viewer3dSectionState extends State<_Viewer3dSection> {
   void dispose() {
     _auth?.removeListener(_sendAuth);
     super.dispose();
+  }
+
+  /// Saytdagi iframe `allow="... microphone; ..."` bilan ochiladi — 3D ichida sotuvchi bilan
+  /// jonli suhbat shu orqali ishlaydi.
+  ///
+  /// Diqqat: WebView'ga ruxsat berish **yetarli emas** — Android 6 dan beri ilovaning o'zi
+  /// tizimdan ruxsat olgan bo'lishi kerak, aks holda `getUserMedia` baribir yiqiladi
+  /// (manifestdagi e'lon faqat so'rash huquqini beradi). Shuning uchun avval tizimdan
+  /// so'raymiz va faqat berilgandan keyin tasdiqlaymiz. iOS'da tizim o'z oynasini
+  /// ko'rsatadi, `permission_handler` esa holatni bir xil qilib beradi.
+  Future<void> _onPermissionRequest(PlatformWebViewPermissionRequest request) async {
+    final needed = <Permission>{};
+    for (final type in request.types) {
+      if (type == WebViewPermissionResourceType.microphone) needed.add(Permission.microphone);
+      if (type == WebViewPermissionResourceType.camera) needed.add(Permission.camera);
+    }
+    if (needed.isEmpty) {
+      // Masalan `protectedMediaId` — tizim ruxsati talab qilinmaydi.
+      await request.grant();
+      return;
+    }
+    final statuses = await needed.toList().request();
+    if (statuses.values.every((status) => status.isGranted)) {
+      await request.grant();
+    } else {
+      await request.deny();
+    }
   }
 
   /// Saytda 3D ko'ruvchi ota oynaga `postMessage` yuboradi. WebView ichida
