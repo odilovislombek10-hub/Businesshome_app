@@ -76,6 +76,8 @@ dependencies:
   # 13.x compileSdk 37 ni talab qiladi; loyiha 36 da (Play uchun yetarli).
   permission_handler: ^12.0.0
   package_info_plus: ^9.0.1
+  image_picker_android: ^0.8.13+23
+  image_picker_platform_interface: ^2.11.1
 
 dev_dependencies:
   flutter_test:

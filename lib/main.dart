@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
+import 'package:image_picker_android/image_picker_android.dart';
 
 import 'app/app.dart';
 import 'core/services/app_usage_service.dart';
@@ -11,6 +13,16 @@ import 'core/services/theme_controller.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Android 13+ dagi tizim "Photo Picker" — galereyaga to'liq ruxsat
+  // (`READ_MEDIA_IMAGES`/`READ_MEDIA_VIDEO`) so'ramasdan rasm tanlash imkonini beradi.
+  // Play'ning "Photo and Video Permissions" siyosati bo'yicha keng ruxsat so'ragan ilova
+  // rad etiladi — bh_apps aynan shu sabab qaytarilgan edi. Bu faqat Android'ga tegishli,
+  // iOS'da o'z tanlagichi ishlaydi.
+  final picker = ImagePickerPlatform.instance;
+  if (picker is ImagePickerAndroid) {
+    picker.useAndroidPhotoPicker = true;
+  }
 
   // Dekodlangan rasmlar xotirasi. Sukut bo'yicha 100 MB / 1000 ta rasm; ro'yxatni pastga surib
   // qaytganda kartalar keshdan chiqib ketib, rasm qaytadan dekodlanardi va bu "qaytadan
